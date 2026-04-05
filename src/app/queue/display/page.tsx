@@ -107,36 +107,36 @@ export default function QueueDisplayPage() {
       </header>
 
       {/* Main: Now Serving + Next */}
-      <div className="flex flex-1 gap-6 p-8">
+      <div className="flex flex-1 gap-4 p-6">
 
-        {/* Now Serving — large */}
+        {/* Now Serving — maximum size */}
         <div onClick={!soundEnabled ? enableSound : undefined}
-          className={`flex flex-1 flex-col items-center justify-center rounded-3xl p-12 cursor-pointer transition-all ${
+          className={`flex flex-1 flex-col items-center justify-center rounded-3xl p-8 cursor-pointer transition-all ${
             activeToken
               ? "border-2 border-white/20 bg-white/5"
               : "border-2 border-dashed border-white/10"
           }`}>
-          <p className="text-base font-bold uppercase tracking-[0.4em] text-white/50 mb-4">
+          <p className="text-xl font-bold uppercase tracking-[0.5em] text-white/50 mb-2">
             Now Serving
           </p>
           <p className={`font-black leading-none tracking-tight drop-shadow-2xl transition-all ${
-            activeToken ? "text-[11rem] text-white" : "text-[8rem] text-white/20"
+            activeToken ? "text-[16rem] text-white" : "text-[10rem] text-white/20"
           }`}>
             {activeToken ? `#${activeToken.displayNumber}` : "---"}
           </p>
           {activeToken && (
-            <div className="mt-6 text-center">
-              <p className="text-3xl font-semibold text-white/90">{activeToken.patientName}</p>
-              <p className="mt-2 text-lg text-white/50">{activeToken.purpose}</p>
+            <div className="mt-4 text-center">
+              <p className="text-4xl font-bold text-white/90">{activeToken.patientName}</p>
+              <p className="mt-2 text-xl text-white/50">{activeToken.purpose}</p>
             </div>
           )}
           {!activeToken && (
-            <p className="text-xl text-white/30 mt-4">Waiting to call next patient</p>
+            <p className="text-2xl text-white/30 mt-4">Waiting to call next patient</p>
           )}
         </div>
 
         {/* Right panel: Next + Waiting */}
-        <div className="w-80 shrink-0 flex flex-col gap-4">
+        <div className="w-72 shrink-0 flex flex-col gap-4">
 
           {/* Next up — prominent */}
           <div className={`rounded-2xl border p-5 text-center ${
@@ -144,13 +144,13 @@ export default function QueueDisplayPage() {
               ? "border-amber-500/40 bg-amber-500/10"
               : "border-white/10 bg-white/5"
           }`}>
-            <p className="text-xs font-bold uppercase tracking-widest text-white/40 mb-2">Next</p>
+            <p className="text-sm font-bold uppercase tracking-widest text-white/40 mb-2">Next Up</p>
             {nextToken ? (
               <>
-                <p className="text-6xl font-black text-amber-400">#{nextToken.displayNumber}</p>
-                <p className="text-base font-medium text-white/80 mt-2">{nextToken.patientName}</p>
-                <p className="text-xs text-white/40 mt-1">{nextToken.purpose}</p>
-                <p className="text-xs text-amber-400/70 mt-2 font-medium">Please be ready</p>
+                <p className="text-7xl font-black text-amber-400">#{nextToken.displayNumber}</p>
+                <p className="text-lg font-semibold text-white/80 mt-2">{nextToken.patientName}</p>
+                <p className="text-sm text-white/40 mt-1">{nextToken.purpose}</p>
+                <p className="text-sm text-amber-400/70 mt-3 font-bold tracking-wide">⚡ PLEASE BE READY</p>
               </>
             ) : (
               <p className="text-white/30 text-sm py-4">No one waiting</p>
