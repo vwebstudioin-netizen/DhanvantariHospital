@@ -79,6 +79,7 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
     );
   }
 
+  // Admin gets all desk links; pharmacist gets billing only; receptionist gets full desk
   const sidebarLinks = (isPharmacist && !isAdmin) ? PHARMACIST_LINKS : RECEPTIONIST_LINKS;
   const roleLabel = isPharmacist && !isAdmin ? "Pharmacy" : isAdmin ? "Admin" : "Reception";
 
@@ -126,7 +127,13 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        <div className="p-2 border-t border-white/5">
+        <div className="p-2 border-t border-white/5 space-y-0.5">
+          {isAdmin && (
+            <Link href="/admin" className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-sm text-white/40 hover:bg-white/5 hover:text-white transition-colors">
+              <LayoutDashboard className="w-4 h-4" />
+              ← Admin Panel
+            </Link>
+          )}
           <button
             onClick={handleSignOut}
             className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-sm text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-colors"
