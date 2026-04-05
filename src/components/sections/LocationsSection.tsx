@@ -8,12 +8,12 @@ export default function LocationsSection() {
     <section className="px-4 py-16 md:py-20">
       <div className="mx-auto max-w-7xl">
         <SectionHeader
-          badge="Our Locations"
-          title="3 Convenient Locations"
-          subtitle="Visit us at any of our modern facilities across Springfield for comprehensive healthcare services."
+          badge="Find Us"
+          title="Our Location"
+          subtitle="Emergency treatment available 24 hours. Visit Dhanvantari Hospital for comprehensive multi-specialty care."
         />
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-1 max-w-2xl mx-auto">
           {locations.map((loc) => (
             <Link
               key={loc.slug}
@@ -24,7 +24,7 @@ export default function LocationsSection() {
                 <MapPin className="h-6 w-6" />
               </div>
               <h3 className="mb-2 text-lg font-semibold text-foreground group-hover:text-primary">
-                {loc.name.replace("Dhanvantari Hospital — ", "")}
+                {loc.name}
               </h3>
               <div className="space-y-2 text-sm text-muted-foreground">
                 <p className="flex items-center gap-2">

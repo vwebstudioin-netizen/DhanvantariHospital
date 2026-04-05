@@ -1,11 +1,11 @@
 import SectionHeader from "@/components/shared/SectionHeader";
-import { Award, Users, Building2, Calendar } from "lucide-react";
+import { Award, Users, Stethoscope, Clock } from "lucide-react";
 
 const stats = [
   { icon: Users, value: "10,000+", label: "Patients Served" },
-  { icon: Award, value: "30+", label: "Expert Specialists" },
-  { icon: Building2, value: "3", label: "Locations" },
-  { icon: Calendar, value: "10", label: "Departments" },
+  { icon: Award, value: "8+", label: "Specialists" },
+  { icon: Stethoscope, value: "8", label: "Departments" },
+  { icon: Clock, value: "24/7", label: "Emergency Care" },
 ];
 
 export default function StatsSection() {
