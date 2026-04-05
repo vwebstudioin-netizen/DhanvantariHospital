@@ -1,21 +1,30 @@
 import type { Timestamp } from "firebase/firestore";
 
+export type CardType = "room" | "visit";
+
 export interface InPatientCard {
   id: string;
-  cardNumber: string;       // IPD-0001, IPD-0002...
-  patientId: string;        // PAT-XXXX auto-generated
+  type: CardType;              // "room" = admitted in-patient | "visit" = OPD visit card
+  cardNumber: string;          // IPD-0001 (room) or OPD-0001 (visit)
+  patientId: string;           // PAT-XXXX auto-generated
   patientName: string;
   patientPhone: string;
   doctorName: string;
-  ward: string;             // General Ward, ICU, Private Room, etc.
-  roomNumber: string;
-  admissionDate: string;    // ISO date string
-  expiryDate: string;       // admissionDate + 14 days
+
+  // Room card specific
+  ward?: string;               // General Ward, ICU, Private Room, etc.
+  roomNumber?: string;
+  bedNumber?: string;
+
+  // Visit card specific
+  expiryDate?: string;         // admissionDate + 14 days (visit cards only)
+
+  admissionDate: string;       // ISO date — admission or visit date
   diagnosis: string;
   notes?: string;
-  isActive: boolean;        // false when discharged
+  isActive: boolean;           // false when discharged (room) or expired/closed (visit)
   dischargedAt?: Timestamp;
-  issuedBy: string;         // desk staff name
+  issuedBy: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

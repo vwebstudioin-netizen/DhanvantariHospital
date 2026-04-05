@@ -1,33 +1,29 @@
 import {
-  collection,
-  addDoc,
-  getDocs,
-  getDoc,
-  doc,
-  updateDoc,
-  query,
-  where,
-  orderBy,
-  Timestamp,
-  runTransaction,
+  collection, addDoc, getDocs, getDoc, doc,
+  updateDoc, query, where, orderBy, Timestamp, runTransaction, setDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { InPatientCard } from "@/types/inpatient";
+import type { InPatientCard, CardType } from "@/types/inpatient";
 import { addDays, format } from "date-fns";
 
 const CARDS = "inpatientCards";
 const COUNTERS = "counters";
 
 function generatePatientId(): string {
-  const rand = Math.floor(1000 + Math.random() * 9000);
-  return `PAT-${rand}`;
+  return `PAT-${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
 export async function createInPatientCard(
-  data: Omit<InPatientCard, "id" | "cardNumber" | "patientId" | "expiryDate" | "isActive" | "createdAt" | "updatedAt">
+  data: Omit<InPatientCard, "id" | "cardNumber" | "patientId" | "isActive" | "createdAt" | "updatedAt">
 ): Promise<{ id: string; cardNumber: string; patientId: string }> {
-  const counterRef = doc(db, COUNTERS, "inpatientCards");
-  let cardNumber = "IPD-0001";
+  const type: CardType = data.type || "room";
+
+  // Separate counters for room vs visit cards
+  const counterKey = type === "visit" ? "visitCards" : "roomCards";
+  const prefix = type === "visit" ? "OPD" : "IPD";
+
+  const counterRef = doc(db, COUNTERS, counterKey);
+  let cardNumber = `${prefix}-0001`;
 
   await runTransaction(db, async (transaction) => {
     const snap = await transaction.get(counterRef);
@@ -38,49 +34,49 @@ export async function createInPatientCard(
     } else {
       transaction.set(counterRef, { lastNumber: 1 });
     }
-    cardNumber = `IPD-${String(count).padStart(4, "0")}`;
+    cardNumber = `${prefix}-${String(count).padStart(4, "0")}`;
   });
 
   const admissionDate = data.admissionDate || format(new Date(), "yyyy-MM-dd");
-  const expiryDate = format(addDays(new Date(admissionDate), 14), "yyyy-MM-dd");
   const patientId = generatePatientId();
   const now = Timestamp.now();
 
-  const docRef = await addDoc(collection(db, CARDS), {
+  const cardData: Record<string, any> = {
     ...data,
+    type,
     cardNumber,
     patientId,
     admissionDate,
-    expiryDate,
     isActive: true,
     createdAt: now,
     updatedAt: now,
-  });
+  };
 
+  // Visit cards expire in 14 days; room cards have no expiry
+  if (type === "visit") {
+    cardData.expiryDate = format(addDays(new Date(admissionDate), 14), "yyyy-MM-dd");
+  } else {
+    delete cardData.expiryDate; // Room cards: no expiry — active until discharged
+  }
+
+  const docRef = await addDoc(collection(db, CARDS), cardData);
   return { id: docRef.id, cardNumber, patientId };
 }
 
-export async function getActiveCards(): Promise<InPatientCard[]> {
-  // Filter client-side to avoid needing a composite Firestore index
+export async function getActiveCards(type?: CardType): Promise<InPatientCard[]> {
   const q = query(collection(db, CARDS), orderBy("createdAt", "desc"));
   const snap = await getDocs(q);
   return snap.docs
     .map((d) => ({ id: d.id, ...d.data() }) as InPatientCard)
-    .filter((c) => c.isActive === true);
+    .filter((c) => c.isActive === true && (!type || c.type === type));
 }
 
-export async function getAllCards(): Promise<InPatientCard[]> {
+export async function getAllCards(type?: CardType): Promise<InPatientCard[]> {
   const q = query(collection(db, CARDS), orderBy("createdAt", "desc"));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as InPatientCard[];
-}
-
-export async function getCardByPatientId(patientId: string): Promise<InPatientCard | null> {
-  const q = query(collection(db, CARDS), where("patientId", "==", patientId));
-  const snap = await getDocs(q);
-  if (snap.empty) return null;
-  const d = snap.docs[0];
-  return { id: d.id, ...d.data() } as InPatientCard;
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }) as InPatientCard)
+    .filter((c) => !type || c.type === type);
 }
 
 export async function dischargePatient(cardId: string): Promise<void> {
