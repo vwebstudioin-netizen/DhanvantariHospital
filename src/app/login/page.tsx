@@ -29,7 +29,7 @@ export default function LoginPage() {
       } else if (role === "pharmacist") {
         router.push("/admin/pharmacy");
       } else if (role === "receptionist") {
-        router.push("/admin/queue");
+        router.push("/desk/queue");
       } else if (role === "doctor") {
         router.push("/admin/queue");
       } else if (role === "patient") {

@@ -14,9 +14,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+// All receptionist links stay within /desk/* — no cross-layout navigation
 const RECEPTIONIST_LINKS = [
   { href: "/desk",                label: "Dashboard",        icon: LayoutDashboard },
-  { href: "/admin/queue",         label: "Token Queue",      icon: Ticket },
+  { href: "/desk/queue",          label: "Token Queue",      icon: Ticket },
   { href: "/desk/inpatient-card", label: "In-Patient Cards", icon: CreditCard },
   { href: "/desk/billing",        label: "New Invoice",      icon: Receipt },
   { href: "/desk/bills",          label: "Invoice History",  icon: FileText },
