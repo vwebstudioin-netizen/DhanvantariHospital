@@ -8,6 +8,7 @@ import Footer from "./Footer";
 const APP_PREFIXES = [
   "/admin",
   "/desk",
+  "/doctor",
   "/login",
   "/portal",       // Patient portal has its own layout
   "/queue/display", // TV display is full-screen, no header/footer
