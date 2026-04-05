@@ -315,7 +315,11 @@
 <span class="key">NEXT_PUBLIC_FIREBASE_APP_ID</span>=<span class="val">1:123:web:abc</span>
 
 <span class="comment"># ✅ No Firebase Admin SDK / service account key required!</span>
-<span class="comment"># Roles are stored in Firestore — see Step 5 for first admin setup.</span>
+<span class="comment"># Roles stored in Firestore /userRoles/{uid} — see Step 5</span>
+
+<span class="comment"># Resend Email (get free API key from resend.com — 100 emails/day free)</span>
+<span class="key">RESEND_API_KEY</span>=<span class="val">re_your_api_key_here</span>
+<span class="key">RESEND_FROM_EMAIL</span>=<span class="val">Dhanvantari Hospital &lt;noreply@dhanvantarihospital.com&gt;</span>
 
 <span class="comment"># Twilio WhatsApp (optional — skip for now)</span>
 <span class="key">TWILIO_ACCOUNT_SID</span>=<span class="val">ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
@@ -444,12 +448,12 @@
 
     <h3>What to verify:</h3>
     <ul class="checklist">
-      <li>Pharmacist sidebar shows: Dashboard, Medicines, Stock, Suppliers, Reports — nothing else</li>
-      <li>Trying <code>/admin</code> → redirected to <code>/admin/pharmacy</code></li>
-      <li>Trying <code>/desk</code> → redirected to <code>/login</code></li>
+      <li>Pharmacist sidebar shows: Dashboard, Medicines, Stock, New Bill, Bill History, Suppliers, Reports</li>
+      <li>Trying <code>/admin</code> (dashboard) → redirected to <code>/admin/pharmacy</code></li>
       <li>Can browse medicine catalog at <code>/admin/pharmacy/medicines</code></li>
-      <li>Can add/edit medicines</li>
       <li>Can add stock and see movement log at <code>/admin/pharmacy/stock</code></li>
+      <li>Can create pharmacy bill at <code>/admin/pharmacy/billing</code> — medicines auto-deducted from stock</li>
+      <li>Bill history at <code>/admin/pharmacy/bills</code> — shows PHRM-XXXX bills with print</li>
       <li>Can see expiry report at <code>/admin/pharmacy/reports</code></li>
     </ul>
   </div>
@@ -464,10 +468,13 @@
 
     <h3>What to verify:</h3>
     <ul class="checklist">
-      <li>Desk sidebar shows: Dashboard, In-Patient Cards, New Invoice, Invoice History, Festive Wishes, Token Queue</li>
-      <li>Trying <code>/admin</code> → redirected to <code>/desk</code></li>
-      <li>Trying <code>/admin/pharmacy</code> → redirected to <code>/login</code></li>
-      <li>Token Queue link (<code>/admin/queue</code>) works from the desk sidebar</li>
+      <li>Desk sidebar shows: Dashboard, Token Queue, In-Patient Cards, Appointments, Enquiries, New Invoice, Invoice History, Festive Wishes</li>
+      <li>Trying <code>/admin</code> → redirected to <code>/desk/queue</code></li>
+      <li>Trying <code>/admin/pharmacy</code> → redirected to login</li>
+      <li>Token Queue at <code>/desk/queue</code> — full queue management within desk layout</li>
+      <li>In-Patient Cards: Room Card (IPD-XXXX) and Visit Card (OPD-XXXX) tabs</li>
+      <li>Visit Card creation auto-issues a queue token</li>
+      <li>Enquiries at <code>/desk/enquiries</code> — appointment requests + contact messages unified</li>
     </ul>
   </div>
 
@@ -481,8 +488,10 @@
       <div class="step"><div class="step-num"></div><div class="step-content">Fill: Patient Name, Phone, Purpose → Click <strong>"Issue Token"</strong></div></div>
       <div class="step"><div class="step-num"></div><div class="step-content">Token #001 should appear in the waiting list on the right</div></div>
       <div class="step"><div class="step-num"></div><div class="step-content">Issue 2-3 more tokens for different patients</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Call Next"</strong> → Token #001 should move to "Now Serving"</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>Print</strong> to test the token slip printout</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Call Next Patient"</strong> → Token moves to "Called" state (amber). WhatsApp would fire to patient.</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Start Consultation"</strong> → Token moves to "In Consultation" (green)</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Done — Call Next"</strong> → complete and auto-call next</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>Print</strong> to test the token slip printout (logo appears)</div></div>
     </div>
 
     <h3>10.2 Test TV Display (open in separate tab/window)</h3>

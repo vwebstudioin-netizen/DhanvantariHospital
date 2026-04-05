@@ -10,7 +10,7 @@ import { SITE_NAME } from "@/lib/constants";
 import Link from "next/link";
 import {
   LayoutDashboard, CreditCard, Receipt, FileText, Gift,
-  Ticket, LogOut, Menu, X, Hospital, Inbox, Calendar,
+  Ticket, LogOut, Menu, X, Hospital, Inbox, Calendar, Users,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -19,6 +19,7 @@ const RECEPTIONIST_LINKS = [
   { href: "/desk",                  label: "Dashboard",        icon: LayoutDashboard },
   { href: "/desk/queue",            label: "Token Queue",      icon: Ticket },
   { href: "/desk/inpatient-card",   label: "In-Patient Cards", icon: CreditCard },
+  { href: "/desk/patients",         label: "Patients",         icon: Users },
   { href: "/desk/appointments",     label: "Appointments",     icon: Calendar },
   { href: "/desk/enquiries",        label: "Enquiries",        icon: Inbox },
   { href: "/desk/billing",          label: "New Invoice",      icon: Receipt },

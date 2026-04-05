@@ -143,30 +143,34 @@
         <tr><td>Patient queue check</td><td>Patients check position by phone/token number</td><td>&#8377;25,000</td></tr>
 
         <tr class="section-row"><td colspan="3">3. Desk Application (Reception Panel)</td></tr>
-        <tr><td>In-patient card management</td><td>Issue, print 85×54mm, discharge, WhatsApp share</td><td></td></tr>
-        <tr><td>14-day auto-expiry with countdown badges</td><td>Green/yellow/red expiry indicator</td><td></td></tr>
-        <tr><td>Invoice / bill creation</td><td>Consultation, surgery, room, lab, medicines with discount</td><td></td></tr>
-        <tr><td>Invoice history & reprint</td><td>Search by patient name, phone, invoice number</td><td></td></tr>
-        <tr><td>Festive wishes blast</td><td>11 occasions — Diwali, Eid, New Year, Pongal, etc.</td><td>&#8377;20,000</td></tr>
+        <tr><td>Room Card (IPD-XXXX)</td><td>Admitted in-patient card — ward, room, bed, doctor, no expiry, active until discharged</td><td></td></tr>
+        <tr><td>Visit Card (OPD-XXXX)</td><td>OPD follow-up card — 14-day expiry, auto-issues queue token on creation</td><td></td></tr>
+        <tr><td>Print 85×54mm cards with logo</td><td>Both card types printable, share via WhatsApp</td><td></td></tr>
+        <tr><td>Hospital invoice (INV-XXXX)</td><td>Consultation, surgery, room, lab, medicines — print with logo, share via WhatsApp</td><td></td></tr>
+        <tr><td>Invoice history & reprint</td><td>Loads from Firestore — search, reprint</td><td></td></tr>
+        <tr><td>Enquiries inbox</td><td>Appointment requests + contact form messages — unified inbox, confirm/done/cancel</td><td></td></tr>
+        <tr><td>MR / Visitor appointment scheduling</td><td>Schedule medical representative and visitor visits with purpose, meeting-with</td><td></td></tr>
+        <tr><td>Festive wishes blast</td><td>11 occasions — actual WhatsApp sent to all patients with progress bar</td><td>&#8377;20,000</td></tr>
 
         <tr class="section-row"><td colspan="3">4. WhatsApp Integration (Twilio)</td></tr>
-        <tr><td>Token-called notification</td><td>Automatic WhatsApp when patient's token is called</td><td></td></tr>
-        <tr><td>Admission card on WhatsApp</td><td>Card details sent when in-patient card is created</td><td></td></tr>
-        <tr><td>Appointment reminders</td><td>Pre-appointment WhatsApp reminder</td><td></td></tr>
+        <tr><td>Token-called notification</td><td>Auto WhatsApp when token is called</td><td></td></tr>
+        <tr><td>Admission card on WhatsApp</td><td>Sent on room/visit card creation</td><td></td></tr>
+        <tr><td>Review request via WhatsApp</td><td>After billing or discharge — review link sent</td><td></td></tr>
         <tr><td>WhatsApp bot (4 keywords)</td><td>APPOINTMENT, CARD, STATUS, HELP — auto-reply</td><td></td></tr>
-        <tr><td>Bulk festive wishes</td><td>Send to all patients in one click</td><td>&#8377;15,000</td></tr>
+        <tr><td>Bulk festive wishes</td><td>Real bulk send with progress bar and campaign history</td><td>&#8377;15,000</td></tr>
 
-        <tr class="section-row"><td colspan="3">5. Pharmacy Inventory</td></tr>
-        <tr><td>Medicine catalog</td><td>Brand name, generic, category, unit, pricing, batch, expiry</td><td></td></tr>
-        <tr><td>Stock management</td><td>Purchase in, dispense out, manual adjustment, movement log</td><td></td></tr>
-        <tr><td>Supplier management</td><td>Name, contact, GST number</td><td></td></tr>
-        <tr><td>Low stock alerts & expiry tracking</td><td>Dashboard alerts + 30/60/90 day expiry report</td><td>&#8377;20,000</td></tr>
+        <tr class="section-row"><td colspan="3">5. Pharmacy Inventory (ERP)</td></tr>
+        <tr><td>Medicine catalog</td><td>Brand, generic, category, unit, pricing, batch, expiry</td><td></td></tr>
+        <tr><td>Stock management</td><td>Purchase in, dispense out, movement log with patient details</td><td></td></tr>
+        <tr><td>Pharmacy invoice (PHRM-XXXX)</td><td>Medicine POS — search & add medicines, qty control, auto stock deduction, print with logo</td><td></td></tr>
+        <tr><td>Pharmacy bill history</td><td>All pharmacy bills with print and search</td><td></td></tr>
+        <tr><td>Supplier management + Low stock alerts</td><td>Dashboard alerts + expiry tracking (30/60/90 days)</td><td>&#8377;20,000</td></tr>
 
         <tr class="section-row"><td colspan="3">6. Access Control & Setup</td></tr>
-        <tr><td>3-role login system</td><td>Admin, Pharmacist, Receptionist — role-based redirect</td><td></td></tr>
-        <tr><td>Admin role management panel</td><td>Assign roles to staff from admin panel</td><td></td></tr>
-        <tr><td>Env-based branding</td><td>Hospital name, phone, address — no code changes needed</td><td></td></tr>
-        <tr><td>Content setup & deployment</td><td>All 8 departments, 15 services, doctor data pre-filled</td><td>&#8377;10,000</td></tr>
+        <tr><td>4-role login system</td><td>Admin, Receptionist, Pharmacist, Doctor — each sees only their panel</td><td></td></tr>
+        <tr><td>Admin creates staff accounts</td><td>Create users and assign roles directly from admin panel</td><td></td></tr>
+        <tr><td>Patient portal — Google Sign-In</td><td>Google login saves patient profile, phone number prompt on first visit</td><td></td></tr>
+        <tr><td>Env-based branding + Resend email</td><td>Name/phone/address from config. Email via Resend (100/day free)</td><td>&#8377;10,000</td></tr>
       </tbody>
     </table>
 
