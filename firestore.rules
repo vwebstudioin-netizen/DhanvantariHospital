@@ -1,0 +1,137 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.admin == true;
+    }
+
+    function isStaff() {
+      return isAuthenticated() && 
+        (request.auth.token.admin == true || request.auth.token.staff == true);
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Doctors
+    match /doctors/{doctorId} {
+      allow read: if true;
+      allow write: if isStaff();
+      
+      match /schedule/{scheduleId} {
+        allow read: if true;
+        allow write: if isStaff();
+      }
+    }
+
+    // Departments
+    match /departments/{departmentId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    // Services
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    // Locations
+    match /locations/{locationId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Site Settings
+    match /siteSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Blog Posts
+    match /blogPosts/{postId} {
+      allow read: if resource.data.status == 'published' || isStaff();
+      allow create: if isStaff();
+      allow update, delete: if isStaff();
+    }
+
+    // News
+    match /news/{articleId} {
+      allow read: if resource.data.isPublished == true || isStaff();
+      allow write: if isStaff();
+    }
+
+    // Reviews
+    match /reviews/{reviewId} {
+      allow read: if resource.data.isApproved == true || isStaff() || 
+        (isAuthenticated() && resource.data.patientId == request.auth.uid);
+      allow create: if isAuthenticated();
+      allow update: if isStaff() || 
+        (isOwner(resource.data.patientId) && 
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'rating', 'updatedAt']));
+      allow delete: if isStaff();
+    }
+
+    // Insurance Plans
+    match /insurancePlans/{planId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Gallery
+    match /gallery/{imageId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    // Jobs
+    match /jobs/{jobId} {
+      allow read: if resource.data.isActive == true || isStaff();
+      allow write: if isStaff();
+    }
+
+    // Contact Messages
+    match /contactMessages/{messageId} {
+      allow create: if true;
+      allow read, update, delete: if isStaff();
+    }
+
+    // Newsletters
+    match /newsletters/{subId} {
+      allow create: if true;
+      allow read, update, delete: if isStaff();
+    }
+
+    // Job Applications
+    match /jobApplications/{appId} {
+      allow create: if true;
+      allow read, update, delete: if isStaff();
+    }
+
+    // Patients
+    match /patients/{patientId} {
+      allow read: if isOwner(patientId) || isStaff();
+      allow create: if isAuthenticated() && request.auth.uid == patientId;
+      allow update: if isOwner(patientId) || isStaff();
+      allow delete: if isAdmin();
+    }
+
+    // Appointments
+    match /appointments/{appointmentId} {
+      allow read: if isStaff() || 
+        (isAuthenticated() && resource.data.patientId == request.auth.uid);
+      allow create: if true;
+      allow update: if isStaff() || 
+        (isAuthenticated() && resource.data.patientId == request.auth.uid &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'cancellationReason', 'cancelledAt', 'updatedAt']));
+      allow delete: if isAdmin();
+    }
+  }
+}

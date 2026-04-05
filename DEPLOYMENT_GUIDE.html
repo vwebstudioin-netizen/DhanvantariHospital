@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dhanvantari Hospital — Deployment & Testing Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Lato', sans-serif; color: #1e293b; line-height: 1.8; background: #f8fafc; }
+
+    .header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%);
+      color: #fff;
+      padding: 48px 40px;
+      text-align: center;
+    }
+    .header h1 { font-size: 2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; }
+    .header p { color: rgba(255,255,255,0.7); margin-top: 8px; font-size: 1rem; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* TOC */
+    .toc {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+    .toc h2 { font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #1e3a5f; margin-bottom: 12px; }
+    .toc ol { padding-left: 20px; }
+    .toc li { padding: 3px 0; font-size: 0.9rem; }
+    .toc a { color: #1e3a5f; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* Section */
+    .section { margin-bottom: 48px; }
+    .section-num {
+      display: inline-flex;
+      width: 32px;
+      height: 32px;
+      background: #1e3a5f;
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.85rem;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: #1e3a5f;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+      scroll-margin-top: 20px;
+    }
+    h3 { font-size: 1rem; font-weight: 700; color: #1e293b; margin: 20px 0 8px; }
+    p { font-size: 0.9rem; color: #475569; margin-bottom: 10px; }
+
+    /* Steps */
+    .steps { counter-reset: step; }
+    .step {
+      display: flex;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      counter-increment: step;
+      min-width: 28px;
+      height: 28px;
+      background: #e2e8f0;
+      color: #64748b;
+      font-weight: 700;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-num::before { content: counter(step); }
+    .step-content { flex: 1; }
+    .step-content strong { font-weight: 700; color: #1e293b; }
+
+    /* Code */
+    .code-block {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      overflow-x: auto;
+      margin: 12px 0;
+      line-height: 1.7;
+    }
+    .code-block .comment { color: #64748b; }
+    .code-block .key { color: #93c5fd; }
+    .code-block .val { color: #86efac; }
+    .code-block .cmd { color: #fde68a; }
+
+    code {
+      background: #f1f5f9;
+      color: #1e3a5f;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+    }
+
+    /* Info cards */
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+    .card.blue { border-left: 4px solid #1e3a5f; }
+    .card.green { border-left: 4px solid #16a34a; }
+    .card.amber { border-left: 4px solid #f59e0b; }
+    .card.red { border-left: 4px solid #dc2626; }
+
+    /* Role table */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 12px 0; }
+    th {
+      background: #1e3a5f;
+      color: #fff;
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; }
+    tr:nth-child(even) td { background: #f8fafc; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .badge-admin { background: #e9d5ff; color: #6b21a8; }
+    .badge-pharmacist { background: #dbeafe; color: #1d4ed8; }
+    .badge-receptionist { background: #dcfce7; color: #166534; }
+
+    .url {
+      display: inline-block;
+      background: #eff6ff;
+      color: #1d4ed8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      text-decoration: none;
+    }
+
+    .checklist { list-style: none; padding: 0; }
+    .checklist li {
+      padding: 6px 0;
+      font-size: 0.9rem;
+      color: #475569;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .checklist li::before {
+      content: '☐';
+      font-size: 1rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .tip {
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: #0369a1;
+      margin: 12px 0;
+    }
+    .warn {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: #92400e;
+      margin: 12px 0;
+    }
+
+    @media (max-width: 600px) {
+      .header { padding: 32px 20px; }
+      .header h1 { font-size: 1.4rem; }
+      .container { padding: 24px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Dhanvantari Hospital — Deployment & Testing Guide</h1>
+  <p>Step-by-step guide to set up Firebase, run locally, and test all 3 roles</p>
+</div>
+
+<div class="container">
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#prereqs">Prerequisites</a></li>
+      <li><a href="#firebase">Firebase Setup</a></li>
+      <li><a href="#env">Environment Variables (.env.local)</a></li>
+      <li><a href="#run">Run Locally</a></li>
+      <li><a href="#first-admin">Create First Admin User</a></li>
+      <li><a href="#roles">Create Staff Users & Assign Roles</a></li>
+      <li><a href="#test-admin">Test Admin Role</a></li>
+      <li><a href="#test-pharmacist">Test Pharmacist Role</a></li>
+      <li><a href="#test-receptionist">Test Receptionist Role</a></li>
+      <li><a href="#test-queue">Test Token Queue & TV Display</a></li>
+      <li><a href="#test-desk">Test Desk App (Cards & Billing)</a></li>
+      <li><a href="#test-pharmacy">Test Pharmacy Inventory</a></li>
+      <li><a href="#twilio">Setup Twilio WhatsApp (Optional)</a></li>
+      <li><a href="#checklist">Full Test Checklist</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. Prerequisites -->
+  <div class="section" id="prereqs">
+    <h2><span class="section-num">1</span>Prerequisites</h2>
+    <div class="card blue">
+      <p>Install these before starting:</p>
+      <ul style="padding-left:20px; font-size:0.9rem; color:#475569;">
+        <li style="padding:4px 0;"><strong>Node.js 18+</strong> — <a href="https://nodejs.org" style="color:#1e3a5f;">nodejs.org</a></li>
+        <li style="padding:4px 0;"><strong>Git</strong> (optional but recommended)</li>
+        <li style="padding:4px 0;"><strong>Google account</strong> for Firebase</li>
+        <li style="padding:4px 0;"><strong>Twilio account</strong> (only if testing WhatsApp)</li>
+      </ul>
+    </div>
+    <p>Project location: <code>Clients/ABHospital/</code> inside your TemplateS folder.</p>
+  </div>
+
+  <!-- 2. Firebase Setup -->
+  <div class="section" id="firebase">
+    <h2><span class="section-num">2</span>Firebase Setup</h2>
+    <p>We need a Firebase project for authentication, database, and file storage.</p>
+
+    <h3>2.1 Create Firebase Project</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a href="https://console.firebase.google.com" style="color:#1e3a5f;" target="_blank">console.firebase.google.com</a></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Add project"</strong> → Name it <code>dhanvantari-hospital</code> → Continue</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Disable Google Analytics (not needed) → <strong>Create project</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Wait for project to be created → Click <strong>Continue</strong></div></div>
+    </div>
+
+    <h3>2.2 Enable Authentication</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">In left sidebar: <strong>Build → Authentication</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Get started"</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Under "Sign-in method" tab → Click <strong>Email/Password</strong> → Enable → Save</div></div>
+    </div>
+
+    <h3>2.3 Create Firestore Database</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">In left sidebar: <strong>Build → Firestore Database</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Create database"</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Choose <strong>"Start in test mode"</strong> → Next</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Select <strong>asia-south1 (Mumbai)</strong> for India → Click <strong>Enable</strong></div></div>
+    </div>
+
+    <h3>2.4 Enable Storage</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">In left sidebar: <strong>Build → Storage</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Get started"</strong> → Start in test mode → Next → Done</div></div>
+    </div>
+
+    <h3>2.5 Get Client Config Keys</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Click the <strong>gear icon ⚙</strong> (top left) → <strong>Project settings</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Scroll to <strong>"Your apps"</strong> → Click <strong>Web icon (&lt;/&gt;)</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Register app as <code>dhanvantari-hospital-web</code> → Continue</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Copy the <code>firebaseConfig</code> object — you'll need these values for .env.local</div></div>
+    </div>
+
+    <h3>2.6 Create Service Account (for Firebase Admin SDK)</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">In <strong>Project settings</strong> → click <strong>"Service accounts"</strong> tab</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Generate new private key"</strong> → Confirm → JSON file downloads</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Open the JSON. You'll need: <code>project_id</code>, <code>client_email</code>, <code>private_key</code></div></div>
+    </div>
+  </div>
+
+  <!-- 3. .env.local -->
+  <div class="section" id="env">
+    <h2><span class="section-num">3</span>Environment Variables (.env.local)</h2>
+    <p>Open <code>Clients/ABHospital/.env.local</code> and fill in your values:</p>
+
+    <div class="code-block">
+<span class="comment"># Hospital Branding</span>
+<span class="key">NEXT_PUBLIC_HOSPITAL_NAME</span>=<span class="val">Dhanvantari Hospital</span>
+<span class="key">NEXT_PUBLIC_HOSPITAL_PHONE</span>=<span class="val">9876543210</span>
+<span class="key">NEXT_PUBLIC_HOSPITAL_ADDRESS</span>=<span class="val">Your Hospital Address, City</span>
+<span class="key">NEXT_PUBLIC_HOSPITAL_EMAIL</span>=<span class="val">hospital@email.com</span>
+<span class="key">NEXT_PUBLIC_HOSPITAL_WHATSAPP</span>=<span class="val">91XXXXXXXXXX</span>
+
+<span class="comment"># Firebase Client Keys (from Step 2.5)</span>
+<span class="key">NEXT_PUBLIC_FIREBASE_API_KEY</span>=<span class="val">AIzaSy...</span>
+<span class="key">NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN</span>=<span class="val">dhanvantari-hospital.firebaseapp.com</span>
+<span class="key">NEXT_PUBLIC_FIREBASE_PROJECT_ID</span>=<span class="val">dhanvantari-hospital</span>
+<span class="key">NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET</span>=<span class="val">dhanvantari-hospital.appspot.com</span>
+<span class="key">NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID</span>=<span class="val">123456789</span>
+<span class="key">NEXT_PUBLIC_FIREBASE_APP_ID</span>=<span class="val">1:123:web:abc</span>
+
+<span class="comment"># Firebase Admin (from Step 2.6 JSON file)</span>
+<span class="key">FIREBASE_PROJECT_ID</span>=<span class="val">dhanvantari-hospital</span>
+<span class="key">FIREBASE_CLIENT_EMAIL</span>=<span class="val">firebase-adminsdk-xxx@dhanvantari-hospital.iam.gserviceaccount.com</span>
+<span class="key">FIREBASE_PRIVATE_KEY</span>=<span class="val">"-----BEGIN PRIVATE KEY-----\nMIIE...\n-----END PRIVATE KEY-----\n"</span>
+
+<span class="comment"># Twilio WhatsApp (optional — skip for now)</span>
+<span class="key">TWILIO_ACCOUNT_SID</span>=<span class="val">ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+<span class="key">TWILIO_AUTH_TOKEN</span>=<span class="val">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+<span class="key">TWILIO_WHATSAPP_FROM</span>=<span class="val">whatsapp:+14155238886</span>
+
+<span class="comment"># Site</span>
+<span class="key">NEXT_PUBLIC_SITE_URL</span>=<span class="val">http://localhost:3000</span>
+<span class="key">HOSPITAL_EMAIL</span>=<span class="val">info@abhospital.com</span>
+<span class="key">REVALIDATION_SECRET</span>=<span class="val">any-random-string-here-123</span>
+
+<span class="comment"># Keep these as-is (placeholders)</span>
+<span class="key">RAZORPAY_KEY_ID</span>=<span class="val">rzp_test_placeholder</span>
+<span class="key">RAZORPAY_KEY_SECRET</span>=<span class="val">placeholder_secret</span>
+    </div>
+
+    <div class="warn">
+      <strong>Private Key formatting:</strong> When copying <code>private_key</code> from the JSON file, keep the <code>\n</code> characters and wrap the whole value in double quotes exactly as shown above.
+    </div>
+  </div>
+
+  <!-- 4. Run Locally -->
+  <div class="section" id="run">
+    <h2><span class="section-num">4</span>Run Locally</h2>
+    <p>Open a terminal in the project folder:</p>
+    <div class="code-block">
+<span class="comment"># Navigate to the project</span>
+<span class="cmd">cd "c:\Users\z004n5ra\Desktop\SUB Projects\MYW\TemplateS\Clients\ABHospital"</span>
+
+<span class="comment"># Install dependencies (if not done already)</span>
+<span class="cmd">npm install</span>
+
+<span class="comment"># Start development server</span>
+<span class="cmd">npm run dev</span>
+    </div>
+
+    <p>The app will open at <a class="url" href="http://localhost:3000" target="_blank">http://localhost:3000</a></p>
+
+    <div class="tip">
+      If port 3000 is busy, use: <code>npx next dev --port 3001</code>
+    </div>
+  </div>
+
+  <!-- 5. First Admin User -->
+  <div class="section" id="first-admin">
+    <h2><span class="section-num">5</span>Create First Admin User</h2>
+    <p>The first admin must be created directly in Firebase Console, then given the admin claim via a script.</p>
+
+    <h3>5.1 Create user in Firebase Console</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Firebase Console → <strong>Authentication → Users</strong> → <strong>Add user</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Email: <code>admin@abhospital.com</code>, Password: <code>Admin@12345</code> → Add user</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Copy the <strong>User UID</strong> shown in the table (looks like: <code>abc123xyz...</code>)</div></div>
+    </div>
+
+    <h3>5.2 Set admin claim via Node.js script</h3>
+    <p>Create a file <code>set-admin.js</code> in the project root (delete after use):</p>
+    <div class="code-block">
+<span class="comment">// set-admin.js — Run once to make first admin</span>
+const admin = require('firebase-admin');
+const serviceAccount = require('./service-account.json'); <span class="comment">// your downloaded JSON</span>
+
+admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+
+const UID = '<span class="val">PASTE_USER_UID_HERE</span>';
+
+admin.auth().setCustomUserClaims(UID, { admin: true })
+  .then(() => { console.log('Admin claim set!'); process.exit(0); })
+  .catch(err => { console.error(err); process.exit(1); });
+    </div>
+    <div class="code-block"><span class="cmd">node set-admin.js</span></div>
+    <div class="warn">Delete <code>set-admin.js</code> and <code>service-account.json</code> after running. Never commit these files.</div>
+
+    <h3>5.3 Test admin login</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/login">http://localhost:3000/login</a></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Login with <code>admin@abhospital.com</code> / <code>Admin@12345</code></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">You should be redirected to <a class="url" href="http://localhost:3000/admin">/admin</a> with the full sidebar</div></div>
+    </div>
+  </div>
+
+  <!-- 6. Create Staff Users -->
+  <div class="section" id="roles">
+    <h2><span class="section-num">6</span>Create Staff Users &amp; Assign Roles</h2>
+    <p>Once you have admin access, create other users and assign roles from the admin panel.</p>
+
+    <h3>6.1 Create users in Firebase Console</h3>
+    <p>Create 2 more test users in Firebase → Authentication → Users:</p>
+    <table>
+      <thead><tr><th>Email</th><th>Password</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td>pharmacist@abhospital.com</td><td>Pharma@12345</td><td><span class="badge badge-pharmacist">Pharmacist</span></td></tr>
+        <tr><td>reception@abhospital.com</td><td>Recep@12345</td><td><span class="badge badge-receptionist">Receptionist</span></td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:10px;">Copy the UID of each user from the table.</p>
+
+    <h3>6.2 Assign roles from Admin Panel</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Login as admin → go to <a class="url" href="http://localhost:3000/admin/roles">/admin/roles</a></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Paste the pharmacist's UID → Select role: <strong>Pharmacist</strong> → Click <strong>Assign Role</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Paste the receptionist's UID → Select role: <strong>Receptionist</strong> → Click <strong>Assign Role</strong></div></div>
+    </div>
+
+    <div class="tip">After assigning a role, the user must log out and log back in for the new role to take effect.</div>
+  </div>
+
+  <!-- 7. Test Admin -->
+  <div class="section" id="test-admin">
+    <h2><span class="section-num">7</span>Test — Admin Role</h2>
+    <div class="card blue">
+      <p><strong>Login:</strong> <code>admin@abhospital.com</code> at <a class="url" href="http://localhost:3000/login">/login</a></p>
+      <p style="margin-top:6px;"><strong>Expected redirect:</strong> <code>/admin</code> — full sidebar with all 15 links</p>
+    </div>
+
+    <h3>What to verify:</h3>
+    <ul class="checklist">
+      <li>Admin sees Dashboard, Token Queue, Appointments, Patients, In-Patient Cards, Invoices, Pharmacy, Services, Blog...</li>
+      <li>Can access <code>/admin/pharmacy</code> → pharmacy dashboard</li>
+      <li>Can access <code>/desk</code> → desk panel</li>
+      <li>Can assign roles at <code>/admin/roles</code></li>
+      <li>Visiting <code>/admin</code> shows admin panel, NOT redirected</li>
+    </ul>
+  </div>
+
+  <!-- 8. Test Pharmacist -->
+  <div class="section" id="test-pharmacist">
+    <h2><span class="section-num">8</span>Test — Pharmacist Role</h2>
+    <div class="card blue">
+      <p><strong>Login:</strong> <code>pharmacist@abhospital.com</code> at <a class="url" href="http://localhost:3000/login">/login</a></p>
+      <p style="margin-top:6px;"><strong>Expected redirect:</strong> <code>/admin/pharmacy</code> — pharmacy-only sidebar</p>
+    </div>
+
+    <h3>What to verify:</h3>
+    <ul class="checklist">
+      <li>Pharmacist sidebar shows: Dashboard, Medicines, Stock, Suppliers, Reports — nothing else</li>
+      <li>Trying <code>/admin</code> → redirected to <code>/admin/pharmacy</code></li>
+      <li>Trying <code>/desk</code> → redirected to <code>/login</code></li>
+      <li>Can browse medicine catalog at <code>/admin/pharmacy/medicines</code></li>
+      <li>Can add/edit medicines</li>
+      <li>Can add stock and see movement log at <code>/admin/pharmacy/stock</code></li>
+      <li>Can see expiry report at <code>/admin/pharmacy/reports</code></li>
+    </ul>
+  </div>
+
+  <!-- 9. Test Receptionist -->
+  <div class="section" id="test-receptionist">
+    <h2><span class="section-num">9</span>Test — Receptionist Role</h2>
+    <div class="card blue">
+      <p><strong>Login:</strong> <code>reception@abhospital.com</code> at <a class="url" href="http://localhost:3000/login">/login</a></p>
+      <p style="margin-top:6px;"><strong>Expected redirect:</strong> <code>/desk</code> — reception desk panel</p>
+    </div>
+
+    <h3>What to verify:</h3>
+    <ul class="checklist">
+      <li>Desk sidebar shows: Dashboard, In-Patient Cards, New Invoice, Invoice History, Festive Wishes, Token Queue</li>
+      <li>Trying <code>/admin</code> → redirected to <code>/desk</code></li>
+      <li>Trying <code>/admin/pharmacy</code> → redirected to <code>/login</code></li>
+      <li>Token Queue link (<code>/admin/queue</code>) works from the desk sidebar</li>
+    </ul>
+  </div>
+
+  <!-- 10. Test Token Queue -->
+  <div class="section" id="test-queue">
+    <h2><span class="section-num">10</span>Test — Token Queue &amp; TV Display</h2>
+
+    <h3>10.1 Test reception queue</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/admin/queue">/admin/queue</a> (as admin or receptionist)</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Fill: Patient Name, Phone, Purpose → Click <strong>"Issue Token"</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Token #001 should appear in the waiting list on the right</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Issue 2-3 more tokens for different patients</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Call Next"</strong> → Token #001 should move to "Now Serving"</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>Print</strong> to test the token slip printout</div></div>
+    </div>
+
+    <h3>10.2 Test TV Display (open in separate tab/window)</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Open a new browser tab → <a class="url" href="http://localhost:3000/queue/display">/queue/display</a></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Should show full-screen dark background with large "Now Serving" number</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Go back to the queue page and click "Call Next" again</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">TV display should update in real-time AND play an audio chime</div></div>
+    </div>
+
+    <h3>10.3 Test patient queue check</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Open <a class="url" href="http://localhost:3000/queue">/queue</a> in browser (public page)</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Enter the phone number used when issuing a token</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Should show queue position and estimated wait time</div></div>
+    </div>
+  </div>
+
+  <!-- 11. Test Desk App -->
+  <div class="section" id="test-desk">
+    <h2><span class="section-num">11</span>Test — Desk App (Cards &amp; Billing)</h2>
+
+    <h3>11.1 In-Patient Card</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/desk/inpatient-card">/desk/inpatient-card</a></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"New Card"</strong> → Fill patient name, doctor, ward, room, diagnosis</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Create Card"</strong> → Card should appear with auto-generated ID and expiry date (+14 days)</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>Print</strong> → Should open print dialog with 85×54mm card layout</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>Discharge</strong> → Card should disappear from active list</div></div>
+    </div>
+
+    <h3>11.2 Invoice/Billing</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/desk/billing">/desk/billing</a></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Fill patient name and phone</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click quick-add buttons (Consultation Fee, Blood Test, etc.) to add line items</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Add a discount, select payment method → Click <strong>"Generate Invoice"</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Invoice preview should appear with print button</div></div>
+    </div>
+
+    <h3>11.3 Festive Wishes</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/desk/wishes">/desk/wishes</a></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Select an occasion (e.g., Diwali) → Message auto-fills</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Edit message if needed → Click <strong>"Send Diwali Wishes"</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Should show success and log the campaign to Firestore</div></div>
+    </div>
+  </div>
+
+  <!-- 12. Test Pharmacy -->
+  <div class="section" id="test-pharmacy">
+    <h2><span class="section-num">12</span>Test — Pharmacy Inventory</h2>
+
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/admin/pharmacy">/admin/pharmacy</a></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Dashboard shows low stock alerts with sample data</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/admin/pharmacy/medicines">/admin/pharmacy/medicines</a> → Click <strong>"Add Medicine"</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Fill: Name, Generic Name, Category, Unit, Cost, Selling Price, Stock, Reorder Level → Save</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/admin/pharmacy/stock">/admin/pharmacy/stock</a> → Switch to <strong>Dispense</strong> tab</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Select medicine, enter quantity, patient name → Click Dispense</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Go to <strong>Log</strong> tab — movement should appear in history</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Check <a class="url" href="http://localhost:3000/admin/pharmacy/reports">/admin/pharmacy/reports</a> → Expiry tracking view</div></div>
+    </div>
+  </div>
+
+  <!-- 13. Twilio WhatsApp -->
+  <div class="section" id="twilio">
+    <h2><span class="section-num">13</span>Setup Twilio WhatsApp (Optional)</h2>
+    <p>Skip this for initial testing. Do this when the client wants live WhatsApp messages.</p>
+
+    <h3>13.1 Create Twilio account</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Sign up at <a href="https://www.twilio.com" style="color:#1e3a5f;" target="_blank">twilio.com</a></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Go to Console → copy <strong>Account SID</strong> and <strong>Auth Token</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Paste into <code>.env.local</code>: TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN</div></div>
+    </div>
+
+    <h3>13.2 Enable WhatsApp Sandbox (for testing)</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Twilio Console → <strong>Messaging → Try it Out → Send a WhatsApp message</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Follow instructions: send "join [code]" from your phone to the Twilio sandbox number</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Sandbox number is: <code>+1 415 523 8886</code> — this is your TWILIO_WHATSAPP_FROM</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Restart dev server → Issue a token and call next → Check if WhatsApp message arrives</div></div>
+    </div>
+
+    <h3>13.3 Test WhatsApp Bot</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Set webhook URL in Twilio: <code>https://your-domain.com/api/whatsapp/webhook</code></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">For local testing, use <a href="https://ngrok.com" style="color:#1e3a5f;" target="_blank">ngrok</a>: <code>ngrok http 3000</code> → copy the HTTPS URL</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Paste in Twilio: Messaging → Sandbox → "When a message comes in" → your ngrok URL + <code>/api/whatsapp/webhook</code></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Send "APPOINTMENT" or "HELP" to the sandbox number → should get an auto-reply</div></div>
+    </div>
+  </div>
+
+  <!-- 14. Full Checklist -->
+  <div class="section" id="checklist">
+    <h2><span class="section-num">14</span>Full Test Checklist</h2>
+    <p>Use this before handing over to the client:</p>
+
+    <h3>Authentication & Roles</h3>
+    <ul class="checklist">
+      <li>Admin login → redirects to /admin with full sidebar</li>
+      <li>Pharmacist login → redirects to /admin/pharmacy with pharmacy-only sidebar</li>
+      <li>Receptionist login → redirects to /desk with Token Queue link</li>
+      <li>Pharmacist cannot access /admin (redirected)</li>
+      <li>Receptionist cannot access /admin (redirected)</li>
+      <li>Receptionist cannot access /admin/pharmacy (redirected)</li>
+      <li>Role assignment via /admin/roles works</li>
+      <li>Logout redirects to /login</li>
+    </ul>
+
+    <h3>Public Website</h3>
+    <ul class="checklist">
+      <li>Homepage loads with hospital branding from env variables</li>
+      <li>Services, Doctors, About, Contact pages load</li>
+      <li>Patient portal login works</li>
+      <li>Book appointment form works</li>
+    </ul>
+
+    <h3>Queue System</h3>
+    <ul class="checklist">
+      <li>Issue token — appears in waiting list</li>
+      <li>Call next — token moves to "Now Serving"</li>
+      <li>TV display updates in real-time</li>
+      <li>Audio chime plays on TV display when token changes</li>
+      <li>Patient can check queue status at /queue</li>
+      <li>Token slip prints correctly</li>
+    </ul>
+
+    <h3>Desk App</h3>
+    <ul class="checklist">
+      <li>Create in-patient card — expiry date auto-set to +14 days</li>
+      <li>Discharge patient — removed from active list</li>
+      <li>Print patient card — 85×54mm layout</li>
+      <li>Create invoice with multiple line items</li>
+      <li>Discount applies correctly</li>
+      <li>Invoice prints correctly</li>
+      <li>Invoice appears in /desk/bills history</li>
+      <li>Festive wishes campaign saves to Firestore</li>
+    </ul>
+
+    <h3>Pharmacy</h3>
+    <ul class="checklist">
+      <li>Add a medicine — appears in catalog</li>
+      <li>Edit medicine — updates correctly</li>
+      <li>Add stock — stock count increases, movement logged</li>
+      <li>Dispense medicine — stock count decreases</li>
+      <li>Low stock alert appears on dashboard when stock ≤ reorder level</li>
+      <li>Add supplier — appears in list</li>
+      <li>Reports: stock status and expiry tracking show data</li>
+    </ul>
+
+    <h3>WhatsApp (if configured)</h3>
+    <ul class="checklist">
+      <li>Token called → WhatsApp notification sent to patient's phone</li>
+      <li>In-patient card created → card details sent via WhatsApp</li>
+      <li>Festive wishes → bulk WhatsApp sent</li>
+      <li>Bot: send "APPOINTMENT" → auto-reply received</li>
+      <li>Bot: send "HELP" → menu received</li>
+    </ul>
+  </div>
+
+  <div class="card green" style="margin-top:40px;">
+    <h3 style="color:#166534; margin-bottom:6px;">✓ All done!</h3>
+    <p>If all items above pass, the system is ready for the client. Remember to update the branding in <code>.env.local</code> with the actual hospital name, phone, address, and UPI details before handing over.</p>
+  </div>
+
+</div>
+</body>
+</html>

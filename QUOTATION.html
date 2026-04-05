@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quotation — Dhanvantari Hospital Digital System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Lato', sans-serif; color: #1e293b; line-height: 1.7; font-size: 14px; }
+
+    .header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%);
+      color: #fff;
+      padding: 40px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .header h1 { font-size: 1.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; }
+    .header .subtitle { font-size: 0.75rem; color: rgba(255,255,255,0.6); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+    .header .right { text-align: right; }
+    .header .right .doc-title { font-size: 1.4rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.15em; }
+    .header .right p { font-size: 0.8rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
+
+    .container { max-width: 880px; margin: 0 auto; padding: 40px; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 36px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .info-grid h3 { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #94a3b8; margin-bottom: 6px; }
+    .info-grid p { font-size: 0.9rem; color: #1e293b; }
+
+    table { width: 100%; border-collapse: collapse; margin-bottom: 28px; }
+    thead th {
+      text-align: left; padding: 10px 14px;
+      background: #1e3a5f; color: #fff; font-weight: 700;
+      text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.08em;
+    }
+    thead th:last-child { text-align: right; }
+    tbody td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; font-size: 0.85rem; }
+    tbody td:last-child { text-align: right; font-weight: 700; }
+    tbody tr:nth-child(even) td { background: #f8fafc; }
+    tbody .section-row td { background: #1e3a5f; color: #fff; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 7px 14px; }
+
+    .totals { text-align: right; margin-bottom: 36px; }
+    .totals .row { display: flex; justify-content: flex-end; gap: 40px; padding: 6px 0; font-size: 0.9rem; }
+    .totals .row.total { font-size: 1.3rem; font-weight: 900; border-top: 2px solid #1e3a5f; padding-top: 12px; margin-top: 8px; color: #1e3a5f; }
+    .totals .label { color: #64748b; min-width: 200px; }
+    .totals .value { font-weight: 700; min-width: 120px; }
+
+    .hosting-box {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%);
+      color: #fff; padding: 24px; margin-bottom: 36px; border-radius: 8px; text-align: center;
+    }
+    .hosting-box h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+    .hosting-box .price { font-size: 2.2rem; font-weight: 900; }
+    .hosting-box .price span { font-size: 0.9rem; font-weight: 400; color: rgba(255,255,255,0.6); }
+    .hosting-box .badge { display: inline-block; margin-top: 10px; padding: 4px 20px; background: rgba(255,255,255,0.15); border-radius: 100px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; }
+    .hosting-box .note { font-size: 0.8rem; color: rgba(255,255,255,0.55); margin-top: 10px; }
+
+    .note-box { background: #fef9c3; border: 1px solid #fde047; padding: 14px 18px; border-radius: 8px; margin-bottom: 28px; font-size: 0.82rem; color: #713f12; }
+
+    .payment-summary { background: #f8fafc; border: 1px solid #e2e8f0; padding: 24px; margin-bottom: 36px; border-radius: 8px; }
+    .payment-summary h3 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 14px; }
+    .payment-summary .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.85rem; }
+    .payment-summary .row.bold { font-weight: 900; font-size: 1rem; border-top: 1px solid #e2e8f0; padding-top: 10px; margin-top: 6px; color: #1e3a5f; }
+
+    .terms h3 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 12px; }
+    .terms ul { list-style: none; }
+    .terms li { padding: 5px 0 5px 16px; font-size: 0.85rem; color: #475569; position: relative; }
+    .terms li::before { content: ''; position: absolute; left: 0; top: 12px; width: 5px; height: 5px; background: #1e3a5f; border-radius: 50%; }
+
+    .footer { background: #1e3a5f; color: rgba(255,255,255,0.6); padding: 28px 40px; text-align: center; }
+    .footer .brand { font-size: 1rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.2em; }
+
+    @media (max-width: 600px) {
+      .header { flex-direction: column; }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+    @media print {
+      body { font-size: 11px; }
+      .header, .container { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>Vwebstudio</h1>
+      <p class="subtitle">Web Design & Development Studio</p>
+    </div>
+    <div class="right">
+      <p class="doc-title">Quotation</p>
+      <p>Date: April 5, 2026</p>
+      <p>Ref: VWS/DHANVANTARI/2026-04</p>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Client Info -->
+    <div class="info-grid">
+      <div>
+        <h3>Prepared For</h3>
+        <p><strong>Dhanvantari Hospital</strong></p>
+        <p>Multi-Specialty Hospital with Emergency Critical Care Unit</p>
+        <p style="margin-top:4px; color:#64748b; font-size:0.82rem;">General Medicine · Surgery · Gynecology · Pediatrics<br>Orthopedics · Neurology · Cardiology · Critical Care</p>
+      </div>
+      <div>
+        <h3>Project</h3>
+        <p><strong>Complete Digital Hospital System</strong></p>
+        <p>Website + Queue + Desk App + WhatsApp + Pharmacy</p>
+      </div>
+    </div>
+
+    <!-- Features & Pricing Table -->
+    <h3 style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;margin-bottom:16px;">Scope of Work & Pricing</h3>
+    <table>
+      <thead><tr><th>Module / Feature</th><th>Details</th><th>Amount</th></tr></thead>
+      <tbody>
+        <tr class="section-row"><td colspan="3">1. Hospital Website</td></tr>
+        <tr><td>8 Department pages with conditions & services</td><td>General Medicine, Surgery, Gynecology, Pediatrics, Orthopedics, Neurology, Cardiology, Critical Care</td><td></td></tr>
+        <tr><td>Doctor profiles (Dr. Ayyapa + 8 specialists)</td><td>Bio, credentials, specialties, contact</td><td></td></tr>
+        <tr><td>15 Service pages with FAQs</td><td>Detailed pages for all services across departments</td><td></td></tr>
+        <tr><td>Online appointment booking + email confirmation</td><td>4-step booking wizard</td><td></td></tr>
+        <tr><td>Patient portal</td><td>Appointments, profile, messages, reviews</td><td></td></tr>
+        <tr><td>Blog, Gallery, Reviews, FAQ, Contact</td><td>Complete content management</td><td>&#8377;30,000</td></tr>
+
+        <tr class="section-row"><td colspan="3">2. Patient Token Queue + TV Display</td></tr>
+        <tr><td>Token issuance at reception</td><td>12 purpose types (Emergency, Surgery, Gynecology, etc.)</td><td></td></tr>
+        <tr><td>Reception management panel</td><td>Call next, Complete, Skip, No Show, print slip</td><td></td></tr>
+        <tr><td>Doctor-facing view</td><td>Current patient + next 5 in queue</td><td></td></tr>
+        <tr><td>Full-screen TV monitor display</td><td>Real-time updates + audio chime</td><td></td></tr>
+        <tr><td>Patient queue check</td><td>Patients check position by phone/token number</td><td>&#8377;25,000</td></tr>
+
+        <tr class="section-row"><td colspan="3">3. Desk Application (Reception Panel)</td></tr>
+        <tr><td>In-patient card management</td><td>Issue, print 85×54mm, discharge, WhatsApp share</td><td></td></tr>
+        <tr><td>14-day auto-expiry with countdown badges</td><td>Green/yellow/red expiry indicator</td><td></td></tr>
+        <tr><td>Invoice / bill creation</td><td>Consultation, surgery, room, lab, medicines with discount</td><td></td></tr>
+        <tr><td>Invoice history & reprint</td><td>Search by patient name, phone, invoice number</td><td></td></tr>
+        <tr><td>Festive wishes blast</td><td>11 occasions — Diwali, Eid, New Year, Pongal, etc.</td><td>&#8377;20,000</td></tr>
+
+        <tr class="section-row"><td colspan="3">4. WhatsApp Integration (Twilio)</td></tr>
+        <tr><td>Token-called notification</td><td>Automatic WhatsApp when patient's token is called</td><td></td></tr>
+        <tr><td>Admission card on WhatsApp</td><td>Card details sent when in-patient card is created</td><td></td></tr>
+        <tr><td>Appointment reminders</td><td>Pre-appointment WhatsApp reminder</td><td></td></tr>
+        <tr><td>WhatsApp bot (4 keywords)</td><td>APPOINTMENT, CARD, STATUS, HELP — auto-reply</td><td></td></tr>
+        <tr><td>Bulk festive wishes</td><td>Send to all patients in one click</td><td>&#8377;15,000</td></tr>
+
+        <tr class="section-row"><td colspan="3">5. Pharmacy Inventory</td></tr>
+        <tr><td>Medicine catalog</td><td>Brand name, generic, category, unit, pricing, batch, expiry</td><td></td></tr>
+        <tr><td>Stock management</td><td>Purchase in, dispense out, manual adjustment, movement log</td><td></td></tr>
+        <tr><td>Supplier management</td><td>Name, contact, GST number</td><td></td></tr>
+        <tr><td>Low stock alerts & expiry tracking</td><td>Dashboard alerts + 30/60/90 day expiry report</td><td>&#8377;20,000</td></tr>
+
+        <tr class="section-row"><td colspan="3">6. Access Control & Setup</td></tr>
+        <tr><td>3-role login system</td><td>Admin, Pharmacist, Receptionist — role-based redirect</td><td></td></tr>
+        <tr><td>Admin role management panel</td><td>Assign roles to staff from admin panel</td><td></td></tr>
+        <tr><td>Env-based branding</td><td>Hospital name, phone, address — no code changes needed</td><td></td></tr>
+        <tr><td>Content setup & deployment</td><td>All 8 departments, 15 services, doctor data pre-filled</td><td>&#8377;10,000</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div class="totals">
+      <div class="row">
+        <span class="label">Hospital Website</span>
+        <span class="value">&#8377;30,000</span>
+      </div>
+      <div class="row">
+        <span class="label">Patient Queue + TV Display</span>
+        <span class="value">&#8377;25,000</span>
+      </div>
+      <div class="row">
+        <span class="label">Desk App (Cards + Billing + Wishes)</span>
+        <span class="value">&#8377;20,000</span>
+      </div>
+      <div class="row">
+        <span class="label">Twilio WhatsApp Bot + Notifications</span>
+        <span class="value">&#8377;15,000</span>
+      </div>
+      <div class="row">
+        <span class="label">Pharmacy Inventory</span>
+        <span class="value">&#8377;20,000</span>
+      </div>
+      <div class="row">
+        <span class="label">Access Control + Content Setup</span>
+        <span class="value">&#8377;10,000</span>
+      </div>
+      <div class="row total">
+        <span class="label">Total Development (One-Time)</span>
+        <span class="value">&#8377;1,20,000</span>
+      </div>
+    </div>
+
+    <!-- Twilio note -->
+    <div class="note-box">
+      <strong>&#9888; Twilio WhatsApp Note:</strong> Twilio charges approximately ₹0.70 per WhatsApp message sent. This is billed directly by Twilio to the hospital — it is separate from our development fee. A Twilio account with WhatsApp Business approval is needed for production use. Sandbox testing is free.
+    </div>
+
+    <!-- Hosting -->
+    <div class="hosting-box">
+      <h3>Monthly Hosting & Maintenance</h3>
+      <div class="price">&#8377;1,699 <span>/ month</span></div>
+      <div class="badge">&#127881; First 3 Months FREE</div>
+      <p class="note">Hosting, SSL, domain management, security updates, backups & minor content changes included</p>
+    </div>
+
+    <!-- Payment Summary -->
+    <div class="payment-summary">
+      <h3>Payment Summary</h3>
+      <div class="row">
+        <span>Development — one-time</span>
+        <span>&#8377;1,20,000</span>
+      </div>
+      <div class="row">
+        <span>Hosting — Months 1 to 3</span>
+        <span style="color:#16a34a; font-weight:700;">FREE</span>
+      </div>
+      <div class="row">
+        <span>Hosting — Month 4 onwards</span>
+        <span>&#8377;1,699 / month</span>
+      </div>
+      <div class="row">
+        <span>Twilio WhatsApp messages</span>
+        <span>~&#8377;0.70/message (billed by Twilio)</span>
+      </div>
+      <div class="row bold">
+        <span>Advance Payment (50% to start)</span>
+        <span>&#8377;60,000</span>
+      </div>
+    </div>
+
+    <!-- Terms -->
+    <div class="terms">
+      <h3>Terms & Notes</h3>
+      <ul>
+        <li>50% advance (₹60,000) required to begin development</li>
+        <li>Balance 50% (₹60,000) payable on project delivery</li>
+        <li>Estimated delivery: 3–4 weeks from advance payment date</li>
+        <li>2 rounds of revisions included per module</li>
+        <li>2 hours of training on admin panel, desk app, and pharmacy included</li>
+        <li>First 3 months of hosting are complimentary</li>
+        <li>All 8 departments, 15 services, and doctor data pre-filled during setup</li>
+        <li>Hospital name, phone, address, and branding configurable without code changes</li>
+        <li>Twilio WhatsApp account to be set up by hospital — we assist with setup and approval</li>
+        <li>Source code will be provided to the hospital on final payment</li>
+        <li>Quotation valid for 30 days from date of issue</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <p class="brand">Vwebstudio</p>
+    <p style="margin-top:6px;">Web Design & Development Studio</p>
+    <p style="margin-top:12px; font-size:0.72rem; color:rgba(255,255,255,0.3);">Confidential — prepared for Dhanvantari Hospital · Ref: VWS/DHANVANTARI/2026-04</p>
+  </div>
+
+</body>
+</html>

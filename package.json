@@ -1,5 +1,5 @@
 {
-  "name": "mid-size-clinic",
+  "name": "dhanvantari-hospital",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,18 +9,47 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@tanstack/react-table": "^8.21.3",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
+    "firebase": "^12.10.0",
+    "firebase-admin": "^13.7.0",
+    "framer-motion": "^12.34.5",
+    "fuse.js": "^7.1.0",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.576.0",
     "next": "16.1.6",
+    "next-sitemap": "^4.2.3",
+    "next-themes": "^0.4.6",
+    "nodemailer": "^8.0.1",
+    "qrcode.react": "^4.2.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "react-hook-form": "^7.71.2",
+    "react-hot-toast": "^2.6.0",
+    "react-leaflet": "^5.0.0",
+    "recharts": "^3.7.0",
+    "swr": "^2.4.1",
+    "tailwind-merge": "^3.5.0",
+    "twilio": "^5.7.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/twilio": "*",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "prettier": "^3.8.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
