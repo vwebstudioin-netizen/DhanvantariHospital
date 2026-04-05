@@ -4,30 +4,32 @@ import { useEffect, useState, ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { getUserRole } from "@/lib/userRoles";
+import { getUserRole, type UserRole } from "@/lib/userRoles";
 import { SITE_NAME } from "@/lib/constants";
 import Link from "next/link";
 import {
-  LayoutDashboard,
-  CreditCard,
-  Receipt,
-  FileText,
-  Gift,
-  Ticket,
-  LogOut,
-  Menu,
-  X,
-  Hospital,
+  LayoutDashboard, CreditCard, Receipt, FileText, Gift,
+  Ticket, LogOut, Menu, X, Hospital,
 } from "lucide-react";
 
-const SIDEBAR_LINKS = [
-  { href: "/desk", label: "Dashboard", icon: LayoutDashboard },
+// Full desk links — receptionist and admin
+const RECEPTIONIST_LINKS = [
+  { href: "/desk",              label: "Dashboard",       icon: LayoutDashboard },
+  { href: "/admin/queue",       label: "Token Queue",     icon: Ticket },
   { href: "/desk/inpatient-card", label: "In-Patient Cards", icon: CreditCard },
-  { href: "/desk/billing", label: "New Invoice", icon: Receipt },
-  { href: "/desk/bills", label: "Invoice History", icon: FileText },
-  { href: "/desk/wishes", label: "Festive Wishes", icon: Gift },
-  { href: "/admin/queue", label: "Token Queue", icon: Ticket },
+  { href: "/desk/billing",      label: "New Invoice",     icon: Receipt },
+  { href: "/desk/bills",        label: "Invoice History", icon: FileText },
+  { href: "/desk/wishes",       label: "Festive Wishes",  icon: Gift },
 ];
+
+// Billing only — pharmacist
+const PHARMACIST_LINKS = [
+  { href: "/desk/billing", label: "New Invoice",     icon: Receipt },
+  { href: "/desk/bills",   label: "Invoice History", icon: FileText },
+];
+
+// Pages pharmacist is allowed on /desk
+const PHARMACIST_DESK_ALLOWED = ["/desk/billing", "/desk/bills"];
 
 export default function DeskLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -35,30 +37,30 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
-      if (pathname === "/desk/login") {
-        setLoading(false);
-        return;
-      }
-      if (!user) {
+      if (pathname === "/desk/login") { setLoading(false); return; }
+      if (!user) { router.push("/login"); setLoading(false); return; }
+
+      const r = await getUserRole(user.uid);
+      const allowed = ["admin", "receptionist", "pharmacist"];
+
+      if (!r || !allowed.includes(r)) {
         router.push("/login");
         setLoading(false);
         return;
       }
 
-      // Check role from Firestore — must be admin or receptionist
-      const role = await getUserRole(user.uid);
-      const isAdmin = role === "admin";
-      const isReceptionist = role === "receptionist";
-
-      if (!isAdmin && !isReceptionist) {
-        router.push("/login");
+      // Pharmacist can only access billing pages on /desk
+      if (r === "pharmacist" && !PHARMACIST_DESK_ALLOWED.some((p) => pathname.startsWith(p))) {
+        router.push("/desk/billing");
         setLoading(false);
         return;
       }
 
+      setRole(r);
       setUserEmail(user.email);
       setLoading(false);
     });
@@ -72,67 +74,68 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-muted flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#0f1729] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
       </div>
     );
   }
 
   if (pathname === "/desk/login") return <>{children}</>;
 
+  const sidebarLinks = role === "pharmacist" ? PHARMACIST_LINKS : RECEPTIONIST_LINKS;
+  const roleLabel = role === "pharmacist" ? "Pharmacy" : role === "admin" ? "Admin" : "Reception";
+
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-[#f0f2f5] flex">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-60 bg-primary text-white flex flex-col transition-transform duration-300 ${
+        className={`fixed inset-y-0 left-0 z-50 w-56 bg-[#0f1729] flex flex-col transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="flex items-center gap-3 p-5 border-b border-white/10">
-          <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
-            <Hospital className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-white">{SITE_NAME}</p>
-            <p className="text-xs text-white/50">Reception</p>
+        <div className="px-4 py-4 border-b border-white/5">
+          <div className="flex items-center gap-2">
+            <Hospital className="w-4 h-4 text-white/50" />
+            <div>
+              <p className="text-sm font-bold text-white">{SITE_NAME}</p>
+              <p className="text-[10px] text-white/40">{roleLabel} Desk</p>
+            </div>
           </div>
         </div>
 
         {userEmail && (
-          <div className="px-5 py-2.5 border-b border-white/10 bg-white/5">
-            <p className="text-xs text-white/70 truncate">{userEmail}</p>
+          <div className="px-4 py-2 border-b border-white/5">
+            <p className="text-xs text-white/40 truncate">{userEmail}</p>
           </div>
         )}
 
-        <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-          {SIDEBAR_LINKS.map((link) => {
-            const Icon = link.icon;
-            const active =
-              link.href === "/desk"
-                ? pathname === "/desk"
-                : pathname.startsWith(link.href);
+        <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
+          {sidebarLinks.map((link) => {
+            const active = link.href === "/desk"
+              ? pathname === "/desk"
+              : pathname.startsWith(link.href);
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
                   active
-                    ? "bg-white text-primary"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                    ? "bg-white/10 text-white font-medium"
+                    : "text-white/50 hover:bg-white/5 hover:text-white"
                 }`}
               >
-                <Icon className="w-4 h-4 shrink-0" />
+                <link.icon className="w-4 h-4 shrink-0" />
                 {link.label}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-3 border-t border-white/10">
+        <div className="p-2 border-t border-white/5">
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all"
+            className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-sm text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-colors"
           >
             <LogOut className="w-4 h-4" />
             Sign Out
@@ -141,22 +144,16 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
       </aside>
 
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      <div className="flex-1 lg:ml-60">
-        <header className="bg-white border-b border-slate-100 px-5 py-3.5 flex items-center gap-4 sticky top-0 z-30">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden text-slate-600 p-1"
-          >
+      <div className="flex-1 lg:ml-56">
+        <header className="bg-white border-b border-neutral-200 px-5 py-3 flex items-center gap-4 sticky top-0 z-30">
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden text-neutral-600 p-1">
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
-          <h1 className="text-base font-semibold text-slate-800 capitalize">
-            {SIDEBAR_LINKS.find((l) =>
+          <h1 className="text-sm font-semibold text-neutral-700">
+            {sidebarLinks.find((l) =>
               l.href === "/desk" ? pathname === "/desk" : pathname.startsWith(l.href)
             )?.label ?? "Desk"}
           </h1>
