@@ -33,7 +33,7 @@ interface BookingState {
 }
 
 const initialState: BookingState = {
-  locationSlug: "",
+  locationSlug: locations[0]?.slug || "", // Auto-select single location
   departmentSlug: "",
   serviceSlug: "",
   doctorSlug: "",
@@ -65,7 +65,7 @@ export default function BookingPage() {
 
   const canProceed = (): boolean => {
     switch (step) {
-      case 0: return !!state.locationSlug;
+      case 0: return true; // Single location auto-selected, always proceed
       case 1: return !!state.departmentSlug;
       case 2: return !!state.serviceSlug;
       case 3: return !!state.doctorSlug;
@@ -154,7 +154,7 @@ export default function BookingPage() {
           </div>
 
           {/* Step Content */}
-          <div className="min-h-[300px] rounded-xl border border-border bg-card p-6">
+          <div className="min-h-75 rounded-xl border border-border bg-card p-6">
             {/* Step 0: Location */}
             {step === 0 && (
               <div className="space-y-4">

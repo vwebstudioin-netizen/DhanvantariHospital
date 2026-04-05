@@ -119,10 +119,14 @@ export const DAYS_OF_WEEK = [
 ] as const;
 
 export const BOOKING_STEPS = [
-  { id: 1, label: "Service" },
-  { id: 2, label: "Date & Time" },
-  { id: 3, label: "Your Details" },
-  { id: 4, label: "Review & Confirm" },
+  { id: 1, label: "Location" },
+  { id: 2, label: "Department" },
+  { id: 3, label: "Service" },
+  { id: 4, label: "Doctor" },
+  { id: 5, label: "Date & Time" },
+  { id: 6, label: "Your Details" },
+  { id: 7, label: "Insurance" },
+  { id: 8, label: "Review" },
 ] as const;
 
 export const INPATIENT_WARDS = [
