@@ -91,6 +91,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     return null;
   }
 
+  // Wait for role to load from Firestore before making access decisions
+  if (!isAdmin && !isPharmacist && !isReceptionist && role === null) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0f1729]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+      </div>
+    );
+  }
+
   // Determine sidebar and allowed pages for this role
   let sidebarLinks = ADMIN_LINKS;
   let roleLabel = "Admin";

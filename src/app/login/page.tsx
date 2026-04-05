@@ -27,7 +27,7 @@ export default function LoginPage() {
       if (role === "admin") {
         router.push("/admin");
       } else if (role === "pharmacist") {
-        router.push("/desk/billing");
+        router.push("/admin/pharmacy");
       } else if (role === "receptionist") {
         router.push("/admin/queue");
       } else if (role === "doctor") {
