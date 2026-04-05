@@ -58,7 +58,7 @@ const PHARMACIST_LINKS = [
 ];
 
 // Pages each non-admin role is allowed to access
-const RECEPTIONIST_ALLOWED = ["/admin/queue", "/admin/appointments", "/admin/patients", "/desk"];
+const RECEPTIONIST_ALLOWED = ["/admin/queue", "/admin/appointments", "/admin/patients"];
 const DOCTOR_ALLOWED = ["/admin/queue", "/admin/appointments", "/admin/patients"];
 const PHARMACIST_ALLOWED = ["/admin/pharmacy", "/desk/billing", "/desk/bills"];
 
@@ -123,13 +123,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         return null;
       }
     } else if (isPharmacist) {
-      sidebarLinks = PHARMACIST_LINKS;
-      roleLabel = "Pharmacy";
-      defaultHref = "/admin/pharmacy";
-      if (!isAllowed(pathname, PHARMACIST_ALLOWED)) {
-        if (typeof window !== "undefined") window.location.href = defaultHref;
+      // Pharmacist uses the dedicated pharmacy sub-layout — don't add admin wrapper
+      const allowed = PHARMACIST_ALLOWED.some((p) => pathname.startsWith(p));
+      if (!allowed) {
+        if (typeof window !== "undefined") window.location.href = "/admin/pharmacy";
         return null;
       }
+      return <>{children}</>;
     } else {
       // No recognized role
       return (
