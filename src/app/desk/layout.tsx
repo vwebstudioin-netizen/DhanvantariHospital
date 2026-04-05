@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, ReactNode } from "react";
+import { useEffect, ReactNode, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -11,10 +11,11 @@ import Link from "next/link";
 import {
   LayoutDashboard, CreditCard, Receipt, FileText, Gift,
   Ticket, LogOut, Menu, X, Hospital, Inbox, Calendar, Users,
+  ArrowLeft,
 } from "lucide-react";
-import { useState } from "react";
+import { cn } from "@/lib/utils";
 
-// All receptionist links stay within /desk/* — no cross-layout navigation
+// ── Receptionist desk links ─────────────────────────────────────────────────
 const RECEPTIONIST_LINKS = [
   { href: "/desk",                  label: "Dashboard",        icon: LayoutDashboard },
   { href: "/desk/queue",            label: "Token Queue",      icon: Ticket },
@@ -27,6 +28,15 @@ const RECEPTIONIST_LINKS = [
   { href: "/desk/wishes",           label: "Festive Wishes",   icon: Gift },
 ];
 
+// ── Doctor links ─────────────────────────────────────────────────────────────
+const DOCTOR_LINKS = [
+  { href: "/desk/queue",            label: "Token Queue",      icon: Ticket },
+  { href: "/desk/appointments",     label: "Appointments",     icon: Calendar },
+  { href: "/desk/patients",         label: "Patients",         icon: Users },
+  { href: "/desk/enquiries",        label: "Enquiries",        icon: Inbox },
+];
+
+// ── Pharmacist billing links ─────────────────────────────────────────────────
 const PHARMACIST_LINKS = [
   { href: "/desk/billing", label: "New Invoice",     icon: Receipt },
   { href: "/desk/bills",   label: "Invoice History", icon: FileText },
@@ -39,26 +49,14 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Use the shared AuthContext — same source of truth as the admin layout
   const { user, loading, isAdmin, isReceptionist, isPharmacist, role } = useAuthContext();
   const isDoctor = role === "doctor";
 
-  // Handle access control — redirect if unauthorized
   useEffect(() => {
     if (loading) return;
     if (pathname === "/desk/login") return;
-
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-
-    if (!isAdmin && !isReceptionist && !isPharmacist && !isDoctor) {
-      router.push("/login");
-      return;
-    }
-
-    // Pharmacist can only access billing pages on /desk
+    if (!user) { router.push("/login"); return; }
+    if (!isAdmin && !isReceptionist && !isPharmacist && !isDoctor) { router.push("/login"); return; }
     if (isPharmacist && !isAdmin && !PHARMACIST_DESK_ALLOWED.some((p) => pathname.startsWith(p))) {
       router.push("/desk/billing");
     }
@@ -79,9 +77,14 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  // Admin gets all desk links; pharmacist gets billing only; receptionist gets full desk
-  const sidebarLinks = (isPharmacist && !isAdmin) ? PHARMACIST_LINKS : RECEPTIONIST_LINKS;
-  const roleLabel = isPharmacist && !isAdmin ? "Pharmacy" : isAdmin ? "Admin" : "Reception";
+  // Determine sidebar based on role
+  const sidebarLinks = isPharmacist && !isAdmin
+    ? PHARMACIST_LINKS
+    : isDoctor && !isAdmin
+    ? DOCTOR_LINKS
+    : RECEPTIONIST_LINKS;
+
+  const roleLabel = isAdmin ? "Admin (Desk View)" : isPharmacist ? "Pharmacy" : isDoctor ? "Doctor" : "Reception";
 
   return (
     <div className="min-h-screen bg-[#f0f2f5] flex">
@@ -90,12 +93,23 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
+        {/* Back to Admin button — only visible to admin */}
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 transition-colors border-b border-white/10 text-white/60 hover:text-white text-xs font-medium"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Back to Admin Panel
+          </Link>
+        )}
+
         <div className="px-4 py-4 border-b border-white/5">
           <div className="flex items-center gap-2">
             <Hospital className="w-4 h-4 text-white/50" />
             <div>
               <p className="text-sm font-bold text-white">{SITE_NAME}</p>
-              <p className="text-[10px] text-white/40">{roleLabel} Desk</p>
+              <p className="text-[10px] text-white/40">{roleLabel}</p>
             </div>
           </div>
         </div>
@@ -108,17 +122,18 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
 
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
           {sidebarLinks.map((link) => {
-            const active = pathname === link.href;
+            const active = pathname === link.href || pathname.startsWith(link.href + "/");
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
                   active
                     ? "bg-white/10 text-white font-medium"
                     : "text-white/50 hover:bg-white/5 hover:text-white"
-                }`}
+                )}
               >
                 <link.icon className="w-4 h-4 shrink-0" />
                 {link.label}
@@ -127,13 +142,7 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        <div className="p-2 border-t border-white/5 space-y-0.5">
-          {isAdmin && (
-            <Link href="/admin" className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-sm text-white/40 hover:bg-white/5 hover:text-white transition-colors">
-              <LayoutDashboard className="w-4 h-4" />
-              ← Admin Panel
-            </Link>
-          )}
+        <div className="p-2 border-t border-white/5">
           <button
             onClick={handleSignOut}
             className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-sm text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-colors"
@@ -154,7 +163,7 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
           <h1 className="text-sm font-semibold text-neutral-700">
-            {sidebarLinks.find((l) => pathname === l.href)?.label ?? "Desk"}
+            {sidebarLinks.find((l) => pathname === l.href || pathname.startsWith(l.href + "/"))?.label ?? "Desk"}
           </h1>
         </header>
         <main className="p-5">{children}</main>

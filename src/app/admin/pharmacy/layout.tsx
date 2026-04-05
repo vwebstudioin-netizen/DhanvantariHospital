@@ -18,6 +18,7 @@ import {
   Hospital,
   Receipt,
   FileText,
+  ArrowLeft,
 } from "lucide-react";
 
 const PHARMACY_LINKS = [
@@ -51,13 +52,6 @@ export default function PharmacyLayout({ children }: { children: ReactNode }) {
 
   if (!user || (!isAdmin && !isPharmacist)) return null;
 
-  // Admin sees the pharmacy pages through the main admin layout (no override).
-  // Pharmacist (non-admin) gets a dedicated pharmacy-only sidebar.
-  if (isAdmin) {
-    // Don't wrap with a second layout — the parent admin/layout.tsx handles it.
-    return <>{children}</>;
-  }
-
   const handleLogout = async () => {
     await signOut();
     router.push("/login");
@@ -66,6 +60,17 @@ export default function PharmacyLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex bg-muted">
       <aside className="w-60 bg-primary text-white flex flex-col shrink-0">
+        {/* Back to Admin — only for admin users */}
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="flex items-center gap-2 px-5 py-3 bg-black/20 hover:bg-black/30 transition-colors border-b border-white/10 text-white/60 hover:text-white text-xs font-medium"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Back to Admin Panel
+          </Link>
+        )}
+
         <div className="px-5 py-5 border-b border-white/10">
           <div className="flex items-center gap-2">
             <Hospital className="w-5 h-5 text-white/70" />
