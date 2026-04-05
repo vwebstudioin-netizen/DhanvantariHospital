@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { format, differenceInDays } from "date-fns";
+import { format, differenceInDays, addDays } from "date-fns";
 import { Plus, Printer, Phone, XCircle, Search, BedDouble, CalendarCheck } from "lucide-react";
 import { createInPatientCard, getActiveCards, dischargePatient } from "@/lib/inpatient";
 import { issueToken } from "@/lib/queue";
@@ -215,7 +215,7 @@ export default function InPatientCardPage() {
       if (form.patientPhone) {
         const tmpCard = { ...payload, cardNumber, patientId: "", id: "", isActive: true, createdAt: null, updatedAt: null };
         if (activeTab === "visit") {
-          const expiryDate = format(new Date(new Date(form.admissionDate).getTime() + 14 * 86400000), "yyyy-MM-dd");
+          const expiryDate = format(addDays(new Date(form.admissionDate), 14), "yyyy-MM-dd");
           tmpCard.expiryDate = expiryDate;
         }
         await sendCardWhatsApp(tmpCard as InPatientCard).catch(() => {});

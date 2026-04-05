@@ -20,7 +20,6 @@ export default function BillsPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [printInvoice, setPrintInvoice] = useState<Invoice | null>(null);
 
   useEffect(() => { load(); }, []);
 
@@ -45,20 +44,14 @@ export default function BillsPage() {
   );
 
   const handlePrint = (inv: Invoice) => {
-    setPrintInvoice(inv);
-    setTimeout(() => {
-      if (printInvoice || inv) {
-        const w = window.open("", "_blank", "width=800,height=600");
-        if (w) {
-          const content = document.getElementById(`print-${inv.id}`)?.innerHTML || "";
-          w.document.write(`<!DOCTYPE html><html><head><title>Invoice ${inv.invoiceNumber}</title>
-            <style>body{font-family:Arial,sans-serif;margin:0;padding:20px}table{width:100%;border-collapse:collapse}th,td{padding:6px 10px;text-align:left;border-bottom:1px solid #e2e8f0}thead tr{background:#1e3a5f;color:#fff}</style>
-            </head><body>${buildPrintHTML(inv)}</body></html>`);
-          w.document.close(); w.focus(); w.print(); w.close();
-        }
-      }
-      setPrintInvoice(null);
-    }, 100);
+    // Use inv directly — no stale closure risk
+    const w = window.open("", "_blank", "width=800,height=600");
+    if (w) {
+      w.document.write(`<!DOCTYPE html><html><head><title>Invoice ${inv.invoiceNumber}</title>
+        <style>body{font-family:Arial,sans-serif;margin:0;padding:20px}table{width:100%;border-collapse:collapse}th,td{padding:6px 10px;text-align:left;border-bottom:1px solid #e2e8f0}thead tr{background:#1e3a5f;color:#fff}</style>
+        </head><body>${buildPrintHTML(inv)}</body></html>`);
+      w.document.close(); w.focus(); w.print(); w.close();
+    }
   };
 
   function buildPrintHTML(inv: Invoice) {

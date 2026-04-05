@@ -16,11 +16,11 @@ import type { Medicine } from "@/types/medicine";
 const COL = "medicines";
 
 export async function getMedicines(activeOnly = true): Promise<Medicine[]> {
-  const q = activeOnly
-    ? query(collection(db, COL), where("isActive", "==", true), orderBy("name", "asc"))
-    : query(collection(db, COL), orderBy("name", "asc"));
+  // Client-side filter to avoid composite index requirement
+  const q = query(collection(db, COL), orderBy("name", "asc"));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Medicine[];
+  const all = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Medicine[];
+  return activeOnly ? all.filter((m) => m.isActive !== false) : all;
 }
 
 export async function getMedicineById(id: string): Promise<Medicine | null> {

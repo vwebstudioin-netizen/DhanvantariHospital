@@ -72,11 +72,11 @@ export async function dispense(
 }
 
 export async function getMovements(medicineId?: string, limitCount = 50): Promise<StockMovement[]> {
-  const q = medicineId
-    ? query(collection(db, MOVEMENTS), where("medicineId", "==", medicineId), orderBy("createdAt", "desc"), limit(limitCount))
-    : query(collection(db, MOVEMENTS), orderBy("createdAt", "desc"), limit(limitCount));
+  // Client-side filter to avoid composite index requirement
+  const q = query(collection(db, MOVEMENTS), orderBy("createdAt", "desc"), limit(limitCount));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as StockMovement[];
+  const all = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as StockMovement[];
+  return medicineId ? all.filter((m) => m.medicineId === medicineId) : all;
 }
 
 export async function getSuppliers(): Promise<Supplier[]> {

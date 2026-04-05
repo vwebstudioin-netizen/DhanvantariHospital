@@ -8,7 +8,7 @@ export interface InPatientCard {
   cardNumber: string;          // IPD-0001 (room) or OPD-0001 (visit)
   patientId: string;           // PAT-XXXX auto-generated
   patientName: string;
-  patientPhone: string;
+  patientPhone?: string;      // Optional — required for WhatsApp notifications
   doctorName: string;
 
   // Room card specific

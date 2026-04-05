@@ -8,6 +8,8 @@ import {
   Check, SkipForward, UserX, Printer, Stethoscope, Play,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import toast from "react-hot-toast";
 
 const PURPOSES = [
   "General Consultation", "Emergency / Accident", "Surgery Review",
@@ -28,6 +30,9 @@ export default function QueuePage() {
   const [issuing, setIssuing] = useState(false);
   const [lastIssued, setLastIssued] = useState<{ displayNumber: string; patientName: string } | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  // Doctor View link adapts: /admin/queue → /admin/queue/doctor | /desk/queue → /desk/queue/doctor
+  const doctorViewHref = pathname.startsWith("/desk") ? "/desk/queue/doctor" : "/admin/queue/doctor";
 
   const handleIssue = async () => {
     if (!name.trim() || !phone.trim()) return;
@@ -96,7 +101,7 @@ export default function QueuePage() {
             Waiting: {waitingTokens.length} · Active: {activeToken ? 1 : 0} · Done: {completedTokens.length}
           </p>
         </div>
-        <Link href="/admin/queue/doctor"
+        <Link href={doctorViewHref}
           className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-[#152d4a]">
           <Stethoscope className="h-4 w-4" /> Doctor View
         </Link>
@@ -197,7 +202,10 @@ export default function QueuePage() {
                 <Play className="h-4 w-4" /> Start Consultation
               </button>
               <div className="grid grid-cols-2 gap-2">
-                <button onClick={async () => { await skip(calledToken.id); await handleCallNext(); }}
+                <button onClick={async () => {
+                    try { await skip(calledToken.id); await handleCallNext(); }
+                    catch { toast.error("Skip failed — please try again"); }
+                  }}
                   className="flex items-center justify-center gap-1.5 rounded-lg bg-amber-500 py-2.5 text-sm font-medium text-white hover:bg-amber-600">
                   <SkipForward className="h-4 w-4" /> Skip
                 </button>

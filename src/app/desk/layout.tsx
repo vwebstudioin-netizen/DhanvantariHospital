@@ -37,7 +37,8 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Use the shared AuthContext — same source of truth as the admin layout
-  const { user, loading, isAdmin, isReceptionist, isPharmacist } = useAuthContext();
+  const { user, loading, isAdmin, isReceptionist, isPharmacist, role } = useAuthContext();
+  const isDoctor = role === "doctor";
 
   // Handle access control — redirect if unauthorized
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
       return;
     }
 
-    if (!isAdmin && !isReceptionist && !isPharmacist) {
+    if (!isAdmin && !isReceptionist && !isPharmacist && !isDoctor) {
       router.push("/login");
       return;
     }
@@ -58,7 +59,7 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
     if (isPharmacist && !isAdmin && !PHARMACIST_DESK_ALLOWED.some((p) => pathname.startsWith(p))) {
       router.push("/desk/billing");
     }
-  }, [user, loading, isAdmin, isReceptionist, isPharmacist, pathname, router]);
+  }, [user, loading, isAdmin, isReceptionist, isPharmacist, isDoctor, pathname, router]);
 
   const handleSignOut = async () => {
     await signOut(auth);
@@ -67,7 +68,7 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
 
   if (pathname === "/desk/login") return <>{children}</>;
 
-  if (loading || (!isAdmin && !isReceptionist && !isPharmacist)) {
+  if (loading || (!isAdmin && !isReceptionist && !isPharmacist && !isDoctor)) {
     return (
       <div className="min-h-screen bg-[#0f1729] flex items-center justify-center">
         <LoadingSpinner size="lg" />
