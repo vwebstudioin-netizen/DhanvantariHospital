@@ -111,8 +111,8 @@ service cloud.firestore {
     // ── Patient data ──────────────────────────────────────────────────
     match /patients/{patientId} {
       allow read: if isOwner(patientId) || isDeskStaff() || isDoctor();
-      allow create: if isAuthenticated() && request.auth.uid == patientId;
-      allow update: if isOwner(patientId) || isDeskStaff();
+      allow create: if isAuthenticated() && (request.auth.uid == patientId || isAdmin());
+      allow update: if isOwner(patientId) || isDeskStaff() || isAdmin();
       allow delete: if isAdmin();
     }
 

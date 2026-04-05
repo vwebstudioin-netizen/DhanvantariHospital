@@ -9,18 +9,23 @@ export default function AdminSettings() {
   const [seeding, setSeeding] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [seedResult, setSeedResult] = useState<string[] | null>(null);
+  const [seedError, setSeedError] = useState<string | null>(null);
   const [resetDone, setResetDone] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
 
   const handleSeed = async () => {
     setSeeding(true);
     setSeedResult(null);
+    setSeedError(null);
     try {
       const result = await seedDemoData();
       setSeedResult(result.seeded);
-      toast.success("Demo data seeded!");
+      toast.success(`Seeded ${result.seeded.length} collections!`);
     } catch (err: any) {
-      toast.error(err.message || "Failed to seed data");
+      const msg = err?.message || "Failed to seed data";
+      setSeedError(msg);
+      toast.error(msg);
+      console.error("Seed error:", err);
     } finally {
       setSeeding(false);
     }
@@ -69,11 +74,21 @@ export default function AdminSettings() {
                 <div className="mt-3 bg-green-50 border border-green-200 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-700">Seeded:</span>
+                    <span className="text-sm font-medium text-green-700">Seeded successfully:</span>
                   </div>
                   <ul className="text-xs text-green-600 space-y-0.5 ml-6">
                     {seedResult.map((s) => <li key={s}>• {s}</li>)}
                   </ul>
+                </div>
+              )}
+              {seedError && (
+                <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-red-700">Seed failed:</p>
+                    <p className="text-xs text-red-600 mt-0.5">{seedError}</p>
+                    <p className="text-xs text-red-500 mt-1">Make sure you are logged in as admin and Firebase is connected.</p>
+                  </div>
                 </div>
               )}
             </div>
