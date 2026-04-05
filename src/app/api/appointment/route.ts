@@ -51,24 +51,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save appointment to Firestore
-    const appointmentId = await addDocument("appointments", {
-      departmentSlug,
-      serviceSlug: serviceSlug || null,
-      doctorSlug: doctorSlug || null,
-      locationSlug,
+    // Save to contactMessages so it appears in the desk Messages inbox
+    // type: "appointment" distinguishes it from contact form messages
+    const appointmentId = await addDocument("contactMessages", {
+      messageType: "appointment",
+      name: patientName,
+      email: patientEmail,
+      phone: patientPhone,
+      subject: `Appointment Request — ${departmentSlug?.replace(/-/g, " ") || "General"}`,
+      message: `Date: ${date} at ${time}\nDepartment: ${departmentSlug || "—"}\nService: ${serviceSlug || "—"}\nDoctor: ${doctorSlug || "Any"}\nNew Patient: ${isNewPatient ? "Yes" : "No"}\nNotes: ${notes || "None"}`,
+      // Extra appointment fields for display
       date,
       time,
-      type: type || "in-person",
-      patientName,
-      patientEmail,
-      patientPhone,
-      patientDOB,
+      departmentSlug: departmentSlug || null,
+      serviceSlug: serviceSlug || null,
+      doctorSlug: doctorSlug || null,
       isNewPatient: isNewPatient ?? true,
-      notes: notes || "",
       insurancePlan: insurancePlan || null,
-      memberId: memberId || null,
-      groupNumber: groupNumber || null,
+      isRead: false,
       status: "pending",
     });
 
