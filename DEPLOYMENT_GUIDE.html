@@ -288,11 +288,8 @@
       <div class="step"><div class="step-num"></div><div class="step-content">Copy the <code>firebaseConfig</code> object — you'll need these values for .env.local</div></div>
     </div>
 
-    <h3>2.6 Create Service Account (for Firebase Admin SDK)</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">In <strong>Project settings</strong> → click <strong>"Service accounts"</strong> tab</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Generate new private key"</strong> → Confirm → JSON file downloads</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Open the JSON. You'll need: <code>project_id</code>, <code>client_email</code>, <code>private_key</code></div></div>
+    <div class="tip">
+      <strong>✅ No service account key needed.</strong> This project uses Firestore-based role management — the Firebase Admin SDK and service account JSON are not required.
     </div>
   </div>
 
@@ -317,10 +314,8 @@
 <span class="key">NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID</span>=<span class="val">123456789</span>
 <span class="key">NEXT_PUBLIC_FIREBASE_APP_ID</span>=<span class="val">1:123:web:abc</span>
 
-<span class="comment"># Firebase Admin (from Step 2.6 JSON file)</span>
-<span class="key">FIREBASE_PROJECT_ID</span>=<span class="val">dhanvantari-hospital</span>
-<span class="key">FIREBASE_CLIENT_EMAIL</span>=<span class="val">firebase-adminsdk-xxx@dhanvantari-hospital.iam.gserviceaccount.com</span>
-<span class="key">FIREBASE_PRIVATE_KEY</span>=<span class="val">"-----BEGIN PRIVATE KEY-----\nMIIE...\n-----END PRIVATE KEY-----\n"</span>
+<span class="comment"># ✅ No Firebase Admin SDK / service account key required!</span>
+<span class="comment"># Roles are stored in Firestore — see Step 5 for first admin setup.</span>
 
 <span class="comment"># Twilio WhatsApp (optional — skip for now)</span>
 <span class="key">TWILIO_ACCOUNT_SID</span>=<span class="val">ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
@@ -329,16 +324,12 @@
 
 <span class="comment"># Site</span>
 <span class="key">NEXT_PUBLIC_SITE_URL</span>=<span class="val">http://localhost:3000</span>
-<span class="key">HOSPITAL_EMAIL</span>=<span class="val">info@abhospital.com</span>
+<span class="key">HOSPITAL_EMAIL</span>=<span class="val">info@dhanvantarihospital.com</span>
 <span class="key">REVALIDATION_SECRET</span>=<span class="val">any-random-string-here-123</span>
-
-<span class="comment"># Keep these as-is (placeholders)</span>
-<span class="key">RAZORPAY_KEY_ID</span>=<span class="val">rzp_test_placeholder</span>
-<span class="key">RAZORPAY_KEY_SECRET</span>=<span class="val">placeholder_secret</span>
     </div>
 
-    <div class="warn">
-      <strong>Private Key formatting:</strong> When copying <code>private_key</code> from the JSON file, keep the <code>\n</code> characters and wrap the whole value in double quotes exactly as shown above.
+    <div class="tip">
+      <strong>No service account key needed!</strong> Roles are stored in Firestore — the Firebase Admin SDK is not required. Only the client-side Firebase keys above are needed to run the app.
     </div>
   </div>
 
@@ -367,82 +358,79 @@
   <!-- 5. First Admin User -->
   <div class="section" id="first-admin">
     <h2><span class="section-num">5</span>Create First Admin User</h2>
-    <p>The first admin must be created directly in Firebase Console, then given the admin claim via a script.</p>
+    <p>No service account key or script needed. Roles are stored directly in Firestore. Just 3 steps:</p>
 
-    <h3>5.1 Create user in Firebase Console</h3>
+    <h3>5.1 Create the admin user in Firebase Auth</h3>
     <div class="steps">
       <div class="step"><div class="step-num"></div><div class="step-content">Firebase Console → <strong>Authentication → Users</strong> → <strong>Add user</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Email: <code>admin@abhospital.com</code>, Password: <code>Admin@12345</code> → Add user</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Copy the <strong>User UID</strong> shown in the table (looks like: <code>abc123xyz...</code>)</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Email: <code>admin@dhanvantarihospital.com</code>, Password: <code>Admin@12345</code> → <strong>Add user</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Copy the <strong>User UID</strong> shown (e.g. <code>abc123xyz...</code>)</div></div>
     </div>
 
-    <h3>5.2 Set admin claim via Node.js script</h3>
-    <p>Create a file <code>set-admin.js</code> in the project root (delete after use):</p>
-    <div class="code-block">
-<span class="comment">// set-admin.js — Run once to make first admin</span>
-const admin = require('firebase-admin');
-const serviceAccount = require('./service-account.json'); <span class="comment">// your downloaded JSON</span>
-
-admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-
-const UID = '<span class="val">PASTE_USER_UID_HERE</span>';
-
-admin.auth().setCustomUserClaims(UID, { admin: true })
-  .then(() => { console.log('Admin claim set!'); process.exit(0); })
-  .catch(err => { console.error(err); process.exit(1); });
+    <h3>5.2 Set the admin role in Firestore</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Firebase Console → <strong>Firestore Database</strong> → <strong>Start collection</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Collection ID: <code>userRoles</code> → Next</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Document ID: <strong>paste the UID from step 5.1</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Add these fields:<br>
+        Field: <code>role</code> — Type: string — Value: <code>admin</code><br>
+        Field: <code>email</code> — Type: string — Value: <code>admin@dhanvantarihospital.com</code>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>Save</strong></div></div>
     </div>
-    <div class="code-block"><span class="cmd">node set-admin.js</span></div>
-    <div class="warn">Delete <code>set-admin.js</code> and <code>service-account.json</code> after running. Never commit these files.</div>
+
+    <div class="tip">
+      That's it — no scripts, no service account key needed. Roles are just Firestore documents.
+    </div>
 
     <h3>5.3 Test admin login</h3>
     <div class="steps">
       <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/login">http://localhost:3000/login</a></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Login with <code>admin@abhospital.com</code> / <code>Admin@12345</code></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">You should be redirected to <a class="url" href="http://localhost:3000/admin">/admin</a> with the full sidebar</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Login with <code>admin@dhanvantarihospital.com</code> / <code>Admin@12345</code></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Should redirect to <a class="url" href="http://localhost:3000/admin">/admin</a> with full sidebar</div></div>
     </div>
   </div>
 
   <!-- 6. Create Staff Users -->
   <div class="section" id="roles">
     <h2><span class="section-num">6</span>Create Staff Users &amp; Assign Roles</h2>
-    <p>Once you have admin access, create other users and assign roles from the admin panel.</p>
+    <p>Once you have admin access, create all other staff from the admin panel — no Firebase Console needed.</p>
 
-    <h3>6.1 Create users in Firebase Console</h3>
-    <p>Create 2 more test users in Firebase → Authentication → Users:</p>
+    <h3>6.1 Create staff accounts from admin panel (recommended)</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-content">Login as admin → go to <a class="url" href="http://localhost:3000/admin/roles">/admin/roles</a></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Fill: Email, Password, Display Name, Role → Click <strong>"Create Account"</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Account is created in Firebase Auth and role is saved to Firestore automatically</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-content">Share the email + password with the staff member</div></div>
+    </div>
+
+    <h3>Test accounts to create:</h3>
     <table>
       <thead><tr><th>Email</th><th>Password</th><th>Role</th></tr></thead>
       <tbody>
-        <tr><td>pharmacist@abhospital.com</td><td>Pharma@12345</td><td><span class="badge badge-pharmacist">Pharmacist</span></td></tr>
-        <tr><td>reception@abhospital.com</td><td>Recep@12345</td><td><span class="badge badge-receptionist">Receptionist</span></td></tr>
+        <tr><td>pharmacist@dhanvantarihospital.com</td><td>Pharma@12345</td><td><span class="badge badge-pharmacist">Pharmacist</span></td></tr>
+        <tr><td>reception@dhanvantarihospital.com</td><td>Recep@12345</td><td><span class="badge badge-receptionist">Receptionist</span></td></tr>
       </tbody>
     </table>
-    <p style="margin-top:10px;">Copy the UID of each user from the table.</p>
 
-    <h3>6.2 Assign roles from Admin Panel</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Login as admin → go to <a class="url" href="http://localhost:3000/admin/roles">/admin/roles</a></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Paste the pharmacist's UID → Select role: <strong>Pharmacist</strong> → Click <strong>Assign Role</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Paste the receptionist's UID → Select role: <strong>Receptionist</strong> → Click <strong>Assign Role</strong></div></div>
-    </div>
-
-    <div class="tip">After assigning a role, the user must log out and log back in for the new role to take effect.</div>
+    <div class="tip">Role takes effect immediately on next login — no sign out needed.</div>
   </div>
 
   <!-- 7. Test Admin -->
   <div class="section" id="test-admin">
     <h2><span class="section-num">7</span>Test — Admin Role</h2>
     <div class="card blue">
-      <p><strong>Login:</strong> <code>admin@abhospital.com</code> at <a class="url" href="http://localhost:3000/login">/login</a></p>
-      <p style="margin-top:6px;"><strong>Expected redirect:</strong> <code>/admin</code> — full sidebar with all 15 links</p>
+      <p><strong>Login:</strong> <code>admin@dhanvantarihospital.com</code> at <a class="url" href="http://localhost:3000/login">/login</a></p>
+      <p style="margin-top:6px;"><strong>Expected redirect:</strong> <code>/admin</code> — full sidebar</p>
     </div>
 
     <h3>What to verify:</h3>
     <ul class="checklist">
       <li>Admin sees Dashboard, Token Queue, Appointments, Patients, In-Patient Cards, Invoices, Pharmacy, Services, Blog...</li>
+      <li>Can create staff accounts from <code>/admin/roles</code></li>
       <li>Can access <code>/admin/pharmacy</code> → pharmacy dashboard</li>
       <li>Can access <code>/desk</code> → desk panel</li>
-      <li>Can assign roles at <code>/admin/roles</code></li>
-      <li>Visiting <code>/admin</code> shows admin panel, NOT redirected</li>
+      <li>Visiting <code>/admin</code> stays on admin panel (not redirected)</li>
     </ul>
   </div>
 
