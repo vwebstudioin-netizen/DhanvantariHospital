@@ -1,23 +1,58 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import Link from "next/link";
 import PageHero from "@/components/layout/PageHero";
-import { Star, ThumbsUp, MessageCircle } from "lucide-react";
 import StarRating from "@/components/shared/StarRating";
+import { MessageSquarePlus } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Patient Reviews",
-  description: "Read what our patients have to say about their experience at Dhanvantari Hospital.",
-};
-
-const demoReviews = [
-  { id: 1, name: "Maria G.", rating: 5, date: "2024-11-15", text: "Excellent care from Dr. Chen. She took the time to listen and explain everything thoroughly. The staff at the Main Campus was warm and welcoming.", department: "General Medicine" },
-  { id: 2, name: "James T.", rating: 5, date: "2024-11-10", text: "Dr. Rodriguez is an outstanding cardiologist. His expertise and bedside manner put me at ease during a stressful time. Highly recommend!", department: "Cardiology" },
-  { id: 3, name: "Linda P.", rating: 4, date: "2024-10-28", text: "Good experience at the Downtown Clinic for my dermatology appointment. The wait time was minimal and the treatment was effective.", department: "Dermatology" },
-  { id: 4, name: "Robert K.", rating: 5, date: "2024-10-20", text: "The orthopedic team helped me recover from my knee surgery faster than expected. The rehabilitation program is top-notch.", department: "Orthopedics" },
-  { id: 5, name: "Sarah M.", rating: 5, date: "2024-10-15", text: "Brought my daughter for a pediatric checkup with Dr. Johnson. She was so patient and wonderful with children. We love Dhanvantari Hospital!", department: "Pediatrics" },
-  { id: 6, name: "David L.", rating: 4, date: "2024-10-05", text: "The mental health services here are excellent. Dr. Williams created a comfortable environment and a comprehensive treatment plan for my anxiety.", department: "Mental Health" },
-];
+interface Review {
+  id: string;
+  name: string;
+  rating: number;
+  comment: string;
+  createdAt: any;
+  status: string;
+}
 
 export default function ReviewsPage() {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const snap = await getDocs(collection(db, "reviews"));
+        const all = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Review[];
+        const approved = all
+          .filter((r) => r.status === "approved")
+          .sort((a, b) => {
+            const aTime = a.createdAt?.toMillis?.() ?? 0;
+            const bTime = b.createdAt?.toMillis?.() ?? 0;
+            return bTime - aTime;
+          });
+        setReviews(approved);
+      } catch {
+        // silently fail on public page
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  const avgRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : 0;
+
+  const formatDate = (createdAt: any) => {
+    if (!createdAt?.toDate) return "";
+    return createdAt.toDate().toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" });
+  };
+
   return (
     <>
       <PageHero
@@ -28,52 +63,53 @@ export default function ReviewsPage() {
 
       <section className="px-4 py-16">
         <div className="mx-auto max-w-5xl">
-          {/* Summary */}
-          <div className="mb-10 flex flex-col items-center gap-6 rounded-xl border border-border bg-card p-8 text-center sm:flex-row sm:text-left">
-            <div className="flex flex-col items-center">
-              <p className="text-5xl font-bold text-primary">4.8</p>
-              <StarRating rating={4.8} />
-              <p className="mt-1 text-sm text-muted-foreground">Based on 500+ reviews</p>
+          {loading ? (
+            <div className="text-center py-20 text-muted-foreground">Loading reviews...</div>
+          ) : reviews.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-2xl font-semibold text-foreground mb-2">No reviews yet</p>
+              <p className="text-muted-foreground mb-6">Be the first to share your experience.</p>
+              <Link href="/reviews/submit"
+                className="inline-flex items-center gap-2 bg-[#1e3a5f] text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-[#152d4a]">
+                <MessageSquarePlus className="w-4 h-4" /> Write a Review
+              </Link>
             </div>
-            <div className="flex flex-1 flex-wrap justify-center gap-6 sm:justify-start">
-              <div className="flex items-center gap-2">
-                <Star className="h-5 w-5 text-yellow-500" />
-                <span className="text-sm text-muted-foreground">95% recommend</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <ThumbsUp className="h-5 w-5 text-primary" />
-                <span className="text-sm text-muted-foreground">4.9 doctor rating</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MessageCircle className="h-5 w-5 text-primary" />
-                <span className="text-sm text-muted-foreground">4.7 staff rating</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Reviews */}
-          <div className="space-y-6">
-            {demoReviews.map((review) => (
-              <div
-                key={review.id}
-                className="rounded-xl border border-border bg-card p-6"
-              >
-                <div className="mb-3 flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-foreground">{review.name}</p>
-                    <p className="text-xs text-muted-foreground">{review.department}</p>
+          ) : (
+            <>
+              {/* Average rating summary */}
+              <div className="mb-10 flex flex-col items-center gap-4 rounded-xl border border-border bg-card p-8 text-center sm:flex-row sm:text-left">
+                <div className="flex flex-col items-center sm:items-start">
+                  <p className="text-5xl font-bold text-primary">{avgRating.toFixed(1)}</p>
+                  <div className="mt-1">
+                    <StarRating rating={Math.round(avgRating)} />
                   </div>
-                  <div className="text-right">
-                    <StarRating rating={review.rating} />
-                    <p className="text-xs text-muted-foreground">{review.date}</p>
-                  </div>
+                  <p className="mt-1 text-sm text-muted-foreground">Based on {reviews.length} verified review{reviews.length !== 1 ? "s" : ""}</p>
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {review.text}
-                </p>
+                <div className="flex-1 flex justify-center sm:justify-end">
+                  <Link href="/reviews/submit"
+                    className="inline-flex items-center gap-2 bg-[#1e3a5f] text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-[#152d4a]">
+                    <MessageSquarePlus className="w-4 h-4" /> Write a Review
+                  </Link>
+                </div>
               </div>
-            ))}
-          </div>
+
+              {/* Review cards */}
+              <div className="space-y-6">
+                {reviews.map((review) => (
+                  <div key={review.id} className="rounded-xl border border-border bg-card p-6">
+                    <div className="mb-3 flex items-start justify-between gap-4">
+                      <div>
+                        <p className="font-semibold text-foreground">{review.name}</p>
+                        <StarRating rating={review.rating} size="sm" />
+                      </div>
+                      <p className="text-xs text-muted-foreground whitespace-nowrap">{formatDate(review.createdAt)}</p>
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{review.comment}</p>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </section>
     </>

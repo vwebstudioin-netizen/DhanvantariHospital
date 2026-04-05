@@ -27,11 +27,11 @@ export default function LoginPage() {
       if (role === "admin") {
         router.push("/admin");
       } else if (role === "pharmacist") {
-        router.push("/admin/pharmacy");
+        router.push("/pharmacy");
       } else if (role === "receptionist") {
-        router.push("/desk/queue");
+        router.push("/desk");
       } else if (role === "doctor") {
-        router.push("/admin/queue");
+        router.push("/doctor/queue");
       } else if (role === "patient") {
         router.push("/portal");
       } else {
