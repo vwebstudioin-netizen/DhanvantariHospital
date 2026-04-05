@@ -175,6 +175,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     );
   }
 
+  // ── If admin navigates into pharmacy, let pharmacy layout own the UI ────
+  if (isAdmin && pathname.startsWith("/admin/pharmacy")) {
+    return <>{children}</>;
+  }
+
   // ── Admin layout with grouped sidebar ────────────────────────────────────
   return (
     <div className="flex h-screen overflow-hidden bg-[#0f1729]">

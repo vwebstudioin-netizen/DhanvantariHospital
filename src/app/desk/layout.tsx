@@ -30,10 +30,9 @@ const RECEPTIONIST_LINKS = [
 
 // ── Doctor links ─────────────────────────────────────────────────────────────
 const DOCTOR_LINKS = [
-  { href: "/desk/queue",            label: "Token Queue",      icon: Ticket },
-  { href: "/desk/appointments",     label: "Appointments",     icon: Calendar },
-  { href: "/desk/patients",         label: "Patients",         icon: Users },
-  { href: "/desk/enquiries",        label: "Enquiries",        icon: Inbox },
+  { href: "/desk/queue",          label: "Token Queue",  icon: Ticket },
+  { href: "/desk/appointments",   label: "Appointments", icon: Calendar },
+  { href: "/desk/patients",       label: "Patients",     icon: Users },
 ];
 
 // ── Pharmacist billing links ─────────────────────────────────────────────────
