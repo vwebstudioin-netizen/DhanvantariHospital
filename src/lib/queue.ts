@@ -1,5 +1,5 @@
 import {
-  collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc,
+  collection, doc, getDoc, getDocs, setDoc, updateDoc,
   query, where, orderBy, limit, serverTimestamp, runTransaction,
   onSnapshot, type Unsubscribe,
 } from "firebase/firestore";
@@ -82,29 +82,26 @@ export async function issueToken(
 // Step 1 — Call Next: picks lowest waiting token → status: "called"
 // WhatsApp notification is sent from the UI after this
 export async function callNextToken(date: string): Promise<Token | null> {
-  const q = query(
-    tokensCol(date),
-    where("status", "==", "waiting"),
-    orderBy("tokenNumber", "asc"),
-    limit(1)
-  );
+  // Fetch all tokens then filter/sort client-side to avoid composite index requirement
+  const q = query(tokensCol(date), orderBy("tokenNumber", "asc"));
   const snap = await getDocs(q);
-  if (snap.empty) return null;
+  const waiting = snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }) as Token)
+    .filter((t) => t.status === "waiting");
+  if (waiting.length === 0) return null;
+  const next = waiting[0]; // Already sorted by tokenNumber asc
 
-  const tokenDoc = snap.docs[0];
-  const tokenData = tokenDoc.data() as Omit<Token, "id">;
-
-  await updateDoc(doc(tokensCol(date), tokenDoc.id), {
+  await updateDoc(doc(tokensCol(date), next.id), {
     status: "called",
     calledAt: serverTimestamp(),
   });
 
   await setDoc(configRef(date), {
-    currentServingToken: tokenData.tokenNumber,
+    currentServingToken: next.tokenNumber,
     updatedAt: serverTimestamp(),
   }, { merge: true });
 
-  return { id: tokenDoc.id, ...tokenData, status: "called" } as Token;
+  return { ...next, status: "called" } as Token;
 }
 
 // Step 2 — Start Consultation: patient arrived → status: "serving"
@@ -146,9 +143,11 @@ export async function getTokens(date: string): Promise<Token[]> {
 }
 
 export async function getWaitingTokens(date: string): Promise<Token[]> {
-  const q = query(tokensCol(date), where("status", "==", "waiting"), orderBy("tokenNumber", "asc"));
+  const q = query(tokensCol(date), orderBy("tokenNumber", "asc"));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Token);
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }) as Token)
+    .filter((t) => t.status === "waiting");
 }
 
 export async function getCurrentCalled(date: string): Promise<Token | null> {

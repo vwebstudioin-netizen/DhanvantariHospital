@@ -109,6 +109,8 @@ export async function seedDemoData(): Promise<{ seeded: string[] }> {
       issuedBy: "Reception", createdAt: now, updatedAt: now,
     });
   }
+  // Update counter so next real card doesn't collide with seeded ones
+  await setDoc(doc(db, "counters", "inpatientCards"), { lastNumber: CARDS.length });
   seeded.push("inpatientCards (2)");
 
   // 4. Invoices (3 sample)

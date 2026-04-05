@@ -37,7 +37,7 @@ export default function AdminReviews() {
     async function load() {
       try {
         const data = await getAllReviews();
-        if (data.length > 0) setReviews(data);
+        setReviews(data); // Always use Firestore data, even if empty
       } catch {
         // Falls back to sample data
       }

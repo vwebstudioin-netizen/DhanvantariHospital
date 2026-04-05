@@ -156,7 +156,18 @@ export default function BillingPage() {
   };
 
   const handlePrint = () => {
-    window.print();
+    if (printRef.current) {
+      const w = window.open("", "_blank", "width=800,height=600");
+      if (w) {
+        w.document.write(`<!DOCTYPE html><html><head><title>Invoice</title>
+          <style>body{font-family:Arial,sans-serif;margin:0;padding:20px}@media print{body{padding:0}}</style>
+          </head><body>${printRef.current.innerHTML}</body></html>`);
+        w.document.close();
+        w.focus();
+        w.print();
+        w.close();
+      }
+    }
   };
 
   if (createdInvoice) {

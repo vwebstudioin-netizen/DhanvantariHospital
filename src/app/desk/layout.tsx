@@ -116,9 +116,8 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
 
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
           {sidebarLinks.map((link) => {
-            const active = link.href === "/desk"
-              ? pathname === "/desk"
-              : pathname.startsWith(link.href);
+            // Use exact match to prevent /desk matching /desk/inpatient-card etc.
+            const active = pathname === link.href;
             return (
               <Link
                 key={link.href}
@@ -158,9 +157,7 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
           <h1 className="text-sm font-semibold text-neutral-700">
-            {sidebarLinks.find((l) =>
-              l.href === "/desk" ? pathname === "/desk" : pathname.startsWith(l.href)
-            )?.label ?? "Desk"}
+            {sidebarLinks.find((l) => pathname === l.href)?.label ?? "Desk"}
           </h1>
         </header>
         <main className="p-5">{children}</main>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Save, User } from "lucide-react";
-import { auth } from "@/lib/firebase";
+import { useAuthContext } from "@/providers/AuthProvider";
 import { getPatient, updatePatient, type PatientRecord } from "@/lib/patients";
 import Image from "next/image";
 import toast from "react-hot-toast";
@@ -19,7 +19,8 @@ export default function PortalProfile() {
     emergencyContact: "",
   });
 
-  const user = auth.currentUser;
+  // Use reactive auth context instead of auth.currentUser snapshot
+  const { user } = useAuthContext();
 
   useEffect(() => {
     if (!user) return;

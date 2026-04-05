@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Calendar, MessageSquare, Star, ArrowRight, Phone } from "lucide-react";
-import { auth } from "@/lib/firebase";
+import { useAuthContext } from "@/providers/AuthProvider";
 import { getPatient, updatePatient } from "@/lib/patients";
 import toast from "react-hot-toast";
 
@@ -43,16 +43,11 @@ function PhonePrompt({ uid, onDone }: { uid: string; onDone: () => void }) {
           maxLength={10}
           className="flex-1 border border-amber-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-400"
         />
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 disabled:opacity-50"
-        >
+        <button onClick={handleSave} disabled={saving}
+          className="px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 disabled:opacity-50">
           {saving ? "Saving..." : "Save"}
         </button>
-        <button onClick={onDone} className="px-3 py-2 text-sm text-amber-600 hover:underline">
-          Skip
-        </button>
+        <button onClick={onDone} className="px-3 py-2 text-sm text-amber-600 hover:underline">Skip</button>
       </div>
     </div>
   );
@@ -60,7 +55,8 @@ function PhonePrompt({ uid, onDone }: { uid: string; onDone: () => void }) {
 
 export default function PortalDashboard() {
   const [showPhonePrompt, setShowPhonePrompt] = useState(false);
-  const user = auth.currentUser;
+  // Use AuthContext for reactive user state (avoids auth.currentUser race condition)
+  const { user, loading } = useAuthContext();
 
   useEffect(() => {
     if (!user) return;
@@ -69,6 +65,14 @@ export default function PortalDashboard() {
     });
   }, [user]);
 
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1 className="mb-2 text-2xl font-bold text-foreground">
@@ -76,8 +80,8 @@ export default function PortalDashboard() {
       </h1>
       <p className="text-muted-foreground text-sm mb-6">Your patient portal</p>
 
-      {showPhonePrompt && (
-        <PhonePrompt uid={user!.uid} onDone={() => setShowPhonePrompt(false)} />
+      {showPhonePrompt && user && (
+        <PhonePrompt uid={user.uid} onDone={() => setShowPhonePrompt(false)} />
       )}
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
