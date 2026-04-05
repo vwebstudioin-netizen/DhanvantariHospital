@@ -22,6 +22,11 @@ export const metadata: Metadata = {
     default: "Dhanvantari Hospital — Advanced Multi-Specialty Healthcare",
     template: "%s | Dhanvantari Hospital",
   },
+  icons: {
+    icon: "/images/logo.jpg",
+    shortcut: "/images/logo.jpg",
+    apple: "/images/logo.jpg",
+  },
   description:
     "Dhanvantari Hospital — Emergency Treatment for Accident Cases Available. Multi-specialty care: General Medicine, Surgery, Gynecology, Pediatrics, Orthopedics, Neurology, Cardiology, Critical Care.",
   keywords: [
