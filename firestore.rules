@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
+    // ── Helper functions ────────────────────────────────────────────
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -11,127 +11,204 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.token.admin == true;
     }
 
+    // Receptionist: desk operations (in-patient cards, invoices, queue)
+    function isReceptionist() {
+      return isAuthenticated() && request.auth.token.receptionist == true;
+    }
+
+    // Pharmacist: pharmacy inventory only
+    function isPharmacist() {
+      return isAuthenticated() && request.auth.token.pharmacist == true;
+    }
+
+    // Doctor: queue and appointments
+    function isDoctor() {
+      return isAuthenticated() && request.auth.token.doctor == true;
+    }
+
+    // Any hospital staff (admin, receptionist, pharmacist, doctor)
     function isStaff() {
-      return isAuthenticated() && 
-        (request.auth.token.admin == true || request.auth.token.staff == true);
+      return isAdmin() || isReceptionist() || isPharmacist() || isDoctor();
+    }
+
+    // Desk staff can manage patient-facing desk operations
+    function isDeskStaff() {
+      return isAdmin() || isReceptionist();
     }
 
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // Doctors
+    // ── Public hospital content ──────────────────────────────────────
+
     match /doctors/{doctorId} {
       allow read: if true;
-      allow write: if isStaff();
-      
+      allow write: if isAdmin();
       match /schedule/{scheduleId} {
         allow read: if true;
-        allow write: if isStaff();
+        allow write: if isAdmin() || isDoctor();
       }
     }
 
-    // Departments
     match /departments/{departmentId} {
       allow read: if true;
-      allow write: if isStaff();
+      allow write: if isAdmin();
     }
 
-    // Services
     match /services/{serviceId} {
       allow read: if true;
-      allow write: if isStaff();
+      allow write: if isAdmin();
     }
 
-    // Locations
     match /locations/{locationId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // Site Settings
     match /siteSettings/{docId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // Blog Posts
     match /blogPosts/{postId} {
-      allow read: if resource.data.status == 'published' || isStaff();
-      allow create: if isStaff();
-      allow update, delete: if isStaff();
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin();
     }
 
-    // News
     match /news/{articleId} {
-      allow read: if resource.data.isPublished == true || isStaff();
-      allow write: if isStaff();
+      allow read: if resource.data.isPublished == true || isAdmin();
+      allow write: if isAdmin();
     }
 
-    // Reviews
-    match /reviews/{reviewId} {
-      allow read: if resource.data.isApproved == true || isStaff() || 
-        (isAuthenticated() && resource.data.patientId == request.auth.uid);
-      allow create: if isAuthenticated();
-      allow update: if isStaff() || 
-        (isOwner(resource.data.patientId) && 
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'rating', 'updatedAt']));
-      allow delete: if isStaff();
+    match /gallery/{imageId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
-    // Insurance Plans
     match /insurancePlans/{planId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // Gallery
-    match /gallery/{imageId} {
-      allow read: if true;
-      allow write: if isStaff();
-    }
-
-    // Jobs
     match /jobs/{jobId} {
-      allow read: if resource.data.isActive == true || isStaff();
-      allow write: if isStaff();
+      allow read: if resource.data.isActive == true || isAdmin();
+      allow write: if isAdmin();
     }
 
-    // Contact Messages
-    match /contactMessages/{messageId} {
+    // ── Reviews (public submit → admin approves) ─────────────────────
+
+    match /reviews/{reviewId} {
+      // Public can read approved reviews; staff can read all
+      allow read: if resource.data.status == 'approved' || isAdmin();
+      // Anyone (including unauthenticated) can submit a review
       allow create: if true;
-      allow read, update, delete: if isStaff();
+      // Only admin can approve/reject/delete
+      allow update, delete: if isAdmin();
     }
 
-    // Newsletters
-    match /newsletters/{subId} {
-      allow create: if true;
-      allow read, update, delete: if isStaff();
-    }
+    // ── Patient data ─────────────────────────────────────────────────
 
-    // Job Applications
-    match /jobApplications/{appId} {
-      allow create: if true;
-      allow read, update, delete: if isStaff();
-    }
-
-    // Patients
     match /patients/{patientId} {
-      allow read: if isOwner(patientId) || isStaff();
+      allow read: if isOwner(patientId) || isDeskStaff() || isDoctor();
       allow create: if isAuthenticated() && request.auth.uid == patientId;
-      allow update: if isOwner(patientId) || isStaff();
+      allow update: if isOwner(patientId) || isDeskStaff();
       allow delete: if isAdmin();
     }
 
-    // Appointments
     match /appointments/{appointmentId} {
-      allow read: if isStaff() || 
+      allow read: if isDeskStaff() || isDoctor() ||
         (isAuthenticated() && resource.data.patientId == request.auth.uid);
       allow create: if true;
-      allow update: if isStaff() || 
+      allow update: if isDeskStaff() || isDoctor() ||
         (isAuthenticated() && resource.data.patientId == request.auth.uid &&
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'cancellationReason', 'cancelledAt', 'updatedAt']));
+          request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['status', 'cancellationReason', 'cancelledAt', 'updatedAt']));
       allow delete: if isAdmin();
+    }
+
+    // ── Desk operations ───────────────────────────────────────────────
+
+    match /inpatientCards/{cardId} {
+      allow read: if isDeskStaff() || isDoctor();
+      allow create: if isDeskStaff();
+      allow update: if isDeskStaff();
+      allow delete: if isAdmin();
+    }
+
+    match /invoices/{invoiceId} {
+      allow read: if isDeskStaff();
+      allow create: if isDeskStaff();
+      allow update: if isDeskStaff();
+      allow delete: if isAdmin();
+    }
+
+    match /wishCampaigns/{campaignId} {
+      allow read: if isDeskStaff();
+      allow create: if isDeskStaff();
+      allow update, delete: if isAdmin();
+    }
+
+    // ── Queue system ──────────────────────────────────────────────────
+
+    match /queue/{dateKey} {
+      // Config: read by all staff + patients (for public queue page)
+      match /config/{docId} {
+        allow read: if true;
+        allow write: if isDeskStaff() || isDoctor();
+      }
+      // Tokens: desk staff and doctors manage; patients can read own token
+      match /tokens/{tokenId} {
+        allow read: if isDeskStaff() || isDoctor() ||
+          (isAuthenticated() && resource.data.patientPhone == request.auth.token.phone_number);
+        allow create: if isDeskStaff();
+        allow update: if isDeskStaff() || isDoctor();
+        allow delete: if isAdmin();
+      }
+    }
+
+    // Atomic counters for auto-numbering
+    match /counters/{counterId} {
+      allow read, write: if isDeskStaff() || isPharmacist();
+    }
+
+    // ── Pharmacy ──────────────────────────────────────────────────────
+
+    match /medicines/{medicineId} {
+      allow read: if isPharmacist() || isAdmin();
+      allow create: if isPharmacist() || isAdmin();
+      allow update: if isPharmacist() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /stockMovements/{movementId} {
+      allow read: if isPharmacist() || isAdmin();
+      allow create: if isPharmacist() || isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    match /suppliers/{supplierId} {
+      allow read: if isPharmacist() || isAdmin();
+      allow create, update: if isPharmacist() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Messaging & forms ─────────────────────────────────────────────
+
+    match /contactMessages/{messageId} {
+      allow create: if true;
+      allow read, update, delete: if isDeskStaff();
+    }
+
+    match /newsletters/{subId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /jobApplications/{appId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
     }
   }
 }

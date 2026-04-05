@@ -1,15 +1,84 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null && 
-        (request.auth.token.admin == true || request.auth.token.staff == true);
+
+    // Helper functions
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
     }
+
+    function isStaff() {
+      return request.auth != null && (
+        request.auth.token.admin == true ||
+        request.auth.token.receptionist == true ||
+        request.auth.token.pharmacist == true ||
+        request.auth.token.doctor == true
+      );
+    }
+
+    function isDeskStaff() {
+      return request.auth != null && (
+        request.auth.token.admin == true ||
+        request.auth.token.receptionist == true
+      );
+    }
+
+    // Hospital images (departments, services, doctors, gallery) — public read
+    match /images/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Doctor profile photos — public read, admin write
+    match /doctors/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Gallery uploads
+    match /gallery/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Blog post images
+    match /blog/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Patient documents (lab reports, prescriptions) — patient can upload, staff can read
+    match /patients/{patientId}/{fileName} {
+      allow read: if request.auth != null &&
+        (request.auth.uid == patientId || isStaff());
+      allow write: if request.auth != null &&
+        (request.auth.uid == patientId || isDeskStaff());
+    }
+
+    // In-patient card prints / invoice PDFs (desk staff only)
+    match /documents/{fileName} {
+      allow read: if isDeskStaff();
+      allow write: if isDeskStaff();
+    }
+
+    // Job application resumes — public upload, admin read
     match /resumes/{fileName} {
       allow write: if true;
-      allow read: if request.auth != null && 
-        (request.auth.token.admin == true || request.auth.token.staff == true);
+      allow read: if isAdmin();
+    }
+
+    // Pharmacy documents (purchase orders, supplier invoices)
+    match /pharmacy/{fileName} {
+      allow read, write: if request.auth != null && (
+        request.auth.token.pharmacist == true ||
+        request.auth.token.admin == true
+      );
+    }
+
+    // Logo and public assets
+    match /public/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }
