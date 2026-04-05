@@ -20,7 +20,7 @@ export default function PageHero({
   return (
     <section
       className={cn(
-        "relative bg-gradient-to-br from-primary/5 via-background to-primary/5 px-4 py-16 md:py-20",
+        "relative bg-linear-to-br from-primary/5 via-background to-primary/5 px-4 py-16 md:py-20",
         className
       )}
     >

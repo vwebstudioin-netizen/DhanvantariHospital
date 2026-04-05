@@ -33,7 +33,7 @@ const ADMIN_CORE_LINKS = [
 // ── Staff panel entry points (navigate admin into each role's view) ──────────
 const STAFF_PANEL_LINKS = [
   { label: "Reception",  href: "/desk",             icon: CreditCard },
-  { label: "Pharmacy",   href: "/admin/pharmacy",   icon: Pill },
+  { label: "Pharmacy",   href: "/pharmacy",         icon: Pill },
   { label: "Doctor",     href: "/doctor/queue",     icon: Stethoscope },
 ];
 
@@ -47,7 +47,7 @@ const RECEPTIONIST_LINKS = [
 ];
 
 const RECEPTIONIST_ALLOWED = ["/admin/queue", "/admin/appointments", "/admin/patients"];
-const PHARMACIST_ALLOWED   = ["/admin/pharmacy"];
+const PHARMACIST_ALLOWED   = ["/pharmacy"];
 
 function isAllowed(pathname: string, allowed: string[]) {
   return allowed.some((p) => pathname.startsWith(p));
@@ -116,11 +116,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
     if (isPharmacist) {
       if (!isAllowed(pathname, PHARMACIST_ALLOWED)) {
-        if (typeof window !== "undefined") window.location.href = "/admin/pharmacy";
+        if (typeof window !== "undefined") window.location.href = "/pharmacy";
         return null;
       }
-      // Pharmacy layout handles the UI — pass through to avoid double sidebar
-      return <>{children}</>;
+      return <>{children}</>;  // pharmacy layout handles the UI
     }
 
     return (
@@ -133,11 +132,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </div>
       </div>
     );
-  }
-
-  // ── If admin navigates into pharmacy, let pharmacy layout own the UI ────
-  if (isAdmin && pathname.startsWith("/admin/pharmacy")) {
-    return <>{children}</>;
   }
 
   // ── Admin layout with grouped sidebar ────────────────────────────────────

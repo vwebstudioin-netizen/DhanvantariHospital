@@ -9,6 +9,7 @@ const APP_PREFIXES = [
   "/admin",
   "/desk",
   "/doctor",
+  "/pharmacy",
   "/login",
   "/portal",       // Patient portal has its own layout
   "/queue/display", // TV display is full-screen, no header/footer
