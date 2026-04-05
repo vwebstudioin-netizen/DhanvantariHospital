@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useState, useRef, ReactNode } from "react";
+import { useEffect, ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { getUserRole, type UserRole } from "@/lib/userRoles";
+import { useAuthContext } from "@/providers/AuthProvider";
+import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { SITE_NAME } from "@/lib/constants";
 import Link from "next/link";
 import {
   LayoutDashboard, CreditCard, Receipt, FileText, Gift,
   Ticket, LogOut, Menu, X, Hospital,
 } from "lucide-react";
+import { useState } from "react";
 
 const RECEPTIONIST_LINKS = [
   { href: "/desk",                label: "Dashboard",        icon: LayoutDashboard },
@@ -31,65 +33,49 @@ const PHARMACIST_DESK_ALLOWED = ["/desk/billing", "/desk/bills"];
 export default function DeskLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [role, setRole] = useState<UserRole | null>(null);
-  // Keep role in ref so pathname changes don't re-trigger auth check
-  const roleRef = useRef<UserRole | null>(null);
 
+  // Use the shared AuthContext — same source of truth as the admin layout
+  const { user, loading, isAdmin, isReceptionist, isPharmacist } = useAuthContext();
+
+  // Handle access control — redirect if unauthorized
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      if (pathname === "/desk/login") { setLoading(false); return; }
-      if (!user) { router.push("/login"); setLoading(false); return; }
+    if (loading) return;
+    if (pathname === "/desk/login") return;
 
-      // Only fetch role from Firestore if not already loaded
-      if (!roleRef.current) {
-        const r = await getUserRole(user.uid);
-        const allowed = ["admin", "receptionist", "pharmacist"];
+    if (!user) {
+      router.push("/login");
+      return;
+    }
 
-        if (!r || !allowed.includes(r)) {
-          router.push("/login");
-          setLoading(false);
-          return;
-        }
+    if (!isAdmin && !isReceptionist && !isPharmacist) {
+      router.push("/login");
+      return;
+    }
 
-        roleRef.current = r;
-        setRole(r);
-        setUserEmail(user.email);
-      }
-
-      // Pharmacist redirect check
-      const currentRole = roleRef.current;
-      if (currentRole === "pharmacist" && !PHARMACIST_DESK_ALLOWED.some((p) => pathname.startsWith(p))) {
-        router.push("/desk/billing");
-        setLoading(false);
-        return;
-      }
-
-      setLoading(false);
-    });
-    return unsub;
-  }, [router, pathname]);
+    // Pharmacist can only access billing pages on /desk
+    if (isPharmacist && !isAdmin && !PHARMACIST_DESK_ALLOWED.some((p) => pathname.startsWith(p))) {
+      router.push("/desk/billing");
+    }
+  }, [user, loading, isAdmin, isReceptionist, isPharmacist, pathname, router]);
 
   const handleSignOut = async () => {
-    roleRef.current = null;
     await signOut(auth);
     router.push("/login");
   };
 
-  if (loading) {
+  if (pathname === "/desk/login") return <>{children}</>;
+
+  if (loading || (!isAdmin && !isReceptionist && !isPharmacist)) {
     return (
       <div className="min-h-screen bg-[#0f1729] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
 
-  if (pathname === "/desk/login") return <>{children}</>;
-
-  const sidebarLinks = role === "pharmacist" ? PHARMACIST_LINKS : RECEPTIONIST_LINKS;
-  const roleLabel = role === "pharmacist" ? "Pharmacy" : role === "admin" ? "Admin" : "Reception";
+  const sidebarLinks = (isPharmacist && !isAdmin) ? PHARMACIST_LINKS : RECEPTIONIST_LINKS;
+  const roleLabel = isPharmacist && !isAdmin ? "Pharmacy" : isAdmin ? "Admin" : "Reception";
 
   return (
     <div className="min-h-screen bg-[#f0f2f5] flex">
@@ -108,15 +94,14 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        {userEmail && (
+        {user?.email && (
           <div className="px-4 py-2 border-b border-white/5">
-            <p className="text-xs text-white/40 truncate">{userEmail}</p>
+            <p className="text-xs text-white/40 truncate">{user.email}</p>
           </div>
         )}
 
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
           {sidebarLinks.map((link) => {
-            // Use exact match to prevent /desk matching /desk/inpatient-card etc.
             const active = pathname === link.href;
             return (
               <Link
