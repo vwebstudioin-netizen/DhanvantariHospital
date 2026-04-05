@@ -233,63 +233,91 @@ export default function QueuePage() {
 
         {/* Current Serving + Controls */}
         <div className="space-y-4">
-          {/* Now Serving */}
-          <div className="rounded-xl border-2 border-primary bg-primary/5 p-6 text-center">
+          {/* Now Serving display */}
+          <div className={`rounded-xl border-2 p-6 text-center transition-colors ${
+            currentServing ? "border-primary bg-primary/5" : "border-border bg-muted/30"
+          }`}>
             <p className="text-xs font-medium uppercase tracking-wider text-primary">
-              Now Serving
+              {currentServing ? "Now Serving" : "Queue Ready"}
             </p>
             <p className="my-2 text-5xl font-bold text-primary">
-              {currentServing
-                ? `#${currentServing.displayNumber}`
-                : "---"}
+              {currentServing ? `#${currentServing.displayNumber}` : "---"}
             </p>
+            {currentServing ? (
+              <>
+                <p className="text-sm font-medium text-foreground">{currentServing.patientName}</p>
+                <p className="text-xs text-muted-foreground">{currentServing.purpose}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{currentServing.patientPhone}</p>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {waitingTokens.length > 0
+                  ? `${waitingTokens.length} patient(s) waiting — press Call Next`
+                  : "No patients waiting"}
+              </p>
+            )}
+          </div>
+
+          {/* Action buttons — flow: Call Next → Start → Done/Skip/No Show */}
+          <div className="space-y-2">
+
+            {/* Step 1: No one serving — Call Next */}
+            {!currentServing && (
+              <button
+                onClick={handleCallNext}
+                disabled={waitingTokens.length === 0}
+                className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#1e3a5f] py-3 text-sm font-semibold text-white hover:bg-[#152d4a] disabled:opacity-40"
+              >
+                <ChevronRight className="h-4 w-4" />
+                Call Next Patient
+              </button>
+            )}
+
+            {/* Step 2: Patient called — Start or Skip/No Show */}
             {currentServing && (
               <>
-                <p className="text-sm font-medium text-foreground">
-                  {currentServing.patientName}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {currentServing.purpose}
-                </p>
+                {/* Start Consultation */}
+                <button
+                  onClick={() => complete(currentServing.id)}
+                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-green-600 py-3 text-sm font-semibold text-white hover:bg-green-700"
+                >
+                  <Check className="h-4 w-4" />
+                  Done — Call Next
+                </button>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {/* Skip — patient not ready, move to end of queue */}
+                  <button
+                    onClick={async () => {
+                      await skip(currentServing.id);
+                      await handleCallNext();
+                    }}
+                    className="flex items-center justify-center gap-2 rounded-lg bg-amber-500 py-2.5 text-sm font-medium text-white hover:bg-amber-600"
+                  >
+                    <SkipForward className="h-4 w-4" />
+                    Skip Patient
+                  </button>
+
+                  {/* No Show — patient absent */}
+                  <button
+                    onClick={() => noShow(currentServing.id)}
+                    className="flex items-center justify-center gap-2 rounded-lg border border-red-200 text-red-600 py-2.5 text-sm font-medium hover:bg-red-50"
+                  >
+                    <UserX className="h-4 w-4" />
+                    No Show
+                  </button>
+                </div>
               </>
             )}
           </div>
 
-          {/* Action buttons */}
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={handleCallNext}
-              className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              <ChevronRight className="h-4 w-4" />
-              Call Next
-            </button>
-            {currentServing && (
-              <>
-                <button
-                  onClick={() => complete(currentServing.id)}
-                  className="flex items-center justify-center gap-2 rounded-lg bg-green-600 py-3 text-sm font-medium text-white hover:bg-green-700"
-                >
-                  <Check className="h-4 w-4" />
-                  Complete
-                </button>
-                <button
-                  onClick={() => skip(currentServing.id)}
-                  className="flex items-center justify-center gap-2 rounded-lg bg-yellow-600 py-3 text-sm font-medium text-white hover:bg-yellow-700"
-                >
-                  <SkipForward className="h-4 w-4" />
-                  Skip
-                </button>
-                <button
-                  onClick={() => noShow(currentServing.id)}
-                  className="flex items-center justify-center gap-2 rounded-lg bg-red-600 py-3 text-sm font-medium text-white hover:bg-red-700"
-                >
-                  <UserX className="h-4 w-4" />
-                  No Show
-                </button>
-              </>
-            )}
-          </div>
+          {/* Next in line preview */}
+          {waitingTokens.length > 0 && (
+            <div className="rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
+              <span className="font-medium">Next up:</span> #{waitingTokens[0].displayNumber} — {waitingTokens[0].patientName}
+              {waitingTokens.length > 1 && ` (+${waitingTokens.length - 1} more)`}
+            </div>
+          )}
         </div>
 
         {/* Waiting List */}
