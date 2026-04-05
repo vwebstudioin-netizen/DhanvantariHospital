@@ -160,16 +160,18 @@
         <tr><td>Bulk festive wishes</td><td>Real bulk send with progress bar and campaign history</td><td>&#8377;15,000</td></tr>
 
         <tr class="section-row"><td colspan="3">5. Pharmacy Inventory (ERP)</td></tr>
-        <tr><td>Medicine catalog</td><td>Brand, generic, category, unit, pricing, batch, expiry</td><td></td></tr>
+        <tr><td>Medicine catalog</td><td>Brand, generic, category, unit, pricing, batch, expiry — live from Firestore</td><td></td></tr>
         <tr><td>Stock management</td><td>Purchase in, dispense out, movement log with patient details</td><td></td></tr>
-        <tr><td>Pharmacy invoice (PHRM-XXXX)</td><td>Medicine POS — search & add medicines, qty control, auto stock deduction, print with logo</td><td></td></tr>
-        <tr><td>Pharmacy bill history</td><td>All pharmacy bills with print and search</td><td></td></tr>
-        <tr><td>Supplier management + Low stock alerts</td><td>Dashboard alerts + expiry tracking (30/60/90 days)</td><td>&#8377;20,000</td></tr>
+        <tr><td>Pharmacy invoice (PHRM-XXXX)</td><td>Medicine POS — search medicines, add to cart, qty +/-, auto stock deduction on save, print with logo</td><td></td></tr>
+        <tr><td>Pharmacy bill history</td><td>All pharmacy bills from Firestore — search, print</td><td></td></tr>
+        <tr><td>Pharmacy reports</td><td>Stock status, expiry alerts (expired/30d/90d), dispensing log with date filter — all from Firestore</td><td></td></tr>
+        <tr><td>Supplier management + Low stock alerts</td><td>Dashboard alerts on low stock, reports accessible to pharmacist</td><td>&#8377;20,000</td></tr>
 
         <tr class="section-row"><td colspan="3">6. Access Control & Setup</td></tr>
-        <tr><td>4-role login system</td><td>Admin, Receptionist, Pharmacist, Doctor — each sees only their panel</td><td></td></tr>
-        <tr><td>Admin creates staff accounts</td><td>Create users and assign roles directly from admin panel</td><td></td></tr>
-        <tr><td>Patient portal — Google Sign-In</td><td>Google login saves patient profile, phone number prompt on first visit</td><td></td></tr>
+        <tr><td>4-role login system</td><td>Admin, Receptionist, Pharmacist, Doctor — each sees only their panel, no cross-navigation</td><td></td></tr>
+        <tr><td>Admin creates staff accounts</td><td>Create users and assign roles directly from admin panel — no Firebase Console needed</td><td></td></tr>
+        <tr><td>Patient management</td><td>Manual patient entry + Google Sign-In auto-creates patient records. Search by name/phone</td><td></td></tr>
+        <tr><td>Patient portal — Google Sign-In</td><td>Google login, phone prompt, health profile (DOB, blood group, address, emergency contact)</td><td></td></tr>
         <tr><td>Env-based branding + Resend email</td><td>Name/phone/address from config. Email via Resend (100/day free)</td><td>&#8377;10,000</td></tr>
       </tbody>
     </table>
