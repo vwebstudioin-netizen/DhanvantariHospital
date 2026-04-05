@@ -31,8 +31,12 @@ export default function QueuePage() {
   const [lastIssued, setLastIssued] = useState<{ displayNumber: string; patientName: string } | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  // Doctor View link adapts: /admin/queue → /admin/queue/doctor | /desk/queue → /desk/queue/doctor
-  const doctorViewHref = pathname.startsWith("/desk") ? "/desk/queue/doctor" : "/admin/queue/doctor";
+  // Doctor View link adapts based on which layout the user is in
+  const doctorViewHref = pathname.startsWith("/desk")
+    ? "/desk/queue/doctor"
+    : pathname.startsWith("/doctor")
+    ? "/doctor/queue/doctor"
+    : "/admin/queue/doctor";
 
   const handleIssue = async () => {
     if (!name.trim() || !phone.trim()) return;
