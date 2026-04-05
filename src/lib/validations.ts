@@ -14,13 +14,10 @@ export type ContactFormValues = z.infer<typeof contactFormSchema>;
 export const bookingPatientSchema = z.object({
   patientName: z.string().min(2, "Name is required"),
   patientEmail: z.string().email("Valid email is required"),
-  patientPhone: z
-    .string()
-    .min(10, "Valid phone number is required")
-    .regex(/^[\d\s\-()+ ]+$/, "Invalid phone number"),
-  patientDOB: z.string().min(1, "Date of birth is required"),
-  isNewPatient: z.boolean(),
-  notes: z.string().optional(),
+  patientPhone: z.string().min(1, "Phone is required"),
+  patientDOB: z.string().optional().nullable(),
+  isNewPatient: z.boolean().optional().default(true),
+  notes: z.string().optional().nullable(),
 });
 
 export type BookingPatientValues = z.infer<typeof bookingPatientSchema>;
