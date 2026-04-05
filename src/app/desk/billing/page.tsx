@@ -162,9 +162,14 @@ export default function BillingPage() {
     if (printRef.current) {
       const w = window.open("", "_blank", "width=800,height=600");
       if (w) {
+        // Replace relative image paths with absolute URLs for the print window
+        const html = printRef.current.innerHTML.replace(
+          /src="\/images\//g,
+          `src="${window.location.origin}/images/`
+        );
         w.document.write(`<!DOCTYPE html><html><head><title>Invoice</title>
           <style>body{font-family:Arial,sans-serif;margin:0;padding:20px}@media print{body{padding:0}}</style>
-          </head><body>${printRef.current.innerHTML}</body></html>`);
+          </head><body>${html}</body></html>`);
         w.document.close();
         w.focus();
         w.print();

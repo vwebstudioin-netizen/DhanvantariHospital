@@ -58,7 +58,7 @@ export default function BillsPage() {
     return `
       <div style="display:flex;justify-content:space-between;border-bottom:2px solid #1e3a5f;padding-bottom:12px;margin-bottom:16px;align-items:center">
         <div style="display:flex;align-items:center;gap:10px">
-          <img src="/images/logo.jpg" style="width:44px;height:44px;border-radius:50%;object-fit:cover" />
+          <img src="${window.location.origin}/images/logo.jpg" style="width:44px;height:44px;border-radius:50%;object-fit:cover" />
           <div>
             <div style="font-size:18px;font-weight:900;color:#1e3a5f">${SITE_NAME}</div>
             <div style="font-size:10px;color:#64748b">${HOSPITAL_ADDRESS} · ${CONTACT_PHONE}</div>
