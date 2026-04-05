@@ -5,6 +5,8 @@ import { format, differenceInDays } from "date-fns";
 import { Plus, Printer, Phone, XCircle, Search } from "lucide-react";
 import { createInPatientCard, getActiveCards, dischargePatient } from "@/lib/inpatient";
 import { SITE_NAME, INPATIENT_WARDS } from "@/lib/constants";
+import type { InPatientCard } from "@/types/inpatient";
+import toast from "react-hot-toast";
 
 async function sendCardWhatsApp(card: { patientPhone: string; patientName: string; cardNumber: string; ward: string; roomNumber: string; expiryDate: string }) {
   const message = `Hello ${card.patientName},\n\n${SITE_NAME} — In-Patient Card Details:\n\n🏥 Card No: *${card.cardNumber}*\n🛏 Ward: ${card.ward}, Room: ${card.roomNumber}\n📅 Valid until: ${card.expiryDate}\n\nGet well soon!`;
@@ -14,8 +16,6 @@ async function sendCardWhatsApp(card: { patientPhone: string; patientName: strin
     body: JSON.stringify({ phone: card.patientPhone, message }),
   });
 }
-import type { InPatientCard } from "@/types/inpatient";
-import toast from "react-hot-toast";
 
 function ExpiryBadge({ expiryDate }: { expiryDate: string }) {
   const days = differenceInDays(new Date(expiryDate), new Date());
