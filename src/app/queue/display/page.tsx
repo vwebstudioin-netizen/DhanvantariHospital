@@ -16,55 +16,51 @@ function LiveClock() {
 export default function QueueDisplayPage() {
   const { waitingTokens, activeToken, loading } = useQueue();
   const prevServingRef = useRef<string | null>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(false);
 
-  // Create AudioContext on user click (browser autoplay policy)
+  // Speak the token announcement using Web Speech API
+  const announce = useCallback((token: { displayNumber: string; patientName: string }) => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel(); // stop any ongoing speech
+
+    const digits = token.displayNumber.split("").join(" "); // "005" → "0 0 5"
+    const text = `Token number ${digits}. ${token.patientName}, please come to the counter. Token number ${digits}.`;
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-IN";
+    utterance.rate = 0.85;   // slightly slower for clarity
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    // Try to use an Indian English voice if available
+    const voices = window.speechSynthesis.getVoices();
+    const indianVoice = voices.find((v) =>
+      v.lang.includes("en-IN") || v.name.toLowerCase().includes("india")
+    );
+    if (indianVoice) utterance.voice = indianVoice;
+
+    window.speechSynthesis.speak(utterance);
+  }, []);
+
+  // Enable speech on user click (browser autoplay policy)
   const enableSound = useCallback(() => {
-    if (!audioCtxRef.current) {
-      audioCtxRef.current = new AudioContext();
-    }
-    if (audioCtxRef.current.state === "suspended") {
-      audioCtxRef.current.resume();
-    }
     setSoundEnabled(true);
-    // Play a test chime so user knows it's working
-    playChime();
+    // Test announcement
+    const test = new SpeechSynthesisUtterance("Sound enabled. Ready to announce tokens.");
+    test.lang = "en-IN";
+    test.rate = 0.9;
+    window.speechSynthesis.speak(test);
   }, []);
 
-  const playChime = useCallback(() => {
-    try {
-      const ctx = audioCtxRef.current || new AudioContext();
-      if (!audioCtxRef.current) audioCtxRef.current = ctx;
-
-      const notes = [880, 1100, 1320]; // ascending 3-note chime
-      notes.forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = freq;
-        osc.type = "sine";
-        gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.15);
-        gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + i * 0.15 + 0.05);
-        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + i * 0.15 + 0.3);
-        osc.start(ctx.currentTime + i * 0.15);
-        osc.stop(ctx.currentTime + i * 0.15 + 0.35);
-      });
-    } catch {
-      // Audio not supported
-    }
-  }, []);
-
-  // Chime when token number changes
+  // Announce when active token changes
   useEffect(() => {
     if (!activeToken) return;
     const currentId = activeToken.displayNumber;
     if (prevServingRef.current !== null && prevServingRef.current !== currentId) {
-      if (soundEnabled) playChime();
+      if (soundEnabled) announce(activeToken);
     }
     prevServingRef.current = currentId;
-  }, [activeToken, soundEnabled, playChime]);
+  }, [activeToken, soundEnabled, announce]);
 
   if (loading) {
     return (
