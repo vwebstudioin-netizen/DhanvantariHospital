@@ -1,6 +1,12 @@
 import { Timestamp } from "firebase/firestore";
 
-export type TokenStatus = "waiting" | "serving" | "completed" | "skipped" | "no-show";
+export type TokenStatus =
+  | "waiting"    // In the queue, not yet called
+  | "called"     // Called out — patient is being summoned (WhatsApp sent)
+  | "serving"    // Consultation in progress
+  | "completed"  // Consultation done
+  | "skipped"    // Patient not present when called — moved back or skipped
+  | "no-show";   // Patient absent, marked done without consultation
 
 export interface Token {
   id: string;
@@ -12,6 +18,7 @@ export interface Token {
   status: TokenStatus;
   issuedAt: Timestamp;
   calledAt?: Timestamp;
+  startedAt?: Timestamp;
   completedAt?: Timestamp;
   notes?: string;
 }

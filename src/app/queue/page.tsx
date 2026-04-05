@@ -7,7 +7,7 @@ import { SITE_NAME, CONTACT_PHONE } from "@/lib/constants";
 import type { Token } from "@/types/token";
 
 export default function QueueCheckPage() {
-  const { tokens, waitingTokens, currentServing } = useQueue();
+  const { tokens, waitingTokens, activeToken } = useQueue();
   const [searchValue, setSearchValue] = useState("");
   const [foundToken, setFoundToken] = useState<Token | null>(null);
   const [searched, setSearched] = useState(false);
@@ -49,7 +49,7 @@ export default function QueueCheckPage() {
           Now Serving
         </p>
         <p className="my-1 text-5xl font-bold text-primary">
-          {currentServing ? `#${currentServing.displayNumber}` : "---"}
+          {activeToken ? `#${activeToken.displayNumber}` : "---"}
         </p>
         <p className="text-sm text-muted-foreground">
           {waitingTokens.length} patient{waitingTokens.length !== 1 ? "s" : ""}{" "}

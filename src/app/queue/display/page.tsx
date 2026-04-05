@@ -5,13 +5,13 @@ import { useQueue } from "@/hooks/useQueue";
 import { SITE_NAME } from "@/lib/constants";
 
 export default function QueueDisplayPage() {
-  const { waitingTokens, currentServing, config, loading } = useQueue();
+  const { waitingTokens, activeToken, config, loading } = useQueue();
   const prevServingRef = useRef<string | null>(null);
 
   // Audio chime when token changes
   useEffect(() => {
-    if (!currentServing) return;
-    const currentId = currentServing.displayNumber;
+    if (!activeToken) return;
+    const currentId = activeToken.displayNumber;
     if (prevServingRef.current && prevServingRef.current !== currentId) {
       try {
         const ctx = new AudioContext();
@@ -35,7 +35,7 @@ export default function QueueDisplayPage() {
       }
     }
     prevServingRef.current = currentId;
-  }, [currentServing]);
+  }, [activeToken]);
 
   if (loading) {
     return (
@@ -76,15 +76,15 @@ export default function QueueDisplayPage() {
             Now Serving
           </p>
           <p className="my-6 text-[12rem] font-bold leading-none tracking-tight text-white drop-shadow-lg">
-            {currentServing ? `#${currentServing.displayNumber}` : "---"}
+            {activeToken ? `#${activeToken.displayNumber}` : "---"}
           </p>
-          {currentServing && (
+          {activeToken && (
             <>
-              <p className="text-3xl font-semibold">{currentServing.patientName}</p>
-              <p className="mt-2 text-lg text-cyan-300">{currentServing.purpose}</p>
+              <p className="text-3xl font-semibold">{activeToken.patientName}</p>
+              <p className="mt-2 text-lg text-cyan-300">{activeToken.purpose}</p>
             </>
           )}
-          {!currentServing && (
+          {!activeToken && (
             <p className="text-xl text-cyan-400">Please wait for your number</p>
           )}
         </div>
