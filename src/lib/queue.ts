@@ -6,6 +6,7 @@ import {
 import { db } from "./firebase";
 import { format } from "date-fns";
 import type { Token, QueueConfig } from "@/types/token";
+import { upsertPatientByPhone } from "@/lib/patients";
 
 export function getTodayDateKey(): string {
   return format(new Date(), "yyyy-MM-dd");
@@ -75,6 +76,11 @@ export async function issueToken(
 
     return { id: tokenRef.id, ...tokenData } as unknown as Token;
   });
+
+  // Auto-create/update patient record from token
+  if (patientPhone) {
+    await upsertPatientByPhone(patientName, patientPhone, "token");
+  }
 
   return newToken;
 }

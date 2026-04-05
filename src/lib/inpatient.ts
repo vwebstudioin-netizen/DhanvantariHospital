@@ -5,6 +5,7 @@ import {
 import { db } from "@/lib/firebase";
 import type { InPatientCard, CardType } from "@/types/inpatient";
 import { addDays, format } from "date-fns";
+import { upsertPatientByPhone } from "@/lib/patients";
 
 const CARDS = "inpatientCards";
 const COUNTERS = "counters";
@@ -60,6 +61,12 @@ export async function createInPatientCard(
   }
 
   const docRef = await addDoc(collection(db, CARDS), cardData);
+
+  // Auto-create/update patient record from card details
+  if (data.patientPhone) {
+    await upsertPatientByPhone(data.patientName, data.patientPhone, "card");
+  }
+
   return { id: docRef.id, cardNumber, patientId };
 }
 
