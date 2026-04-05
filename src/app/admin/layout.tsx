@@ -2,7 +2,9 @@
 
 import { ReactNode } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { useAuthContext } from "@/providers/AuthProvider";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import {
@@ -21,6 +23,7 @@ import {
   CreditCard,
   Receipt,
   Pill,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +48,12 @@ const adminLinks = [
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const { user, loading, isAdmin, isPharmacist, isReceptionist } = useAuthContext();
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push("/login");
+  };
 
   if (loading) {
     return (
@@ -118,6 +127,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   {link.label}
                 </Link>
               ))}
+              <div className="pt-2 border-t border-border mt-2">
+                <button
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50 hover:text-red-600 transition"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </button>
+              </div>
             </nav>
           </div>
         </aside>
