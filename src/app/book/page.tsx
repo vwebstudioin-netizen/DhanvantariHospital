@@ -77,9 +77,45 @@ export default function BookingPage() {
     }
   };
 
-  const handleNext = () => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleNext = async () => {
     if (step === 7) {
-      setSubmitted(true);
+      // Final step — save to Firestore via API
+      setSubmitting(true);
+      try {
+        const res = await fetch("/api/appointment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            locationSlug: state.locationSlug,
+            departmentSlug: state.departmentSlug,
+            serviceSlug: state.serviceSlug || null,
+            doctorSlug: state.doctorSlug || null,
+            date: state.date,
+            time: state.time,
+            type: "in-person",
+            patientName: `${state.patientInfo.firstName} ${state.patientInfo.lastName}`.trim(),
+            patientEmail: state.patientInfo.email,
+            patientPhone: state.patientInfo.phone,
+            patientDOB: state.patientInfo.dateOfBirth || null,
+            isNewPatient: true,
+            notes: state.patientInfo.reason || "",
+            insurancePlan: state.insurance.provider || null,
+            memberId: state.insurance.memberId || null,
+            groupNumber: state.insurance.groupNumber || null,
+          }),
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || "Booking failed");
+        }
+        setSubmitted(true);
+      } catch (err: any) {
+        alert(err.message || "Failed to save booking. Please try again.");
+      } finally {
+        setSubmitting(false);
+      }
       return;
     }
     if (canProceed()) setStep((s) => s + 1);
@@ -418,15 +454,11 @@ export default function BookingPage() {
             >
               <ArrowLeft className="h-4 w-4" /> Back
             </Button>
-            <Button onClick={handleNext} disabled={!canProceed()} className="gap-2">
+            <Button onClick={handleNext} disabled={!canProceed() || submitting} className="gap-2">
               {step === 7 ? (
-                <>
-                  <Calendar className="h-4 w-4" /> Confirm Booking
-                </>
+                submitting ? "Submitting..." : <><Calendar className="h-4 w-4" /> Confirm Booking</>
               ) : (
-                <>
-                  Next <ArrowRight className="h-4 w-4" />
-                </>
+                <>Next <ArrowRight className="h-4 w-4" /></>
               )}
             </Button>
           </div>
