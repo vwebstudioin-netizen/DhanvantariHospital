@@ -45,7 +45,9 @@ export default function EnquiriesPage() {
         getDocs(query(collection(db, "contactMessages"), orderBy("createdAt", "desc"))),
       ]);
       const allAppts = apptSnap.docs.map((d) => ({ id: d.id, ...d.data() }) as Appointment);
-      setAppointments(allAppts.filter((e) => !e.type || e.type === "patient"));
+      // Exclude MR/visitor appointments — those go to admin/appointments
+      // Patient appointments have type "in-person", "telehealth", or undefined
+      setAppointments(allAppts.filter((e) => e.type !== "mr"));
       setMessages(msgSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as ContactMessage[]);
     } catch { toast.error("Failed to load"); }
     finally { setLoading(false); }
