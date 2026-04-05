@@ -110,18 +110,22 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       sidebarLinks = RECEPTIONIST_LINKS;
       roleLabel = "Reception";
       defaultHref = "/admin/queue";
-      if (!isAllowed(pathname, RECEPTIONIST_ALLOWED)) {
+      // Only redirect within /admin routes — /desk routes are handled by desk layout
+      if (pathname.startsWith("/admin") && !isAllowed(pathname, RECEPTIONIST_ALLOWED)) {
         if (typeof window !== "undefined") window.location.href = defaultHref;
         return null;
       }
+      // If navigating to /desk, let the desk layout handle it (return null silently)
+      if (!pathname.startsWith("/admin")) return null;
     } else if (isDoctor) {
       sidebarLinks = DOCTOR_LINKS;
       roleLabel = "Doctor";
       defaultHref = "/admin/queue";
-      if (!isAllowed(pathname, DOCTOR_ALLOWED)) {
+      if (pathname.startsWith("/admin") && !isAllowed(pathname, DOCTOR_ALLOWED)) {
         if (typeof window !== "undefined") window.location.href = defaultHref;
         return null;
       }
+      if (!pathname.startsWith("/admin")) return null;
     } else if (isPharmacist) {
       // Pharmacist uses the dedicated pharmacy sub-layout — don't add admin wrapper
       const allowed = PHARMACIST_ALLOWED.some((p) => pathname.startsWith(p));
