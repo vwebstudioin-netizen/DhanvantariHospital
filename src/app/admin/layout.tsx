@@ -10,7 +10,7 @@ import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import {
   LayoutDashboard, Calendar, Users, FileText, MessageSquare,
   Star, Settings, Image, BarChart3, Shield,
-  Ticket, Pill, LogOut, ArrowDownUp, Truck,
+  Ticket, Pill, LogOut,
   CreditCard, Receipt, Stethoscope,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -34,7 +34,7 @@ const ADMIN_CORE_LINKS = [
 const STAFF_PANEL_LINKS = [
   { label: "Reception",  href: "/desk",             icon: CreditCard },
   { label: "Pharmacy",   href: "/admin/pharmacy",   icon: Pill },
-  { label: "Doctor",     href: "/desk/queue",       icon: Stethoscope },
+  { label: "Doctor",     href: "/doctor/queue",     icon: Stethoscope },
 ];
 
 // ── Non-admin role sidebars ──────────────────────────────────────────────────
@@ -46,24 +46,7 @@ const RECEPTIONIST_LINKS = [
   { label: "Invoices",         href: "/desk/bills",         icon: Receipt },
 ];
 
-const DOCTOR_LINKS = [
-  { label: "Token Queue",  href: "/admin/queue",        icon: Ticket },
-  { label: "Appointments", href: "/admin/appointments", icon: Calendar },
-  { label: "Patients",     href: "/admin/patients",     icon: Users },
-];
-
-const PHARMACIST_LINKS = [
-  { label: "Dashboard",    href: "/admin/pharmacy",           icon: LayoutDashboard },
-  { label: "Medicines",    href: "/admin/pharmacy/medicines", icon: Pill },
-  { label: "Stock",        href: "/admin/pharmacy/stock",     icon: ArrowDownUp },
-  { label: "New Bill",     href: "/admin/pharmacy/billing",   icon: Receipt },
-  { label: "Bill History", href: "/admin/pharmacy/bills",     icon: FileText },
-  { label: "Suppliers",    href: "/admin/pharmacy/suppliers", icon: Truck },
-  { label: "Reports",      href: "/admin/pharmacy/reports",   icon: BarChart3 },
-];
-
 const RECEPTIONIST_ALLOWED = ["/admin/queue", "/admin/appointments", "/admin/patients"];
-const DOCTOR_ALLOWED       = ["/admin/queue", "/admin/appointments", "/admin/patients"];
 const PHARMACIST_ALLOWED   = ["/admin/pharmacy"];
 
 function isAllowed(pathname: string, allowed: string[]) {
@@ -126,23 +109,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     }
 
     if (isDoctor) {
-      if (pathname.startsWith("/admin") && !isAllowed(pathname, DOCTOR_ALLOWED)) {
-        if (typeof window !== "undefined") window.location.href = "/admin/queue";
-        return null;
-      }
-      if (!pathname.startsWith("/admin")) return null;
-
-      return (
-        <SidebarLayout
-          links={DOCTOR_LINKS}
-          roleLabel="Doctor"
-          email={user.email ?? ""}
-          onLogout={handleLogout}
-          pathname={pathname}
-        >
-          {children}
-        </SidebarLayout>
-      );
+      // Doctor has a dedicated /doctor/* route with its own layout
+      if (typeof window !== "undefined") window.location.href = "/doctor/queue";
+      return null;
     }
 
     if (isPharmacist) {
@@ -150,17 +119,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         if (typeof window !== "undefined") window.location.href = "/admin/pharmacy";
         return null;
       }
-      return (
-        <SidebarLayout
-          links={PHARMACIST_LINKS}
-          roleLabel="Pharmacy"
-          email={user.email ?? ""}
-          onLogout={handleLogout}
-          pathname={pathname}
-        >
-          {children}
-        </SidebarLayout>
-      );
+      // Pharmacy layout handles the UI — pass through to avoid double sidebar
+      return <>{children}</>;
     }
 
     return (
