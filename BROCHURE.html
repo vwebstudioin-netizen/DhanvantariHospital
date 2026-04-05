@@ -193,7 +193,10 @@
         <span class="cv-expiry-date">2026-04-19</span>
       </div>
     </div>
-    <p style="text-align:center; margin-top:16px; font-size:0.8rem; color:#64748b;">Auto-generated patient ID · Auto-calculated expiry (+14 days) · Discharge button removes from active list</p>
+    <p style="text-align:center; margin-top:16px; font-size:0.8rem; color:#64748b;">
+      <strong>Room Card (IPD-XXXX)</strong> — Admitted patients, no expiry, active until discharged &nbsp;|&nbsp;
+      <strong>Visit Card (OPD-XXXX)</strong> — 14-day expiry, auto-issues a queue token on creation
+    </p>
   </div>
 </div>
 
@@ -218,10 +221,11 @@
         <div class="role-badge">Receptionist</div>
         <h3>Reception / Desk</h3>
         <ul>
-          <li>Token queue (issue, call, start, skip)</li>
-          <li>Appointments & patients</li>
-          <li>In-patient card management</li>
-          <li>Invoice & billing creation</li>
+          <li>Token queue — call, start, skip, done</li>
+          <li>Room Card (IPD) & Visit Card (OPD)</li>
+          <li>Patients, appointments & enquiries inbox</li>
+          <li>Hospital invoice (INV-XXXX) creation</li>
+          <li>MR / visitor appointment scheduling</li>
           <li>Festive wishes to all patients</li>
         </ul>
       </div>
@@ -229,11 +233,11 @@
         <div class="role-badge">Pharmacist</div>
         <h3>Pharmacist</h3>
         <ul>
-          <li>Medicine catalog management</li>
-          <li>Stock in / out tracking</li>
-          <li>Dispense medicines to patients</li>
-          <li>Supplier management</li>
-          <li>Expiry & low stock reports</li>
+          <li>Medicine catalog (brand, generic, batch, expiry)</li>
+          <li>Stock in / out with patient tracking</li>
+          <li>Pharmacy invoice (PHRM-XXXX) — medicine POS</li>
+          <li>Auto stock deduction on billing</li>
+          <li>Supplier management & expiry reports</li>
         </ul>
       </div>
       <div class="role-card doctor">
@@ -308,29 +312,29 @@
         <tr><td>10</td><td>Done → auto-call next patient</td><td>Doctor / Receptionist</td></tr>
         <tr><td>11</td><td>Skip patient → auto-call next</td><td>Doctor / Receptionist</td></tr>
         <tr><td>12</td><td>No Show marking</td><td>Doctor / Receptionist</td></tr>
-        <tr><td>13</td><td>Full-screen TV display with audio chime</td><td>Waiting Room</td></tr>
+        <tr><td>13</td><td>Full-screen TV display — voice announcement of token number & patient name</td><td>Waiting Room</td></tr>
         <tr><td>14</td><td>Patient queue position check (by phone/token)</td><td>Patients</td></tr>
         <tr><td>15</td><td>Printable token slip (80mm thermal format)</td><td>Receptionist</td></tr>
 
         <tr class="cat-row"><td colspan="3">Desk Application</td></tr>
-        <tr><td>16</td><td>In-patient card issuance with 14-day auto-expiry</td><td>Receptionist / Admin</td></tr>
-        <tr><td>17</td><td>Auto-generated patient ID (PAT-XXXX) and card (IPD-XXXX)</td><td>System</td></tr>
-        <tr><td>18</td><td>Print patient card (85×54mm format)</td><td>Receptionist</td></tr>
-        <tr><td>19</td><td>Share card details via WhatsApp</td><td>Receptionist</td></tr>
-        <tr><td>20</td><td>Discharge patient — removes from active list</td><td>Receptionist</td></tr>
-        <tr><td>21</td><td>Invoice creation — consultation, surgery, room, lab, medicines</td><td>Receptionist / Pharmacist</td></tr>
-        <tr><td>22</td><td>Discount + payment method (cash, UPI, card, insurance)</td><td>Receptionist</td></tr>
-        <tr><td>23</td><td>Invoice history — search, reprint, share</td><td>Receptionist</td></tr>
-        <tr><td>24</td><td>Festive wishes bulk WhatsApp (11 occasions)</td><td>Receptionist / Admin</td></tr>
+        <tr><td>16</td><td>Room Card (IPD-XXXX) — admitted in-patients, ward/room/bed, no expiry</td><td>Receptionist / Admin</td></tr>
+        <tr><td>17</td><td>Visit Card (OPD-XXXX) — 14-day expiry, auto-issues queue token</td><td>Receptionist</td></tr>
+        <tr><td>18</td><td>Print both card types (85×54mm) with hospital logo</td><td>Receptionist</td></tr>
+        <tr><td>19</td><td>Discharge / Close card — removes from active list</td><td>Receptionist</td></tr>
+        <tr><td>20</td><td>Hospital invoice (INV-XXXX) — consultation, surgery, room, lab, medicines</td><td>Receptionist / Admin</td></tr>
+        <tr><td>21</td><td>Invoice history — loads from Firestore, search, reprint with logo</td><td>Receptionist</td></tr>
+        <tr><td>22</td><td>Enquiries inbox — appointment requests + contact messages unified</td><td>Receptionist</td></tr>
+        <tr><td>23</td><td>MR / Visitor appointment scheduling (medical representatives)</td><td>Receptionist / Admin</td></tr>
+        <tr><td>24</td><td>Festive wishes — actual WhatsApp bulk send with progress bar (11 occasions)</td><td>Receptionist / Admin</td></tr>
         <tr><td>25</td><td>Review request via WhatsApp after billing/discharge</td><td>Receptionist</td></tr>
 
-        <tr class="cat-row"><td colspan="3">Pharmacy Inventory</td></tr>
-        <tr><td>26</td><td>Medicine catalog (brand, generic, category, unit, pricing)</td><td>Pharmacist / Admin</td></tr>
-        <tr><td>27</td><td>Stock management — purchase in, dispense out, adjustment</td><td>Pharmacist</td></tr>
-        <tr><td>28</td><td>Dispense with patient name and movement log</td><td>Pharmacist</td></tr>
-        <tr><td>29</td><td>Supplier management (name, contact, GST)</td><td>Pharmacist / Admin</td></tr>
-        <tr><td>30</td><td>Low stock alerts on dashboard</td><td>Pharmacist / Admin</td></tr>
-        <tr><td>31</td><td>Expiry tracking (30/60/90 day warnings)</td><td>Pharmacist / Admin</td></tr>
+        <tr class="cat-row"><td colspan="3">Pharmacy Inventory (ERP)</td></tr>
+        <tr><td>26</td><td>Medicine catalog (brand, generic, category, unit, pricing, batch, expiry)</td><td>Pharmacist / Admin</td></tr>
+        <tr><td>27</td><td>Stock management — purchase in, dispense out, movement log</td><td>Pharmacist</td></tr>
+        <tr><td>28</td><td>Pharmacy invoice (PHRM-XXXX) — medicine POS, auto stock deduction</td><td>Pharmacist</td></tr>
+        <tr><td>29</td><td>Pharmacy bill history — search, print with logo</td><td>Pharmacist</td></tr>
+        <tr><td>30</td><td>Supplier management (name, contact, GST)</td><td>Pharmacist / Admin</td></tr>
+        <tr><td>31</td><td>Low stock alerts + expiry tracking (30/60/90 day warnings)</td><td>Pharmacist / Admin</td></tr>
 
         <tr class="cat-row"><td colspan="3">WhatsApp & Reviews</td></tr>
         <tr><td>32</td><td>Token called notification (Twilio WhatsApp)</td><td>System</td></tr>
@@ -341,12 +345,14 @@
         <tr><td>37</td><td>Star ratings shown on website</td><td>Public</td></tr>
 
         <tr class="cat-row"><td colspan="3">Access Control & System</td></tr>
-        <tr><td>38</td><td>4 roles: Admin, Receptionist, Pharmacist, Doctor</td><td>Admin</td></tr>
-        <tr><td>39</td><td>Single login page — each role sees their own panel</td><td>Staff</td></tr>
-        <tr><td>40</td><td>Create staff accounts from admin panel</td><td>Admin</td></tr>
-        <tr><td>41</td><td>Patient login via Google — profile saved to Firestore</td><td>Patients</td></tr>
-        <tr><td>42</td><td>Seed demo data & delete all data (Settings)</td><td>Admin</td></tr>
-        <tr><td>43</td><td>Branding configurable from environment variables</td><td>Developer</td></tr>
+        <tr><td>38</td><td>4 roles: Admin, Receptionist, Pharmacist, Doctor — isolated panels</td><td>Admin</td></tr>
+        <tr><td>39</td><td>Single login page with role-based redirect</td><td>Staff</td></tr>
+        <tr><td>40</td><td>Create staff accounts from admin panel (no Firebase Console needed)</td><td>Admin</td></tr>
+        <tr><td>41</td><td>Patient portal — Google Sign-In, health profile, appointment history</td><td>Patients</td></tr>
+        <tr><td>42</td><td>TV voice announcement — speaks token number & patient name aloud</td><td>Waiting Room</td></tr>
+        <tr><td>43</td><td>Seed demo data & delete all data (admin settings)</td><td>Admin</td></tr>
+        <tr><td>44</td><td>Resend email for appointment confirmations (100/day free)</td><td>System</td></tr>
+        <tr><td>45</td><td>Branding configurable from environment variables</td><td>Developer</td></tr>
         <tr><td>44</td><td>Mobile responsive — all pages work on phone</td><td>Everyone</td></tr>
       </tbody>
     </table>
