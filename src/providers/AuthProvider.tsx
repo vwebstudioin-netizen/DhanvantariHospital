@@ -8,23 +8,28 @@ import {
   type ReactNode,
 } from "react";
 import { onAuthChange } from "@/lib/auth";
+import { getUserRole, type UserRole } from "@/lib/userRoles";
 import type { User } from "firebase/auth";
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  role: UserRole | null;
   isAdmin: boolean;
   isPharmacist: boolean;
   isReceptionist: boolean;
+  isDoctor: boolean;
   isStaff: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  role: null,
   isAdmin: false,
   isPharmacist: false,
   isReceptionist: false,
+  isDoctor: false,
   isStaff: false,
 });
 
@@ -35,37 +40,35 @@ export function useAuthContext() {
 export default function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isPharmacist, setIsPharmacist] = useState(false);
-  const [isReceptionist, setIsReceptionist] = useState(false);
-  const [isStaff, setIsStaff] = useState(false);
+  const [role, setRole] = useState<UserRole | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthChange(async (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
-        const result = await firebaseUser.getIdTokenResult();
-        const admin = result.claims.admin === true;
-        const pharmacist = result.claims.pharmacist === true;
-        const receptionist = result.claims.receptionist === true;
-        setIsAdmin(admin);
-        setIsPharmacist(pharmacist);
-        setIsReceptionist(receptionist);
-        setIsStaff(admin || pharmacist || receptionist);
+        try {
+          const r = await getUserRole(firebaseUser.uid);
+          setRole(r);
+        } catch {
+          setRole(null);
+        }
       } else {
-        setIsAdmin(false);
-        setIsPharmacist(false);
-        setIsReceptionist(false);
-        setIsStaff(false);
+        setRole(null);
       }
       setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
+  const isAdmin = role === "admin";
+  const isPharmacist = role === "pharmacist";
+  const isReceptionist = role === "receptionist";
+  const isDoctor = role === "doctor";
+  const isStaff = isAdmin || isPharmacist || isReceptionist || isDoctor;
+
   return (
     <AuthContext.Provider
-      value={{ user, loading, isAdmin, isPharmacist, isReceptionist, isStaff }}
+      value={{ user, loading, role, isAdmin, isPharmacist, isReceptionist, isDoctor, isStaff }}
     >
       {children}
     </AuthContext.Provider>

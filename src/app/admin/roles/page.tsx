@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Shield, UserCheck, UserPlus } from "lucide-react";
-import { getIdToken } from "@/lib/auth";
+import { auth } from "@/lib/firebase";
 import toast from "react-hot-toast";
 
 type Role = "admin" | "pharmacist" | "receptionist" | "doctor" | "patient";
@@ -16,33 +16,27 @@ const ROLES: { value: Role; label: string; desc: string; color: string }[] = [
 ];
 
 export default function AdminRoles() {
-  // Create user state
   const [createForm, setCreateForm] = useState({ email: "", password: "", displayName: "", role: "receptionist" as Role });
   const [creating, setCreating] = useState(false);
   const [lastCreated, setLastCreated] = useState<{ email: string; role: string } | null>(null);
 
-  // Assign role state
   const [uid, setUid] = useState("");
+  const [uidEmail, setUidEmail] = useState("");
   const [selectedRole, setSelectedRole] = useState<Role>("receptionist");
   const [assigning, setAssigning] = useState(false);
   const [lastAssigned, setLastAssigned] = useState<{ email: string; role: string } | null>(null);
 
+  const callerUid = auth.currentUser?.uid;
+
   const handleCreateUser = async () => {
-    if (!createForm.email || !createForm.password) {
-      toast.error("Email and password are required");
-      return;
-    }
-    if (createForm.password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
+    if (!createForm.email || !createForm.password) { toast.error("Email and password are required"); return; }
+    if (createForm.password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
     setCreating(true);
     try {
-      const token = await getIdToken();
       const res = await fetch("/api/admin/create-user", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(createForm),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ callerUid, ...createForm }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
@@ -60,17 +54,16 @@ export default function AdminRoles() {
     if (!uid.trim()) { toast.error("Enter a user UID"); return; }
     setAssigning(true);
     try {
-      const token = await getIdToken();
       const res = await fetch("/api/admin/set-role", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ uid: uid.trim(), role: selectedRole }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ callerUid, uid: uid.trim(), role: selectedRole, email: uidEmail }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
-      setLastAssigned({ email: data.email, role: selectedRole });
-      toast.success(`Role "${selectedRole}" assigned to ${data.email}`);
-      setUid("");
+      setLastAssigned({ email: uidEmail || uid, role: selectedRole });
+      toast.success(`Role "${selectedRole}" assigned`);
+      setUid(""); setUidEmail("");
     } catch (err: any) {
       toast.error(err.message || "Failed to assign role");
     } finally {
@@ -83,7 +76,7 @@ export default function AdminRoles() {
       <div>
         <h1 className="text-2xl font-bold text-foreground">User Management</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Create staff accounts and assign roles. Users can only log in via <strong>/login</strong>.
+          Create staff accounts and assign roles. Staff log in via <strong>/login</strong>.
         </p>
       </div>
 
@@ -94,35 +87,22 @@ export default function AdminRoles() {
           Create New Staff Account
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Email *</label>
-            <input
-              type="email"
-              value={createForm.email}
-              onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
-              placeholder="staff@dhanvantarihospital.com"
-              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Password *</label>
-            <input
-              type="password"
-              value={createForm.password}
-              onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
-              placeholder="Min 6 characters"
-              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Display Name</label>
-            <input
-              value={createForm.displayName}
-              onChange={(e) => setCreateForm({ ...createForm, displayName: e.target.value })}
-              placeholder="Staff member name (optional)"
-              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
+          {[
+            { key: "email", label: "Email *", placeholder: "staff@dhanvantarihospital.com", type: "email" },
+            { key: "password", label: "Password *", placeholder: "Min 6 characters", type: "password" },
+            { key: "displayName", label: "Display Name", placeholder: "Staff member name (optional)", type: "text" },
+          ].map((f) => (
+            <div key={f.key}>
+              <label className="block text-sm font-medium text-foreground mb-1">{f.label}</label>
+              <input
+                type={f.type}
+                value={(createForm as any)[f.key]}
+                onChange={(e) => setCreateForm({ ...createForm, [f.key]: e.target.value })}
+                placeholder={f.placeholder}
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+          ))}
           <div>
             <label className="block text-sm font-medium text-foreground mb-1">Role *</label>
             <select
@@ -136,18 +116,14 @@ export default function AdminRoles() {
             </select>
           </div>
         </div>
-        <button
-          onClick={handleCreateUser}
-          disabled={creating}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
-        >
+        <button onClick={handleCreateUser} disabled={creating}
+          className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50">
           <UserPlus className="w-4 h-4" />
           {creating ? "Creating..." : "Create Account"}
         </button>
         {lastCreated && (
           <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-700">
-            ✓ Account created: <strong>{lastCreated.email}</strong> with role <strong>{lastCreated.role}</strong>.
-            Share the email + password with the staff member.
+            ✓ Created <strong>{lastCreated.email}</strong> as <strong>{lastCreated.role}</strong>. Share the credentials with the staff member.
           </div>
         )}
       </div>
@@ -158,47 +134,34 @@ export default function AdminRoles() {
           <UserCheck className="w-4 h-4 text-primary" />
           Change Role of Existing User
         </h2>
-        <p className="text-sm text-muted-foreground">
-          Use the Firebase User UID to change the role of an existing account.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">User UID</label>
-            <input
-              value={uid}
-              onChange={(e) => setUid(e.target.value)}
-              placeholder="Firebase User UID"
-              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Find in Firebase Console → Authentication → Users
-            </p>
+            <label className="block text-sm font-medium text-foreground mb-1">User UID *</label>
+            <input value={uid} onChange={(e) => setUid(e.target.value)} placeholder="Firebase User UID"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+            <p className="text-xs text-muted-foreground mt-1">Firebase Console → Authentication → Users</p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">New Role</label>
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value as Role)}
-              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              {ROLES.map((r) => (
-                <option key={r.value} value={r.value}>{r.label}</option>
-              ))}
+            <label className="block text-sm font-medium text-foreground mb-1">Email (for record)</label>
+            <input value={uidEmail} onChange={(e) => setUidEmail(e.target.value)} placeholder="user@email.com"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">New Role *</label>
+            <select value={selectedRole} onChange={(e) => setSelectedRole(e.target.value as Role)}
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+              {ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
             </select>
           </div>
         </div>
-        <button
-          onClick={handleAssignRole}
-          disabled={assigning}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
-        >
+        <button onClick={handleAssignRole} disabled={assigning}
+          className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50">
           <Shield className="w-4 h-4" />
           {assigning ? "Updating..." : "Update Role"}
         </button>
         {lastAssigned && (
           <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-700">
             ✓ Role <strong>{lastAssigned.role}</strong> assigned to <strong>{lastAssigned.email}</strong>.
-            User must sign out and back in for the change to take effect.
           </div>
         )}
       </div>
@@ -209,9 +172,7 @@ export default function AdminRoles() {
         <div className="space-y-3">
           {ROLES.map((role) => (
             <div key={role.value} className="flex items-start gap-3 p-3 rounded-lg bg-muted/40">
-              <span className={`px-2 py-0.5 text-xs font-bold rounded-full shrink-0 ${role.color}`}>
-                {role.label}
-              </span>
+              <span className={`px-2 py-0.5 text-xs font-bold rounded-full shrink-0 ${role.color}`}>{role.label}</span>
               <p className="text-sm text-muted-foreground">{role.desc}</p>
             </div>
           ))}
@@ -219,7 +180,7 @@ export default function AdminRoles() {
       </div>
 
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-        <strong>Note:</strong> After changing a role, the user must sign out and sign back in for the new role to take effect. All staff log in via <strong>/login</strong>.
+        <strong>Note:</strong> Role changes take effect immediately on next login. All staff use <strong>/login</strong>.
       </div>
     </div>
   );

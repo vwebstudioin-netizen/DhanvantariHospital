@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { getUserRole } from "@/lib/userRoles";
 import { SITE_NAME } from "@/lib/constants";
 import { Hospital } from "lucide-react";
 import toast from "react-hot-toast";
@@ -19,19 +20,19 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const credential = await signInWithEmailAndPassword(auth, email, password);
-      const result = await credential.user.getIdTokenResult();
-      const claims = result.claims;
+      const role = await getUserRole(credential.user.uid);
 
-      if (claims.admin) {
+      if (role === "admin") {
         router.push("/admin");
-      } else if (claims.pharmacist) {
+      } else if (role === "pharmacist") {
         router.push("/admin/pharmacy");
-      } else if (claims.receptionist) {
+      } else if (role === "receptionist") {
         router.push("/desk");
-      } else if (claims.patient) {
+      } else if (role === "doctor") {
+        router.push("/admin/queue/doctor");
+      } else if (role === "patient") {
         router.push("/portal");
       } else {
-        // No role assigned yet
         toast.error("Your account has no role assigned. Contact admin.");
         await auth.signOut();
       }
@@ -58,9 +59,7 @@ export default function LoginPage() {
           className="bg-card border border-border rounded-2xl shadow-sm p-6 space-y-4"
         >
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-foreground mb-1">Email</label>
             <input
               type="email"
               value={email}
@@ -72,9 +71,7 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              Password
-            </label>
+            <label className="block text-sm font-medium text-foreground mb-1">Password</label>
             <input
               type="password"
               value={password}
