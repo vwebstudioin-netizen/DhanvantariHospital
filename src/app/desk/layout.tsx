@@ -4,6 +4,7 @@ import { useEffect, useState, ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { getUserRole } from "@/lib/userRoles";
 import { SITE_NAME } from "@/lib/constants";
 import Link from "next/link";
 import {
@@ -47,10 +48,10 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
         return;
       }
 
-      // Check role — must be admin or receptionist
-      const result = await user.getIdTokenResult();
-      const isAdmin = result.claims.admin === true;
-      const isReceptionist = result.claims.receptionist === true;
+      // Check role from Firestore — must be admin or receptionist
+      const role = await getUserRole(user.uid);
+      const isAdmin = role === "admin";
+      const isReceptionist = role === "receptionist";
 
       if (!isAdmin && !isReceptionist) {
         router.push("/login");
