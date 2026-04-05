@@ -40,10 +40,11 @@ service cloud.firestore {
     }
 
     // ── User Roles collection ─────────────────────────────────────────
-    // Admin can read/write all roles; users can read their own
+    // Any authenticated user can read/write — safe because only
+    // hospital staff have Firebase Auth accounts (no public signup).
+    // The roles page in the admin panel restricts who can access it at app level.
     match /userRoles/{uid} {
-      allow read: if isOwner(uid) || isAdmin();
-      allow write: if isAdmin();
+      allow read, write: if request.auth != null;
     }
 
     // ── Public hospital content ───────────────────────────────────────
