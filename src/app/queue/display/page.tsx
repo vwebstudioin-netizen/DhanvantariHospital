@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useQueue } from "@/hooks/useQueue";
-import { SITE_NAME } from "@/lib/constants";
+import { SITE_NAME, SITE_TAGLINE } from "@/lib/constants";
 
 function LiveClock() {
   const [time, setTime] = useState(new Date());
@@ -77,7 +77,7 @@ export default function QueueDisplayPage() {
   const nextToken = waitingTokens[0] || null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-[#0f1729] via-[#1e3a5f] to-[#0f1729] text-white select-none">
+    <div className="flex min-h-screen flex-col bg-linear-to-br from-[#0f1729] via-[#1e3a5f] to-[#0f1729] text-white select-none">
 
       {/* Sound enable button — click anywhere or the button */}
       {!soundEnabled && (
@@ -98,7 +98,7 @@ export default function QueueDisplayPage() {
       <header className="flex items-center justify-between border-b border-white/10 px-8 py-4">
         <div>
           <h1 className="text-2xl font-bold tracking-wide">{SITE_NAME}</h1>
-          <p className="text-sm text-white/50">Emergency Treatment for Accident Cases Available</p>
+          <p className="text-sm text-white/50">{SITE_TAGLINE}</p>
         </div>
         <div className="text-right">
           <p className="text-sm text-white/50">
