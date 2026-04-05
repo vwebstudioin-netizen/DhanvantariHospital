@@ -442,7 +442,7 @@
   <div class="section" id="test-pharmacist">
     <h2><span class="section-num">8</span>Test — Pharmacist Role</h2>
     <div class="card blue">
-      <p><strong>Login:</strong> <code>pharmacist@abhospital.com</code> at <a class="url" href="http://localhost:3000/login">/login</a></p>
+      <p><strong>Login:</strong> <code>pharmacist@dhanvantarihospital.com</code> at <a class="url" href="http://localhost:3000/login">/login</a></p>
       <p style="margin-top:6px;"><strong>Expected redirect:</strong> <code>/admin/pharmacy</code> — pharmacy-only sidebar</p>
     </div>
 
@@ -462,19 +462,20 @@
   <div class="section" id="test-receptionist">
     <h2><span class="section-num">9</span>Test — Receptionist Role</h2>
     <div class="card blue">
-      <p><strong>Login:</strong> <code>reception@abhospital.com</code> at <a class="url" href="http://localhost:3000/login">/login</a></p>
-      <p style="margin-top:6px;"><strong>Expected redirect:</strong> <code>/desk</code> — reception desk panel</p>
+      <p><strong>Login:</strong> <code>reception@dhanvantarihospital.com</code> at <a class="url" href="http://localhost:3000/login">/login</a></p>
+      <p style="margin-top:6px;"><strong>Expected redirect:</strong> <code>/desk/queue</code> — reception desk panel</p>
     </div>
 
     <h3>What to verify:</h3>
     <ul class="checklist">
-      <li>Desk sidebar shows: Dashboard, Token Queue, In-Patient Cards, Appointments, Enquiries, New Invoice, Invoice History, Festive Wishes</li>
-      <li>Trying <code>/admin</code> → redirected to <code>/desk/queue</code></li>
+      <li>Desk sidebar shows: Dashboard, Token Queue, In-Patient Cards, Patients, Appointments, Enquiries, New Invoice, Invoice History, Festive Wishes</li>
+      <li>Trying <code>/admin</code> → redirected to <code>/desk/queue</code> (never leaves desk layout)</li>
       <li>Trying <code>/admin/pharmacy</code> → redirected to login</li>
-      <li>Token Queue at <code>/desk/queue</code> — full queue management within desk layout</li>
-      <li>In-Patient Cards: Room Card (IPD-XXXX) and Visit Card (OPD-XXXX) tabs</li>
-      <li>Visit Card creation auto-issues a queue token</li>
-      <li>Enquiries at <code>/desk/enquiries</code> — appointment requests + contact messages unified</li>
+      <li>Token Queue at <code>/desk/queue</code> — issue tokens, call next, start, done, skip</li>
+      <li>In-Patient Cards: Room Card (IPD-XXXX, no expiry) and Visit Card (OPD-XXXX, 14-day) tabs</li>
+      <li>Creating a Visit Card auto-issues a queue token for the patient</li>
+      <li>Enquiries at <code>/desk/enquiries</code> — unified inbox: appointment requests + contact messages, filter by type</li>
+      <li>Appointments at <code>/desk/appointments</code> — manage patient + MR/visitor appointments</li>
     </ul>
   </div>
 

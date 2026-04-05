@@ -188,26 +188,35 @@
       <span class="role-pill">Receptionist</span>
       <div>
         <strong>Receptionist Role</strong><br>
-        <span class="creds">receptionist@test.com / Recep@12345 → Login at /login → redirects to /admin/queue</span>
+        <span class="creds">receptionist@test.com / Recep@12345 → Login at /login → redirects to /desk/queue</span>
       </div>
     </div>
 
     <div class="workflow">
       <div class="workflow-title">Access Control Check</div>
       <div class="steps">
-        <div class="step"><div class="step-num"></div><div class="step-content">Try navigating to <code>/admin</code> (dashboard).<div class="expected">Redirected to <code>/admin/queue</code>. Cannot access dashboard.</div></div></div>
-        <div class="step"><div class="step-num"></div><div class="step-content">Try navigating to <code>/admin/pharmacy</code>.<div class="expected">Redirected away — no pharmacy access.</div></div></div>
-        <div class="step"><div class="step-num"></div><div class="step-content">Check the sidebar — should show: Token Queue, Appointments, Patients, In-Patient Cards, Invoices.<div class="expected">Only 5 links visible. No Blog, Gallery, Analytics, etc.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Try navigating to <code>/admin</code> (dashboard).<div class="expected">Redirected to <code>/desk/queue</code>. Never leaves the desk layout.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Try navigating to <code>/admin/pharmacy</code>.<div class="expected">Redirected to login — no pharmacy access.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Check the sidebar — should show: Dashboard, Token Queue, In-Patient Cards, Patients, Appointments, Enquiries, New Invoice, Invoice History, Festive Wishes.<div class="expected">All 9 links visible within /desk layout. No cross-layout navigation.</div></div></div>
       </div>
     </div>
 
     <div class="workflow">
-      <div class="workflow-title">In-Patient Card <span class="url">/desk/inpatient-card</span></div>
+      <div class="workflow-title">In-Patient Cards <span class="url">/desk/inpatient-card</span></div>
       <div class="steps">
-        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"New Card"</strong> → Fill patient name, phone, doctor, ward, room, diagnosis → Click <strong>"Create Card"</strong>.<div class="expected">Card appears in list with correct auto-expiry date (+14 days).</div></div></div>
-        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Print"</strong> on any card.<div class="expected">New browser window opens with printable 85×54mm card. Only the card, no sidebar.</div></div></div>
-        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"⭐ Review"</strong> button on a card (requires phone number).<div class="expected">WhatsApp review request sent (if Twilio configured). Toast confirmation shown.</div></div></div>
-        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Discharge"</strong> → Confirm.<div class="expected">Card disappears from active list.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click tab <strong>"Room Cards"</strong> → New Card → Fill patient, doctor, ward, room, diagnosis → Create.<div class="expected">Room Card (IPD-XXXX) appears with no expiry — active until discharged.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click tab <strong>"Visit Cards"</strong> → New Card → Fill patient, doctor, diagnosis → Create.<div class="expected">Visit Card (OPD-XXXX) appears with 14-day expiry. AND a queue token is auto-issued.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Print"</strong> on any card.<div class="expected">New window opens with 85×54mm card with hospital logo.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Discharge"</strong> or <strong>"Close"</strong> → Confirm.<div class="expected">Card removed from active list.</div></div></div>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Enquiries Inbox <span class="url">/desk/enquiries</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Go to Enquiries page → check "Appointments" tab.<div class="expected">Patient bookings from website appear with date, time, department, confirm/done/cancel actions.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Check "Contact" tab.<div class="expected">Contact form messages from website. Click to mark as read.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Confirm an appointment → Done.<div class="expected">Status updates in real-time.</div></div></div>
       </div>
     </div>
 

@@ -10,7 +10,7 @@ import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import {
   LayoutDashboard, Calendar, Users, FileText, MessageSquare,
   Star, Settings, Image, BarChart3, Shield, Stethoscope,
-  Ticket, CreditCard, Receipt, Pill, LogOut,
+  Ticket, CreditCard, Receipt, Pill, LogOut, ArrowDownUp, Truck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -49,18 +49,20 @@ const DOCTOR_LINKS = [
 ];
 
 const PHARMACIST_LINKS = [
-  { label: "Pharmacy",        href: "/admin/pharmacy",      icon: Pill },
-  { label: "Medicines",       href: "/admin/pharmacy/medicines", icon: Pill },
-  { label: "Stock",           href: "/admin/pharmacy/stock", icon: Pill },
-  { label: "Suppliers",       href: "/admin/pharmacy/suppliers", icon: Pill },
-  { label: "Reports",         href: "/admin/pharmacy/reports", icon: Pill },
+  { label: "Dashboard",    href: "/admin/pharmacy",              icon: LayoutDashboard },
+  { label: "Medicines",    href: "/admin/pharmacy/medicines",    icon: Pill },
+  { label: "Stock",        href: "/admin/pharmacy/stock",        icon: ArrowDownUp },
+  { label: "New Bill",     href: "/admin/pharmacy/billing",      icon: Receipt },
+  { label: "Bill History", href: "/admin/pharmacy/bills",        icon: FileText },
+  { label: "Suppliers",    href: "/admin/pharmacy/suppliers",    icon: Truck },
+  { label: "Reports",      href: "/admin/pharmacy/reports",      icon: BarChart3 },
   { label: "Invoices",        href: "/desk/bills",          icon: Receipt },
 ];
 
 // Pages each non-admin role is allowed to access
 const RECEPTIONIST_ALLOWED = ["/admin/queue", "/admin/appointments", "/admin/patients"];
 const DOCTOR_ALLOWED = ["/admin/queue", "/admin/appointments", "/admin/patients"];
-const PHARMACIST_ALLOWED = ["/admin/pharmacy", "/desk/billing", "/desk/bills"];
+const PHARMACIST_ALLOWED = ["/admin/pharmacy"]; // /desk paths handled by desk layout
 
 function isAllowed(pathname: string, allowed: string[]) {
   return allowed.some((p) => pathname.startsWith(p));
