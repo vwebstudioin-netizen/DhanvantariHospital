@@ -10,19 +10,20 @@ import { SITE_NAME } from "@/lib/constants";
 import Link from "next/link";
 import {
   LayoutDashboard, CreditCard, Receipt, FileText, Gift,
-  Ticket, LogOut, Menu, X, Hospital, Inbox,
+  Ticket, LogOut, Menu, X, Hospital, Inbox, Calendar,
 } from "lucide-react";
 import { useState } from "react";
 
 // All receptionist links stay within /desk/* — no cross-layout navigation
 const RECEPTIONIST_LINKS = [
-  { href: "/desk",                label: "Dashboard",        icon: LayoutDashboard },
-  { href: "/desk/queue",          label: "Token Queue",      icon: Ticket },
-  { href: "/desk/inpatient-card", label: "In-Patient Cards", icon: CreditCard },
-  { href: "/desk/enquiries",      label: "Enquiries",        icon: Inbox },
-  { href: "/desk/billing",        label: "New Invoice",      icon: Receipt },
-  { href: "/desk/bills",          label: "Invoice History",  icon: FileText },
-  { href: "/desk/wishes",         label: "Festive Wishes",   icon: Gift },
+  { href: "/desk",                  label: "Dashboard",        icon: LayoutDashboard },
+  { href: "/desk/queue",            label: "Token Queue",      icon: Ticket },
+  { href: "/desk/inpatient-card",   label: "In-Patient Cards", icon: CreditCard },
+  { href: "/desk/appointments",     label: "Appointments",     icon: Calendar },
+  { href: "/desk/enquiries",        label: "Enquiries",        icon: Inbox },
+  { href: "/desk/billing",          label: "New Invoice",      icon: Receipt },
+  { href: "/desk/bills",            label: "Invoice History",  icon: FileText },
+  { href: "/desk/wishes",           label: "Festive Wishes",   icon: Gift },
 ];
 
 const PHARMACIST_LINKS = [
