@@ -284,7 +284,7 @@ export default function InPatientCardPage() {
                     Admitted: {card.admissionDate} → Expires: {card.expiryDate}
                   </div>
                 </div>
-                <div className="flex flex-col gap-1.5 flex-shrink-0">
+                <div className="flex flex-col gap-1.5 shrink-0">
                   <button
                     onClick={() => handlePrint(card)}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
