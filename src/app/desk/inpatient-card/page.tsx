@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { format, differenceInDays } from "date-fns";
 import { Plus, Printer, Phone, XCircle, Search, BedDouble, CalendarCheck } from "lucide-react";
 import { createInPatientCard, getActiveCards, dischargePatient } from "@/lib/inpatient";
+import { issueToken } from "@/lib/queue";
 import { SITE_NAME, CONTACT_PHONE, INPATIENT_WARDS } from "@/lib/constants";
 import type { InPatientCard, CardType } from "@/types/inpatient";
 import toast from "react-hot-toast";
@@ -195,6 +196,21 @@ export default function InPatientCardPage() {
       const payload: any = { type: activeTab, ...form, issuedBy: "Desk Staff" };
       const { cardNumber } = await createInPatientCard(payload);
 
+      // Visit card → auto-issue a token in today's queue
+      let tokenNumber = "";
+      if (activeTab === "visit") {
+        try {
+          const token = await issueToken(
+            form.patientName,
+            form.patientPhone || "",
+            `OPD Visit — Dr. ${form.doctorName} — ${form.diagnosis}`
+          );
+          tokenNumber = token.displayNumber;
+        } catch {
+          // Token issue failure should not block card creation
+        }
+      }
+
       // Send WhatsApp notification
       if (form.patientPhone) {
         const tmpCard = { ...payload, cardNumber, patientId: "", id: "", isActive: true, createdAt: null, updatedAt: null };
@@ -205,7 +221,10 @@ export default function InPatientCardPage() {
         await sendCardWhatsApp(tmpCard as InPatientCard).catch(() => {});
       }
 
-      toast.success(`${activeTab === "room" ? "Room" : "Visit"} Card ${cardNumber} created!`);
+      const successMsg = activeTab === "visit" && tokenNumber
+        ? `Visit Card ${cardNumber} created! Token #${tokenNumber} added to queue.`
+        : `${activeTab === "room" ? "Room" : "Visit"} Card ${cardNumber} created!`;
+      toast.success(successMsg);
       setShowForm(false);
       activeTab === "room"
         ? setRoomForm({ patientName: "", patientPhone: "", doctorName: "", ward: INPATIENT_WARDS[0] as string, roomNumber: "", bedNumber: "", diagnosis: "", notes: "", admissionDate: format(new Date(), "yyyy-MM-dd") })
@@ -349,7 +368,7 @@ export default function InPatientCardPage() {
                     className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500" />
                 </div>
                 <div className="sm:col-span-2 p-3 bg-green-50 border border-green-200 rounded-lg text-xs text-green-700">
-                  📋 Visit card expires in <strong>14 days</strong> from visit date. Patient can use it for follow-up consultations.
+                  📋 Visit card expires in <strong>14 days</strong>. A <strong>token number</strong> will be automatically added to today's queue when this card is created.
                 </div>
               </>
             )}
