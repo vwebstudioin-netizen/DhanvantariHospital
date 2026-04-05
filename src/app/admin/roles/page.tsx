@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Shield, UserCheck, UserPlus } from "lucide-react";
 import { auth } from "@/lib/firebase";
+import { setUserRole } from "@/lib/userRoles";
 import toast from "react-hot-toast";
 
 type Role = "admin" | "pharmacist" | "receptionist" | "doctor" | "patient";
@@ -33,6 +34,7 @@ export default function AdminRoles() {
     if (createForm.password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
     setCreating(true);
     try {
+      // Step 1: Create Firebase Auth user via REST API
       const res = await fetch("/api/admin/create-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -40,6 +42,10 @@ export default function AdminRoles() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
+
+      // Step 2: Write role to Firestore directly from client (authenticated)
+      await setUserRole(data.uid, createForm.role, data.email, createForm.displayName);
+
       setLastCreated({ email: data.email, role: createForm.role });
       toast.success(`User ${data.email} created with role "${createForm.role}"`);
       setCreateForm({ email: "", password: "", displayName: "", role: "receptionist" });
@@ -54,13 +60,8 @@ export default function AdminRoles() {
     if (!uid.trim()) { toast.error("Enter a user UID"); return; }
     setAssigning(true);
     try {
-      const res = await fetch("/api/admin/set-role", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ callerUid, uid: uid.trim(), role: selectedRole, email: uidEmail }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed");
+      // Write directly from client — admin is authenticated so Firestore allows it
+      await setUserRole(uid.trim(), selectedRole, uidEmail || uid);
       setLastAssigned({ email: uidEmail || uid, role: selectedRole });
       toast.success(`Role "${selectedRole}" assigned`);
       setUid(""); setUidEmail("");
