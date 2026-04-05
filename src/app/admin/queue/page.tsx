@@ -130,7 +130,7 @@ export default function QueuePage() {
         </div>
         <Link
           href="/admin/queue/doctor"
-          className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
+          className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-[#152d4a]"
         >
           <Stethoscope className="h-4 w-4" />
           Doctor View
@@ -194,7 +194,7 @@ export default function QueuePage() {
             <button
               onClick={handleIssue}
               disabled={!name.trim() || !phone.trim() || issuing}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-medium text-white transition hover:bg-[#152d4a] disabled:opacity-50"
             >
               <Ticket className="h-4 w-4" />
               {issuing ? "Issuing..." : "Issue Token"}

@@ -117,7 +117,7 @@ export default function AdminRoles() {
           </div>
         </div>
         <button onClick={handleCreateUser} disabled={creating}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50">
+          className="flex items-center gap-2 bg-[#1e3a5f] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#152d4a] transition-colors disabled:opacity-50">
           <UserPlus className="w-4 h-4" />
           {creating ? "Creating..." : "Create Account"}
         </button>
@@ -155,7 +155,7 @@ export default function AdminRoles() {
           </div>
         </div>
         <button onClick={handleAssignRole} disabled={assigning}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50">
+          className="flex items-center gap-2 bg-[#1e3a5f] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#152d4a] transition-colors disabled:opacity-50">
           <Shield className="w-4 h-4" />
           {assigning ? "Updating..." : "Update Role"}
         </button>

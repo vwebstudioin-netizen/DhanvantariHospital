@@ -77,7 +77,7 @@ export default function QueueCheckPage() {
           />
           <button
             onClick={handleSearch}
-            className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary-dark"
+            className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-[#152d4a]"
           >
             Search
           </button>

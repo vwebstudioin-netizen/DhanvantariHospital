@@ -165,7 +165,7 @@ function SubmitForm() {
       <button
         type="submit"
         disabled={loading || rating === 0}
-        className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold text-sm hover:bg-primary-dark transition-colors disabled:opacity-50"
+        className="w-full bg-[#1e3a5f] text-white py-3 rounded-lg font-semibold text-sm hover:bg-[#152d4a] transition-colors disabled:opacity-50"
       >
         {loading ? "Submitting..." : "Submit Review"}
       </button>

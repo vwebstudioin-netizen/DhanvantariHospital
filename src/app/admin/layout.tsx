@@ -102,47 +102,52 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="flex flex-col gap-8 lg:flex-row">
-        {/* Sidebar */}
-        <aside className="w-full shrink-0 lg:w-56">
-          <div className="rounded-xl border border-border bg-card p-4">
-            <div className="mb-4 border-b border-border pb-4">
-              <p className="font-semibold text-foreground">Admin Panel</p>
-              <p className="text-xs text-muted-foreground">{user.email}</p>
-            </div>
-            <nav className="space-y-0.5">
-              {adminLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition",
-                    pathname === link.href
-                      ? "bg-primary/10 font-medium text-primary"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                  )}
-                >
-                  <link.icon className="h-4 w-4" />
-                  {link.label}
-                </Link>
-              ))}
-              <div className="pt-2 border-t border-border mt-2">
-                <button
-                  onClick={handleLogout}
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50 hover:text-red-600 transition"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </button>
-              </div>
-            </nav>
-          </div>
-        </aside>
+    <div className="flex h-screen overflow-hidden bg-[#0f1729]">
+      {/* Sidebar — full height, dark, software style */}
+      <aside className="w-56 shrink-0 flex flex-col bg-[#0f1729] border-r border-white/5 h-full">
+        {/* Header */}
+        <div className="px-4 py-4 border-b border-white/5">
+          <p className="text-sm font-bold text-white tracking-wide">Dhanvantari Hospital</p>
+          <p className="text-[10px] text-white/40 mt-0.5">Admin Panel</p>
+        </div>
+        {/* User */}
+        <div className="px-4 py-2.5 border-b border-white/5">
+          <p className="text-xs text-white/50 truncate">{user.email}</p>
+        </div>
+        {/* Nav */}
+        <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
+          {adminLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                (link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href))
+                  ? "bg-white/10 text-white font-medium"
+                  : "text-white/50 hover:bg-white/5 hover:text-white"
+              )}
+            >
+              <link.icon className="h-4 w-4 shrink-0" />
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+        {/* Logout */}
+        <div className="px-2 py-3 border-t border-white/5">
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+          >
+            <LogOut className="h-4 w-4" />
+            Logout
+          </button>
+        </div>
+      </aside>
 
-        {/* Main */}
-        <main className="min-w-0 flex-1">{children}</main>
-      </div>
+      {/* Main content */}
+      <main className="flex-1 overflow-y-auto bg-[#f0f2f5]">
+        <div className="p-6 lg:p-8">{children}</div>
+      </main>
     </div>
   );
 }

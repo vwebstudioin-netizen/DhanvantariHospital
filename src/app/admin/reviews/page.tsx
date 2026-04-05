@@ -98,7 +98,7 @@ export default function AdminReviews() {
         {(["pending", "all", "approved", "rejected"] as FilterTab[]).map((tab) => (
           <button key={tab} onClick={() => setFilter(tab)}
             className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-colors ${
-              filter === tab ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:bg-muted"
+              filter === tab ? "bg-[#1e3a5f] text-white" : "bg-card border border-border text-muted-foreground hover:bg-muted"
             }`}
           >
             {tab}
