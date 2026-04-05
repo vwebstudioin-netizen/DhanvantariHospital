@@ -27,9 +27,12 @@ function ExpiryBadge({ expiryDate }: { expiryDate: string }) {
 function PrintableCard({ card }: { card: InPatientCard }) {
   return (
     <div style={{ width: "85.6mm", minHeight: "54mm", border: "2px solid #1e3a5f", padding: "8px 12px", fontFamily: "Arial, sans-serif", fontSize: "11px", color: "#1e293b", background: "#fff" }}>
-      <div style={{ borderBottom: "1.5px solid #1e3a5f", paddingBottom: "4px", marginBottom: "6px" }}>
-        <div style={{ fontWeight: "900", fontSize: "13px", color: "#1e3a5f", textTransform: "uppercase", letterSpacing: "1px" }}>{SITE_NAME}</div>
-        <div style={{ fontSize: "9px", color: "#64748b" }}>In-Patient Card</div>
+      <div style={{ borderBottom: "1.5px solid #1e3a5f", paddingBottom: "4px", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
+        <img src="/images/logo.jpg" alt="Logo" style={{ width: "28px", height: "28px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+        <div>
+          <div style={{ fontWeight: "900", fontSize: "11px", color: "#1e3a5f", textTransform: "uppercase", letterSpacing: "1px" }}>{SITE_NAME}</div>
+          <div style={{ fontSize: "8px", color: "#64748b" }}>In-Patient Card</div>
+        </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px" }}>
         <div><span style={{ color: "#64748b" }}>Card No: </span><strong>{card.cardNumber}</strong></div>

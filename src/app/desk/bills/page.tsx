@@ -36,9 +36,12 @@ export default function BillsPage() {
         <div className="fixed inset-0 bg-white z-50 p-8 print:static">
           <div style={{ fontFamily: "Arial", fontSize: "12px", color: "#1e293b" }}>
             <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "2px solid #1e3a5f", paddingBottom: "12px", marginBottom: "16px" }}>
-              <div>
-                <div style={{ fontSize: "20px", fontWeight: "900", color: "#1e3a5f" }}>{SITE_NAME}</div>
-                <div style={{ fontSize: "10px", color: "#64748b" }}>{HOSPITAL_ADDRESS} · {CONTACT_PHONE}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <img src="/images/logo.jpg" alt="Logo" style={{ width: "44px", height: "44px", borderRadius: "50%", objectFit: "cover" }} />
+                <div>
+                  <div style={{ fontSize: "18px", fontWeight: "900", color: "#1e3a5f" }}>{SITE_NAME}</div>
+                  <div style={{ fontSize: "10px", color: "#64748b" }}>{HOSPITAL_ADDRESS} · {CONTACT_PHONE}</div>
+                </div>
               </div>
               <div style={{ textAlign: "right" }}>
                 <div style={{ fontSize: "16px", fontWeight: "700", color: "#1e3a5f" }}>INVOICE</div>

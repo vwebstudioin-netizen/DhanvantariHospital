@@ -24,10 +24,13 @@ function InvoicePrint({ data }: { data: any }) {
   return (
     <div style={{ width: "210mm", padding: "20mm", fontFamily: "Arial", fontSize: "12px", color: "#1e293b" }}>
       <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "2px solid #1e3a5f", paddingBottom: "12px", marginBottom: "16px" }}>
-        <div>
-          <div style={{ fontSize: "20px", fontWeight: "900", color: "#1e3a5f", textTransform: "uppercase", letterSpacing: "2px" }}>{SITE_NAME}</div>
-          <div style={{ fontSize: "10px", color: "#64748b", marginTop: "2px" }}>{HOSPITAL_ADDRESS}</div>
-          <div style={{ fontSize: "10px", color: "#64748b" }}>Ph: {CONTACT_PHONE}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <img src="/images/logo.jpg" alt="Logo" style={{ width: "48px", height: "48px", borderRadius: "50%", objectFit: "cover" }} />
+          <div>
+            <div style={{ fontSize: "18px", fontWeight: "900", color: "#1e3a5f", textTransform: "uppercase", letterSpacing: "1px" }}>{SITE_NAME}</div>
+            <div style={{ fontSize: "10px", color: "#64748b", marginTop: "2px" }}>{HOSPITAL_ADDRESS}</div>
+            <div style={{ fontSize: "10px", color: "#64748b" }}>Ph: {CONTACT_PHONE}</div>
+          </div>
         </div>
         <div style={{ textAlign: "right" }}>
           <div style={{ fontSize: "18px", fontWeight: "700", color: "#1e3a5f" }}>INVOICE</div>

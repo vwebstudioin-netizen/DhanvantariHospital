@@ -96,7 +96,7 @@ export default function PharmacyLayout({ children }: { children: ReactNode }) {
                     : "text-white/70 hover:bg-white/10 hover:text-white"
                 )}
               >
-                <Icon className="w-4 h-4 flex-shrink-0" />
+                <Icon className="w-4 h-4 shrink-0" />
                 {link.label}
               </Link>
             );
