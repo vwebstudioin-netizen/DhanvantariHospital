@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dhanvantari Hospital — Manual Testing Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Lato', sans-serif; color: #1e293b; line-height: 1.7; background: #f8fafc; }
+
+    .header { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%); color: #fff; padding: 40px; }
+    .header h1 { font-size: 1.8rem; font-weight: 900; }
+    .header p { color: rgba(255,255,255,0.7); margin-top: 6px; }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 80px; }
+
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px 24px; margin-bottom: 36px; }
+    .toc h2 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc li { padding: 2px 0; font-size: 0.85rem; }
+    .toc a { color: #1e3a5f; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    .user-section { margin-bottom: 48px; scroll-margin-top: 16px; }
+    .user-header { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-radius: 10px; margin-bottom: 20px; }
+    .user-header.admin { background: #ede9fe; border: 1px solid #c4b5fd; }
+    .user-header.receptionist { background: #dcfce7; border: 1px solid #86efac; }
+    .user-header.pharmacist { background: #dbeafe; border: 1px solid #93c5fd; }
+    .user-header.doctor { background: #fef3c7; border: 1px solid #fcd34d; }
+    .user-header.patient { background: #f0f9ff; border: 1px solid #7dd3fc; }
+    .role-pill { padding: 4px 14px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; }
+    .admin .role-pill { background: #7c3aed; color: #fff; }
+    .receptionist .role-pill { background: #16a34a; color: #fff; }
+    .pharmacist .role-pill { background: #1d4ed8; color: #fff; }
+    .doctor .role-pill { background: #d97706; color: #fff; }
+    .patient .role-pill { background: #0ea5e9; color: #fff; }
+    .user-header .creds { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #475569; }
+
+    .workflow { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
+    .workflow-title { padding: 12px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-weight: 700; font-size: 0.9rem; color: #1e293b; display: flex; align-items: center; gap: 8px; }
+    .workflow-title .url { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #64748b; font-weight: 400; }
+
+    .steps { padding: 0; counter-reset: step; }
+    .step { display: flex; gap: 14px; padding: 12px 18px; border-bottom: 1px solid #f1f5f9; }
+    .step:last-child { border-bottom: none; }
+    .step-num { counter-increment: step; min-width: 24px; height: 24px; background: #1e3a5f; color: #fff; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; justify-content: center; border-radius: 50%; flex-shrink: 0; margin-top: 1px; }
+    .step-num::before { content: counter(step); }
+    .step-content { flex: 1; font-size: 0.85rem; }
+    .step-content strong { color: #1e293b; }
+    .step-content .expected { color: #16a34a; font-size: 0.78rem; margin-top: 3px; }
+    .step-content .expected::before { content: "✓ Expected: "; font-weight: 700; }
+
+    code { background: #f1f5f9; color: #1e3a5f; padding: 1px 5px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+
+    .checklist { list-style: none; padding: 0; }
+    .checklist li { padding: 5px 18px; font-size: 0.85rem; display: flex; align-items: flex-start; gap: 10px; border-bottom: 1px solid #f1f5f9; }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li::before { content: '☐'; font-size: 1rem; flex-shrink: 0; }
+    .checklist li.pass::before { content: '✅'; }
+    .checklist li.fail::before { content: '❌'; }
+
+    .note { background: #fef9c3; border: 1px solid #fde047; border-radius: 8px; padding: 12px 16px; font-size: 0.82rem; color: #713f12; margin: 12px 18px; }
+    .warn { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; font-size: 0.82rem; color: #991b1b; margin: 12px 18px; }
+
+    h2 { font-size: 1.3rem; font-weight: 900; color: #1e3a5f; margin-bottom: 4px; }
+    h3 { font-size: 0.9rem; font-weight: 700; color: #1e3a5f; }
+
+    @media (max-width: 600px) {
+      .header { padding: 24px; }
+      .container { padding: 20px 16px; }
+    }
+    @media print {
+      body { background: #fff; }
+      .header { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Dhanvantari Hospital — Manual Testing Guide</h1>
+  <p>Complete workflow testing for all 4 staff roles + patient portal</p>
+</div>
+
+<div class="container">
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#setup">1. Test Setup</a></li>
+      <li><a href="#admin">2. Admin Role Testing</a></li>
+      <li><a href="#receptionist">3. Receptionist Role Testing</a></li>
+      <li><a href="#pharmacist">4. Pharmacist Role Testing</a></li>
+      <li><a href="#doctor">5. Doctor Role Testing</a></li>
+      <li><a href="#patient">6. Patient Portal Testing</a></li>
+      <li><a href="#public">7. Public Website Testing</a></li>
+      <li><a href="#whatsapp">8. WhatsApp Integration Testing</a></li>
+      <li><a href="#checklist">9. Final Go-Live Checklist</a></li>
+    </ol>
+  </div>
+
+  <!-- Setup -->
+  <div class="user-section" id="setup">
+    <h2>1. Test Setup</h2>
+    <div class="workflow">
+      <div class="workflow-title">Before You Start</div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">
+          Go to <strong>Firebase Console → Authentication → Users</strong> and create 4 test accounts with Email/Password.
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">
+          Go to <strong>Firestore → userRoles</strong> collection. Create 4 documents (one per user UID) with field <code>role</code>:<br>
+          <code>admin@test.com</code> → <code>role: "admin"</code><br>
+          <code>receptionist@test.com</code> → <code>role: "receptionist"</code><br>
+          <code>pharmacist@test.com</code> → <code>role: "pharmacist"</code><br>
+          <code>doctor@test.com</code> → <code>role: "doctor"</code>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">
+          Login as <strong>admin</strong> → go to <code>/admin/settings</code> → click <strong>"Seed Demo Data"</strong> to populate test records.
+          <div class="expected">Settings page shows green success list with seeded items.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">
+          Open the app in multiple browser tabs/windows for parallel testing of different roles.
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin -->
+  <div class="user-section" id="admin">
+    <div class="user-header admin">
+      <span class="role-pill">Admin</span>
+      <div>
+        <strong>Admin Role</strong><br>
+        <span class="creds">admin@test.com / Admin@12345 → Login at /login → redirects to /admin</span>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">User Management <span class="url">/admin/roles</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">
+          Go to <code>/admin/roles</code> → Click <strong>"Create Account"</strong> with a new email and role "Receptionist".
+          <div class="expected">Success message shows. User appears in Firebase Auth.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">
+          Use <strong>"Change Role"</strong> with an existing UID and change their role.
+          <div class="expected">Success message. User gets new role on next login.</div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Patient Queue — Full Flow <span class="url">/admin/queue</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Fill patient name, phone, purpose → Click <strong>"Issue Token"</strong>.<div class="expected">Token #001 appears in waiting list. Print slip works.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Issue 3 more tokens for different patients.</div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Call Next Patient"</strong>.<div class="expected">Token moves to "Called — Awaiting Patient" state (amber). WhatsApp would fire (if configured).</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Start Consultation"</strong>.<div class="expected">Token moves to "In Consultation" state (green).</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Done — Call Next"</strong>.<div class="expected">Token marked complete. Next patient auto-called.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">For a waiting patient: click <strong>"Skip Patient"</strong>.<div class="expected">Patient skipped. Next auto-called.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Open <code>/queue/display</code> in another tab.<div class="expected">Full-screen TV display shows current token. Updates in real-time when you call next.</div></div></div>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Reviews Management <span class="url">/admin/reviews</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Open <code>/reviews/submit</code> (public page) in incognito → Give 5 stars + write comment → Submit.<div class="expected">Review saved with status "pending".</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Go to <code>/admin/reviews</code> → Find the pending review → Click <strong>"Approve"</strong>.<div class="expected">Status changes to "Approved". Review appears on <code>/reviews</code> public page.</div></div></div>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Seed & Reset <span class="url">/admin/settings</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Seed Demo Data"</strong>.<div class="expected">Green success card lists all seeded items.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Delete All Data"</strong> → Confirm → Click "Yes, Delete All".<div class="expected">All transactional data removed. Admin accounts remain.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receptionist -->
+  <div class="user-section" id="receptionist">
+    <div class="user-header receptionist">
+      <span class="role-pill">Receptionist</span>
+      <div>
+        <strong>Receptionist Role</strong><br>
+        <span class="creds">receptionist@test.com / Recep@12345 → Login at /login → redirects to /admin/queue</span>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Access Control Check</div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Try navigating to <code>/admin</code> (dashboard).<div class="expected">Redirected to <code>/admin/queue</code>. Cannot access dashboard.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Try navigating to <code>/admin/pharmacy</code>.<div class="expected">Redirected away — no pharmacy access.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Check the sidebar — should show: Token Queue, Appointments, Patients, In-Patient Cards, Invoices.<div class="expected">Only 5 links visible. No Blog, Gallery, Analytics, etc.</div></div></div>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">In-Patient Card <span class="url">/desk/inpatient-card</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"New Card"</strong> → Fill patient name, phone, doctor, ward, room, diagnosis → Click <strong>"Create Card"</strong>.<div class="expected">Card appears in list with correct auto-expiry date (+14 days).</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Print"</strong> on any card.<div class="expected">New browser window opens with printable 85×54mm card. Only the card, no sidebar.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"⭐ Review"</strong> button on a card (requires phone number).<div class="expected">WhatsApp review request sent (if Twilio configured). Toast confirmation shown.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Discharge"</strong> → Confirm.<div class="expected">Card disappears from active list.</div></div></div>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Invoice Creation <span class="url">/desk/billing</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Fill patient name and phone. Click quick-add buttons (Consultation Fee, Blood Test). Add a discount.<div class="expected">Line items appear with correct totals. Discount reduces total.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Generate Invoice"</strong>.<div class="expected">Invoice preview appears with print button and "Request Review via WhatsApp" button.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Print Invoice"</strong>.<div class="expected">New window opens with only the invoice — no sidebar or navigation.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Go to <code>/desk/bills</code> → search for the patient.<div class="expected">Invoice appears in history with correct amount and status.</div></div></div>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Festive Wishes <span class="url">/desk/wishes</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Select "Diwali" → edit message → click <strong>"Send Diwali Wishes"</strong>.<div class="expected">Progress bar shows while sending. Success screen. Campaign saved to Firestore.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Check "Past Campaigns" section.<div class="expected">Sent campaign appears with recipient count.</div></div></div>
+      </div>
+      <div class="note">WhatsApp messages only actually send if Twilio is configured. Without Twilio, campaigns save but no messages are sent.</div>
+    </div>
+  </div>
+
+  <!-- Pharmacist -->
+  <div class="user-section" id="pharmacist">
+    <div class="user-header pharmacist">
+      <span class="role-pill">Pharmacist</span>
+      <div>
+        <strong>Pharmacist Role</strong><br>
+        <span class="creds">pharmacist@test.com / Pharma@12345 → Login at /login → redirects to /admin/pharmacy</span>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Access Control Check</div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Try <code>/admin</code> (full admin panel).<div class="expected">Redirected to <code>/admin/pharmacy</code>. Cannot see admin sidebar.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Try <code>/desk/inpatient-card</code>.<div class="expected">Redirected to <code>/desk/billing</code> — no in-patient card access.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Sidebar should show: Dashboard, Medicines, Stock, Suppliers, Reports, Invoices.<div class="expected">Only pharmacy + invoice links visible.</div></div></div>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Medicine Catalog <span class="url">/admin/pharmacy/medicines</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Add Medicine"</strong> → fill Brand Name, Generic Name, Category, Unit, Selling Price, Stock, Reorder Level → Save.<div class="expected">Medicine saved to Firestore. Appears in table immediately.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>Edit</strong> (pencil icon) → change selling price → Update.<div class="expected">Updated in Firestore. New price shown.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Check: medicines with stock ≤ reorder level show ⚠ warning icon.<div class="expected">Warning icon visible next to low-stock medicines.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Search by medicine name.<div class="expected">List filters in real-time.</div></div></div>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Stock Management <span class="url">/admin/pharmacy/stock</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Tab: <strong>Add Stock</strong> → select medicine → enter quantity 50 → Reason "Purchase from MedLine" → Click <strong>"Add Stock"</strong>.<div class="expected">Stock count increases. Movement log shows new "Stock In" entry.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Tab: <strong>Dispense</strong> → select medicine → quantity 5 → patient name "Ravi Kumar" → Click <strong>"Dispense"</strong>.<div class="expected">Stock decreases by 5. Movement log shows "Dispensed" entry with patient name.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Try dispensing more than available stock.<div class="expected">Error toast: "Only X units in stock". Dispense blocked.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Check <strong>Movement Log</strong> tab.<div class="expected">Both movements appear with date, type, quantity, and new stock level.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Doctor -->
+  <div class="user-section" id="doctor">
+    <div class="user-header doctor">
+      <span class="role-pill">Doctor</span>
+      <div>
+        <strong>Doctor Role</strong><br>
+        <span class="creds">doctor@test.com / Doctor@12345 → Login at /login → redirects to /admin/queue</span>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Doctor Queue View <span class="url">/admin/queue/doctor</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Open Doctor View from the queue page (or navigate directly).<div class="expected">Stats show Waiting / Active / Done counts. Next 3 patients listed.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Call Next Patient"</strong> (if no active token).<div class="expected">Token moves to "Called" state. Patient name and purpose shown.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Start Consultation"</strong>.<div class="expected">Status changes to "In Consultation" (green). Button changes to "Done — Call Next".</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Done — Call Next"</strong>.<div class="expected">Current patient completed. Next patient auto-called.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Test <strong>"Skip Patient"</strong> — patient not present.<div class="expected">Patient skipped. Next auto-called.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Try accessing <code>/admin/pharmacy</code>.<div class="expected">Redirected back — no pharmacy access for doctors.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Patient -->
+  <div class="user-section" id="patient">
+    <div class="user-header patient">
+      <span class="role-pill">Patient</span>
+      <div>
+        <strong>Patient Portal</strong><br>
+        <span class="creds">Google Sign-In at /portal/login — No separate account needed</span>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Portal Login <span class="url">/portal/login</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Navigate to <code>/portal/login</code> — verify NO website header/footer appears (standalone page).<div class="expected">Clean login page with hospital logo and "Continue with Google" button only.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Continue with Google"</strong> → complete Google sign-in.<div class="expected">Redirected to <code>/portal</code>. Welcome message shows first name.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">If this is first login, check for phone number prompt.<div class="expected">Amber prompt appears asking for phone number.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Enter phone and save.<div class="expected">Prompt disappears. Patient record updated in Firestore.</div></div></div>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Profile <span class="url">/portal/profile</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Go to Profile — verify Google name/email shown (read-only) with Google badge.<div class="expected">Name, email, "Signed in with Google" badge visible. Cannot edit these.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Fill in DOB, blood group, address, emergency contact → Save.<div class="expected">"Profile updated!" toast. Data persists on refresh.</div></div></div>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Queue Check <span class="url">/queue</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Enter a token number that was issued → Search.<div class="expected">Shows position in queue, estimated wait, patient name.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Enter the phone number used when token was issued → Search.<div class="expected">Same result — found by phone.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Enter a random non-existent token → Search.<div class="expected">"No token found" message.</div></div></div>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Submit Review <span class="url">/reviews/submit</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Verify page loads without website header/footer.<div class="expected">Standalone page with hospital logo.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Try submitting without selecting a star rating.<div class="expected">Error: "Please select a star rating".</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Select 5 stars, write comment, select department → Submit.<div class="expected">Thank you screen. Review saved as "pending" in Firestore.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Admin approves it → Check <code>/reviews</code> public page.<div class="expected">Review appears with star rating and comment.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Public Website -->
+  <div class="user-section" id="public">
+    <h2>7. Public Website Testing</h2>
+    <div class="workflow">
+      <div class="workflow-title">Pages & Navigation</div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Homepage <code>/</code> — verify: emergency banner, hospital name from env, 8 departments, stats bar, queue link.<div class="expected">All content loads. No "CliniCare Pro" or placeholder text visible.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Check <code>/departments</code> — all 8 departments listed including Critical Care.<div class="expected">8 departments with correct names and descriptions.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Check <code>/services</code> — all 15 services listed.<div class="expected">Services grouped by department.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Check <code>/locations</code> — only ONE location (not "3 Convenient Locations").<div class="expected">Single location card. No "3 locations" text anywhere.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Check <code>/queue/display</code> — verify no header/footer (standalone TV display).<div class="expected">Full-screen dark display. No navigation bar.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Click "Book Appointment" → fill form → submit.<div class="expected">Confirmation email sent. Appointment saved in Firestore.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WhatsApp -->
+  <div class="user-section" id="whatsapp">
+    <h2>8. WhatsApp Integration Testing</h2>
+    <div class="workflow">
+      <div class="workflow-title">Setup Required</div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Configure Twilio credentials in <code>.env.local</code> (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM).</div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">For local testing: run <code>ngrok http 3000</code> and set webhook URL in Twilio sandbox settings to <code>https://YOUR_NGROK_URL/api/whatsapp/webhook</code>.</div></div>
+      </div>
+    </div>
+    <div class="workflow">
+      <div class="workflow-title">Tests</div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-content">Issue a token with a real phone number → Call Next.<div class="expected">WhatsApp message received: "Your token #XXX is being called".</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Create in-patient card with phone → click WhatsApp button.<div class="expected">Card details received via WhatsApp.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Text "HELP" to the Twilio sandbox number.<div class="expected">Bot replies with menu of commands.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Text "APPOINTMENT" to the number.<div class="expected">Bot replies with appointment info or hospital contact.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Text "STATUS" to the number.<div class="expected">Bot replies with queue check link.</div></div></div>
+        <div class="step"><div class="step-num"></div><div class="step-content">Generate an invoice → click "Request Review via WhatsApp".<div class="expected">Review link received via WhatsApp.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final Checklist -->
+  <div class="user-section" id="checklist">
+    <h2>9. Final Go-Live Checklist</h2>
+    <div class="workflow">
+      <div class="workflow-title">Before handing over to client</div>
+      <ul class="checklist">
+        <li>Hospital name, phone, address updated in <code>.env.local</code></li>
+        <li>Firebase project created for the client (separate from test)</li>
+        <li>Firestore rules published (simple <code>if request.auth != null</code> rules)</li>
+        <li>Storage rules published</li>
+        <li>Google Sign-In enabled in Firebase Auth</li>
+        <li>Admin account created and <code>userRoles</code> document set in Firestore</li>
+        <li>All 4 staff roles created and tested</li>
+        <li>Seed data cleared after testing (<code>/admin/settings → Delete All Data</code>)</li>
+        <li>Logo uploaded to <code>/public/images/logo.jpg</code></li>
+        <li>Doctor profiles updated with real names and credentials</li>
+        <li>Hospital address updated in <code>src/data/locations.ts</code></li>
+        <li>Emergency phone number confirmed correct</li>
+        <li>Twilio account created (optional for WhatsApp)</li>
+        <li>Domain registered and DNS configured</li>
+        <li>Deployed to Vercel (connect GitHub repo → auto-deploy)</li>
+        <li>All env vars added to Vercel project settings</li>
+        <li>Staff trained on admin panel, desk, and pharmacy</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
