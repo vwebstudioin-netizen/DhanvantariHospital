@@ -1,72 +1,166 @@
 "use client";
 
 import { useState } from "react";
-import { Shield, UserCheck, Search } from "lucide-react";
+import { Shield, UserCheck, UserPlus } from "lucide-react";
 import { getIdToken } from "@/lib/auth";
 import toast from "react-hot-toast";
 
 type Role = "admin" | "pharmacist" | "receptionist" | "doctor" | "patient";
 
 const ROLES: { value: Role; label: string; desc: string; color: string }[] = [
-  { value: "admin", label: "Admin", desc: "Full access — all admin features, user management, settings", color: "bg-purple-100 text-purple-700" },
-  { value: "pharmacist", label: "Pharmacist", desc: "Access to pharmacy module only — medicines, stock, suppliers, reports", color: "bg-blue-100 text-blue-700" },
-  { value: "receptionist", label: "Receptionist", desc: "Access to desk (in-patient cards, billing, invoices) and token queue", color: "bg-green-100 text-green-700" },
-  { value: "doctor", label: "Doctor", desc: "Access to doctor-facing queue view and appointment management", color: "bg-amber-100 text-amber-700" },
-  { value: "patient", label: "Patient", desc: "Access to patient portal only", color: "bg-gray-100 text-gray-700" },
+  { value: "admin", label: "Admin", desc: "Full access — all modules, user management, settings", color: "bg-purple-100 text-purple-700" },
+  { value: "pharmacist", label: "Pharmacist", desc: "Pharmacy only — medicines, stock, suppliers, reports", color: "bg-blue-100 text-blue-700" },
+  { value: "receptionist", label: "Receptionist", desc: "Desk panel — in-patient cards, billing, invoices, token queue", color: "bg-green-100 text-green-700" },
+  { value: "doctor", label: "Doctor", desc: "Doctor queue view and appointment management", color: "bg-amber-100 text-amber-700" },
+  { value: "patient", label: "Patient", desc: "Patient portal access only", color: "bg-gray-100 text-gray-700" },
 ];
 
 export default function AdminRoles() {
+  // Create user state
+  const [createForm, setCreateForm] = useState({ email: "", password: "", displayName: "", role: "receptionist" as Role });
+  const [creating, setCreating] = useState(false);
+  const [lastCreated, setLastCreated] = useState<{ email: string; role: string } | null>(null);
+
+  // Assign role state
   const [uid, setUid] = useState("");
   const [selectedRole, setSelectedRole] = useState<Role>("receptionist");
-  const [loading, setLoading] = useState(false);
+  const [assigning, setAssigning] = useState(false);
   const [lastAssigned, setLastAssigned] = useState<{ email: string; role: string } | null>(null);
 
-  const handleAssignRole = async () => {
-    if (!uid.trim()) {
-      toast.error("Enter a user UID or email");
+  const handleCreateUser = async () => {
+    if (!createForm.email || !createForm.password) {
+      toast.error("Email and password are required");
       return;
     }
-    setLoading(true);
+    if (createForm.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    setCreating(true);
+    try {
+      const token = await getIdToken();
+      const res = await fetch("/api/admin/create-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(createForm),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      setLastCreated({ email: data.email, role: createForm.role });
+      toast.success(`User ${data.email} created with role "${createForm.role}"`);
+      setCreateForm({ email: "", password: "", displayName: "", role: "receptionist" });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create user");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleAssignRole = async () => {
+    if (!uid.trim()) { toast.error("Enter a user UID"); return; }
+    setAssigning(true);
     try {
       const token = await getIdToken();
       const res = await fetch("/api/admin/set-role", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ uid: uid.trim(), role: selectedRole }),
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
-
       setLastAssigned({ email: data.email, role: selectedRole });
       toast.success(`Role "${selectedRole}" assigned to ${data.email}`);
       setUid("");
     } catch (err: any) {
       toast.error(err.message || "Failed to assign role");
     } finally {
-      setLoading(false);
+      setAssigning(false);
     }
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">User Roles</h1>
+        <h1 className="text-2xl font-bold text-foreground">User Management</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Assign roles to staff members. Roles control what each person can access after login.
+          Create staff accounts and assign roles. Users can only log in via <strong>/login</strong>.
         </p>
       </div>
 
-      {/* Assign role */}
+      {/* Create new user */}
       <div className="rounded-xl border border-border bg-card p-6 space-y-4">
         <h2 className="font-semibold text-foreground flex items-center gap-2">
-          <UserCheck className="w-4 h-4" />
-          Assign Role to User
+          <UserPlus className="w-4 h-4 text-primary" />
+          Create New Staff Account
         </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Email *</label>
+            <input
+              type="email"
+              value={createForm.email}
+              onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
+              placeholder="staff@dhanvantarihospital.com"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Password *</label>
+            <input
+              type="password"
+              value={createForm.password}
+              onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
+              placeholder="Min 6 characters"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Display Name</label>
+            <input
+              value={createForm.displayName}
+              onChange={(e) => setCreateForm({ ...createForm, displayName: e.target.value })}
+              placeholder="Staff member name (optional)"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Role *</label>
+            <select
+              value={createForm.role}
+              onChange={(e) => setCreateForm({ ...createForm, role: e.target.value as Role })}
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              {ROLES.filter(r => r.value !== "patient").map((r) => (
+                <option key={r.value} value={r.value}>{r.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <button
+          onClick={handleCreateUser}
+          disabled={creating}
+          className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
+        >
+          <UserPlus className="w-4 h-4" />
+          {creating ? "Creating..." : "Create Account"}
+        </button>
+        {lastCreated && (
+          <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-700">
+            ✓ Account created: <strong>{lastCreated.email}</strong> with role <strong>{lastCreated.role}</strong>.
+            Share the email + password with the staff member.
+          </div>
+        )}
+      </div>
 
+      {/* Assign role to existing user */}
+      <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+        <h2 className="font-semibold text-foreground flex items-center gap-2">
+          <UserCheck className="w-4 h-4 text-primary" />
+          Change Role of Existing User
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Use the Firebase User UID to change the role of an existing account.
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-1">User UID</label>
@@ -77,11 +171,11 @@ export default function AdminRoles() {
               className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Find UID in Firebase Console → Authentication → Users
+              Find in Firebase Console → Authentication → Users
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Role</label>
+            <label className="block text-sm font-medium text-foreground mb-1">New Role</label>
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value as Role)}
@@ -93,20 +187,18 @@ export default function AdminRoles() {
             </select>
           </div>
         </div>
-
         <button
           onClick={handleAssignRole}
-          disabled={loading}
+          disabled={assigning}
           className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
         >
           <Shield className="w-4 h-4" />
-          {loading ? "Assigning..." : "Assign Role"}
+          {assigning ? "Updating..." : "Update Role"}
         </button>
-
         {lastAssigned && (
           <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-700">
             ✓ Role <strong>{lastAssigned.role}</strong> assigned to <strong>{lastAssigned.email}</strong>.
-            User must log out and back in for the change to take effect.
+            User must sign out and back in for the change to take effect.
           </div>
         )}
       </div>
@@ -126,9 +218,8 @@ export default function AdminRoles() {
         </div>
       </div>
 
-      {/* Note */}
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-        <strong>Note:</strong> After assigning a role, the user must sign out and sign back in for the new role to take effect. Firebase custom claims are cached in the ID token.
+        <strong>Note:</strong> After changing a role, the user must sign out and sign back in for the new role to take effect. All staff log in via <strong>/login</strong>.
       </div>
     </div>
   );

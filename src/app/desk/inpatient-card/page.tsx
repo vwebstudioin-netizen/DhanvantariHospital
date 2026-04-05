@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { format, differenceInDays } from "date-fns";
-import { Plus, Printer, Phone, CheckCircle, XCircle, Search } from "lucide-react";
+import { Plus, Printer, Phone, XCircle, Search } from "lucide-react";
 import { createInPatientCard, getActiveCards, dischargePatient } from "@/lib/inpatient";
-import { SITE_NAME, HOSPITAL_ADDRESS, INPATIENT_WARDS } from "@/lib/constants";
+import { SITE_NAME, INPATIENT_WARDS } from "@/lib/constants";
 
 async function sendCardWhatsApp(card: { patientPhone: string; patientName: string; cardNumber: string; ward: string; roomNumber: string; expiryDate: string }) {
   const message = `Hello ${card.patientName},\n\n${SITE_NAME} — In-Patient Card Details:\n\n🏥 Card No: *${card.cardNumber}*\n🛏 Ward: ${card.ward}, Room: ${card.roomNumber}\n📅 Valid until: ${card.expiryDate}\n\nGet well soon!`;
@@ -85,7 +85,7 @@ export default function InPatientCardPage() {
     }
   }
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleCreate = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!form.patientName || !form.doctorName || !form.roomNumber || !form.diagnosis) {
       toast.error("Please fill all required fields");
@@ -93,7 +93,7 @@ export default function InPatientCardPage() {
     }
     setSaving(true);
     try {
-      const { cardNumber, patientId } = await createInPatientCard({
+      const { cardNumber } = await createInPatientCard({
         ...form,
         issuedBy: "Desk Staff",
       });
@@ -301,6 +301,25 @@ export default function InPatientCardPage() {
                     >
                       <Phone className="w-3.5 h-3.5" />
                       WhatsApp
+                    </button>
+                  )}
+                  {card.patientPhone && (
+                    <button
+                      onClick={async () => {
+                        const res = await fetch("/api/whatsapp/send", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            phone: card.patientPhone,
+                            message: `Thank you for choosing Dhanvantari Hospital! We hope you are recovering well.\n\nPlease share your experience ⭐\n${window.location.origin}/reviews/submit?ref=${card.cardNumber}&name=${encodeURIComponent(card.patientName)}`,
+                          }),
+                        });
+                        if (res.ok) toast.success("Review request sent!");
+                        else toast.error("Failed to send");
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-50 transition-colors"
+                    >
+                      ⭐ Review
                     </button>
                   )}
                   <button

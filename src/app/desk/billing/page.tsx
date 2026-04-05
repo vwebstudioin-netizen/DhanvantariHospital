@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Plus, Trash2, Printer, Phone, IndianRupee } from "lucide-react";
+import { Plus, Trash2, Printer, IndianRupee } from "lucide-react";
 import { createInvoice } from "@/lib/invoices";
 import { SITE_NAME, HOSPITAL_ADDRESS, CONTACT_PHONE, INVOICE_PAYMENT_METHODS } from "@/lib/constants";
 import type { InvoiceItem, InvoiceItemType, InvoicePaymentMethod } from "@/types/invoice";
@@ -174,10 +174,29 @@ export default function BillingPage() {
         <div ref={printRef} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
           <InvoicePrint data={createdInvoice} />
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <button onClick={handlePrint} className="flex items-center gap-2 bg-[#1e3a5f] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#152d4a]">
             <Printer className="w-4 h-4" /> Print Invoice
           </button>
+          {createdInvoice.patientPhone && (
+            <button
+              onClick={async () => {
+                const res = await fetch("/api/whatsapp/send", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    phone: createdInvoice.patientPhone,
+                    message: `Thank you for visiting Dhanvantari Hospital! We'd love your feedback ⭐\n\nRate your visit: ${window.location.origin}/reviews/submit?ref=${createdInvoice.invoiceNumber}&name=${encodeURIComponent(createdInvoice.patientName)}`,
+                  }),
+                });
+                if (res.ok) toast.success("Review request sent via WhatsApp!");
+                else toast.error("Failed to send WhatsApp");
+              }}
+              className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+            >
+              ⭐ Request Review via WhatsApp
+            </button>
+          )}
           <button onClick={() => { setCreatedInvoice(null); setPatient({ name: "", phone: "", patientId: "", doctorName: "" }); setItems([]); setDiscount(0); }} className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 border border-slate-200 hover:bg-slate-50">
             New Invoice
           </button>

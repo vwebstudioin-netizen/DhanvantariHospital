@@ -97,3 +97,14 @@ export async function sendBulkWishes(
 
   return { success, failed };
 }
+
+export async function sendReviewRequest(
+  phone: string,
+  name: string,
+  ref: string
+): Promise<boolean> {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const reviewUrl = `${siteUrl}/reviews/submit?ref=${encodeURIComponent(ref)}&name=${encodeURIComponent(name)}`;
+  const message = `Hello ${name},\n\nThank you for visiting *${SITE_NAME}*! 🙏\n\nWe hope you had a great experience. Please take a moment to share your feedback — it helps us serve you better.\n\n⭐ Rate your visit here:\n${reviewUrl}\n\n(It only takes 30 seconds!)\n\nThank you,\n${SITE_NAME}`;
+  return sendWhatsApp(phone, message);
+}
