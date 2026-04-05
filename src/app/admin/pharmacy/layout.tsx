@@ -16,14 +16,18 @@ import {
   BarChart3,
   LogOut,
   Hospital,
+  Receipt,
+  FileText,
 } from "lucide-react";
 
 const PHARMACY_LINKS = [
-  { label: "Dashboard", href: "/admin/pharmacy", icon: LayoutDashboard },
-  { label: "Medicines", href: "/admin/pharmacy/medicines", icon: Pill },
-  { label: "Stock", href: "/admin/pharmacy/stock", icon: ArrowDownUp },
-  { label: "Suppliers", href: "/admin/pharmacy/suppliers", icon: Truck },
-  { label: "Reports", href: "/admin/pharmacy/reports", icon: BarChart3 },
+  { label: "Dashboard",      href: "/admin/pharmacy",          icon: LayoutDashboard },
+  { label: "Medicines",      href: "/admin/pharmacy/medicines", icon: Pill },
+  { label: "Stock",          href: "/admin/pharmacy/stock",     icon: ArrowDownUp },
+  { label: "New Bill",       href: "/admin/pharmacy/billing",   icon: Receipt },
+  { label: "Bill History",   href: "/admin/pharmacy/bills",     icon: FileText },
+  { label: "Suppliers",      href: "/admin/pharmacy/suppliers", icon: Truck },
+  { label: "Reports",        href: "/admin/pharmacy/reports",   icon: BarChart3 },
 ];
 
 export default function PharmacyLayout({ children }: { children: ReactNode }) {
