@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, ReactNode } from "react";
+import { useEffect, useState, useRef, ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -12,23 +12,20 @@ import {
   Ticket, LogOut, Menu, X, Hospital,
 } from "lucide-react";
 
-// Full desk links — receptionist and admin
 const RECEPTIONIST_LINKS = [
-  { href: "/desk",              label: "Dashboard",       icon: LayoutDashboard },
-  { href: "/admin/queue",       label: "Token Queue",     icon: Ticket },
+  { href: "/desk",                label: "Dashboard",        icon: LayoutDashboard },
+  { href: "/admin/queue",         label: "Token Queue",      icon: Ticket },
   { href: "/desk/inpatient-card", label: "In-Patient Cards", icon: CreditCard },
-  { href: "/desk/billing",      label: "New Invoice",     icon: Receipt },
-  { href: "/desk/bills",        label: "Invoice History", icon: FileText },
-  { href: "/desk/wishes",       label: "Festive Wishes",  icon: Gift },
+  { href: "/desk/billing",        label: "New Invoice",      icon: Receipt },
+  { href: "/desk/bills",          label: "Invoice History",  icon: FileText },
+  { href: "/desk/wishes",         label: "Festive Wishes",   icon: Gift },
 ];
 
-// Billing only — pharmacist
 const PHARMACIST_LINKS = [
   { href: "/desk/billing", label: "New Invoice",     icon: Receipt },
   { href: "/desk/bills",   label: "Invoice History", icon: FileText },
 ];
 
-// Pages pharmacist is allowed on /desk
 const PHARMACIST_DESK_ALLOWED = ["/desk/billing", "/desk/bills"];
 
 export default function DeskLayout({ children }: { children: ReactNode }) {
@@ -38,36 +35,45 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [role, setRole] = useState<UserRole | null>(null);
+  // Keep role in ref so pathname changes don't re-trigger auth check
+  const roleRef = useRef<UserRole | null>(null);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (pathname === "/desk/login") { setLoading(false); return; }
       if (!user) { router.push("/login"); setLoading(false); return; }
 
-      const r = await getUserRole(user.uid);
-      const allowed = ["admin", "receptionist", "pharmacist"];
+      // Only fetch role from Firestore if not already loaded
+      if (!roleRef.current) {
+        const r = await getUserRole(user.uid);
+        const allowed = ["admin", "receptionist", "pharmacist"];
 
-      if (!r || !allowed.includes(r)) {
-        router.push("/login");
-        setLoading(false);
-        return;
+        if (!r || !allowed.includes(r)) {
+          router.push("/login");
+          setLoading(false);
+          return;
+        }
+
+        roleRef.current = r;
+        setRole(r);
+        setUserEmail(user.email);
       }
 
-      // Pharmacist can only access billing pages on /desk
-      if (r === "pharmacist" && !PHARMACIST_DESK_ALLOWED.some((p) => pathname.startsWith(p))) {
+      // Pharmacist redirect check
+      const currentRole = roleRef.current;
+      if (currentRole === "pharmacist" && !PHARMACIST_DESK_ALLOWED.some((p) => pathname.startsWith(p))) {
         router.push("/desk/billing");
         setLoading(false);
         return;
       }
 
-      setRole(r);
-      setUserEmail(user.email);
       setLoading(false);
     });
     return unsub;
   }, [router, pathname]);
 
   const handleSignOut = async () => {
+    roleRef.current = null;
     await signOut(auth);
     router.push("/login");
   };
@@ -87,7 +93,6 @@ export default function DeskLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#f0f2f5] flex">
-      {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-56 bg-[#0f1729] flex flex-col transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
