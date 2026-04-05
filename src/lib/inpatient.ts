@@ -61,13 +61,12 @@ export async function createInPatientCard(
 }
 
 export async function getActiveCards(): Promise<InPatientCard[]> {
-  const q = query(
-    collection(db, CARDS),
-    where("isActive", "==", true),
-    orderBy("createdAt", "desc")
-  );
+  // Filter client-side to avoid needing a composite Firestore index
+  const q = query(collection(db, CARDS), orderBy("createdAt", "desc"));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as InPatientCard[];
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }) as InPatientCard)
+    .filter((c) => c.isActive === true);
 }
 
 export async function getAllCards(): Promise<InPatientCard[]> {

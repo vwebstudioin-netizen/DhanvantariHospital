@@ -6,7 +6,6 @@ import {
   updateDoc,
   deleteDoc,
   query,
-  where,
   orderBy,
   Timestamp,
 } from "firebase/firestore";
@@ -39,13 +38,11 @@ export async function submitReview(
 }
 
 export async function getApprovedReviews(): Promise<Review[]> {
-  const q = query(
-    collection(db, COL),
-    where("status", "==", "approved"),
-    orderBy("createdAt", "desc")
-  );
+  const q = query(collection(db, COL), orderBy("createdAt", "desc"));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Review[];
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }) as Review)
+    .filter((r) => r.status === "approved");
 }
 
 export async function getAllReviews(): Promise<Review[]> {
