@@ -23,31 +23,48 @@ export default function QueueDisplayPage() {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel(); // stop any ongoing speech
 
-    const digits = token.displayNumber.split("").join(" "); // "005" → "0 0 5"
-    const text = `Token number ${digits}. ${token.patientName}, please come to the counter. Token number ${digits}.`;
+    // Announce in Telugu first, then English fallback
+    const num = parseInt(token.displayNumber, 10); // "005" → 5 (TTS reads it naturally)
+    const teluguText  = `టోకెన్ నంబర్ ${num}. ${token.patientName}, దయచేసి కౌంటర్‌కు రండి. టోకెన్ నంబర్ ${num}.`;
+    const englishText = `Token number ${num}. ${token.patientName}, please come to the counter. Token number ${num}.`;
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-IN";
-    utterance.rate = 0.85;   // slightly slower for clarity
-    utterance.pitch = 1;
-    utterance.volume = 1;
-
-    // Try to use an Indian English voice if available
     const voices = window.speechSynthesis.getVoices();
-    const indianVoice = voices.find((v) =>
-      v.lang.includes("en-IN") || v.name.toLowerCase().includes("india")
-    );
-    if (indianVoice) utterance.voice = indianVoice;
 
-    window.speechSynthesis.speak(utterance);
+    // Try Telugu voice first
+    const teluguVoice = voices.find(v => v.lang.startsWith("te") || v.lang.includes("tel"));
+
+    if (teluguVoice) {
+      const utterance = new SpeechSynthesisUtterance(teluguText);
+      utterance.voice = teluguVoice;
+      utterance.lang  = "te-IN";
+      utterance.rate  = 0.85;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      // Fallback: English with bilingual text (browser reads Telugu chars as English if no Telugu voice)
+      const utterance = new SpeechSynthesisUtterance(englishText);
+      utterance.lang  = "en-IN";
+      utterance.rate  = 0.85;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      const indianVoice = voices.find(v => v.lang.includes("en-IN") || v.name.toLowerCase().includes("india"));
+      if (indianVoice) utterance.voice = indianVoice;
+      window.speechSynthesis.speak(utterance);
+    }
   }, []);
 
   // Enable speech on user click (browser autoplay policy)
   const enableSound = useCallback(() => {
     setSoundEnabled(true);
-    // Test announcement
-    const test = new SpeechSynthesisUtterance("Sound enabled. Ready to announce tokens.");
-    test.lang = "en-IN";
+    // Test announcement in Telugu
+    const voices = window.speechSynthesis.getVoices();
+    const teluguVoice = voices.find(v => v.lang.startsWith("te") || v.lang.includes("tel"));
+    const test = new SpeechSynthesisUtterance(
+      teluguVoice ? "శబ్దం ప్రారంభించబడింది. టోకెన్ ప్రకటనలకు సిద్ధంగా ఉంది." : "Sound enabled. Ready to announce tokens."
+    );
+    test.lang = teluguVoice ? "te-IN" : "en-IN";
+    if (teluguVoice) test.voice = teluguVoice;
     test.rate = 0.9;
     window.speechSynthesis.speak(test);
   }, []);
