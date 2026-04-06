@@ -71,12 +71,15 @@ export const FOOTER_LINKS = {
   ],
 };
 
+export const DEVELOPER_CREDIT = "Vwebstudio";
+export const DEVELOPER_URL    = "https://vwebstudio.in";
+
 export const SOCIAL_LINKS = {
-  facebook: "#",
-  instagram: "#",
-  twitter: "#",
-  youtube: "#",
-  linkedin: "#",
+  facebook:  process.env.NEXT_PUBLIC_FACEBOOK_URL  || "",
+  instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL || "",
+  twitter:   process.env.NEXT_PUBLIC_TWITTER_URL   || "",
+  youtube:   process.env.NEXT_PUBLIC_YOUTUBE_URL   || "",
+  linkedin:  process.env.NEXT_PUBLIC_LINKEDIN_URL  || "",
 };
 
 export const APPOINTMENT_STATUSES = {

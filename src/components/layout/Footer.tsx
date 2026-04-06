@@ -140,7 +140,11 @@ export default function Footer() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-muted-foreground sm:flex-row">
           <p>© {currentYear} {SITE_NAME}. All rights reserved.</p>
           <p>
-            This is a demo template. Not a real medical practice.
+            Designed &amp; developed by{" "}
+            <a href="https://vwebstudio.in" target="_blank" rel="noopener noreferrer"
+              className="font-medium text-primary hover:underline">
+              Vwebstudio
+            </a>
           </p>
         </div>
       </div>

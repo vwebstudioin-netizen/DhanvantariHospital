@@ -4,14 +4,14 @@ export const locations: LocationData[] = [
   {
     slug: "main",
     name: "Dhanvantari Hospital",
-    address: "Your Address Here",
-    city: "City",
-    state: "State",
-    zipCode: "000000",
-    phone: "9876543210",
+    address: process.env.NEXT_PUBLIC_HOSPITAL_ADDRESS || "Mysuru",
+    city: "Mysuru",
+    state: "Karnataka",
+    zipCode: "570001",
+    phone: process.env.NEXT_PUBLIC_HOSPITAL_PHONE || "",
     fax: "",
-    email: "info@dhanvantarihospital.com",
-    coordinates: { lat: 17.385, lng: 78.4867 },
+    email: process.env.NEXT_PUBLIC_HOSPITAL_EMAIL || "info@dhanvantarihospital.com",
+    coordinates: { lat: 12.2958, lng: 76.6394 }, // Mysuru, Karnataka
     hours: {
       monday: "24 Hours (Emergency Always Open)",
       tuesday: "24 Hours (Emergency Always Open)",
