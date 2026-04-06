@@ -46,8 +46,14 @@ export default function PortalLoginPage() {
         toast.success(`Hi ${user.displayName?.split(" ")[0] || "there"}! One more step.`);
       }
     } catch (err: any) {
-      if (err.code !== "auth/popup-closed-by-user") {
-        toast.error("Sign-in failed. Please try again.");
+      console.error("Google sign-in error:", err.code, err.message);
+      if (err.code === "auth/popup-closed-by-user") return;
+      if (err.code === "auth/unauthorized-domain") {
+        toast.error("This domain is not authorised in Firebase. Add it in Firebase Console → Authentication → Authorized domains.");
+      } else if (err.code === "auth/popup-blocked") {
+        toast.error("Popup was blocked. Please allow popups for this site and try again.");
+      } else {
+        toast.error(`Sign-in failed (${err.code || "unknown"}). Check console for details.`);
       }
     } finally {
       setLoading(false);
