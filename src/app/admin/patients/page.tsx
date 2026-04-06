@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from "react";
 import {
-  collection, getDocs, addDoc, orderBy, query, Timestamp,
+  collection, getDocs, addDoc, deleteDoc, doc, orderBy, query, Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Plus, Search, RefreshCw, User, Phone, Mail, ChevronRight, Download } from "lucide-react";
+import { Plus, Search, RefreshCw, User, Phone, Mail, ChevronRight, Download, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToCsv } from "@/lib/exportCsv";
+import { useAuthContext } from "@/providers/AuthProvider";
 
 interface Patient {
   id: string;
@@ -30,6 +31,7 @@ const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 
 export default function AdminPatients() {
   const pathname = usePathname();
+  const { isAdmin } = useAuthContext();
   const basePath = pathname.startsWith("/desk") ? "/desk/patients"
     : pathname.startsWith("/doctor") ? "/doctor/patients"
     : "/admin/patients";
@@ -55,6 +57,15 @@ export default function AdminPatients() {
     } catch { toast.error("Failed to load patients"); }
     finally { setLoading(false); }
   }
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!window.confirm(`Delete patient "${name}"? This only removes the patient record — linked invoices and cards are not deleted.`)) return;
+    try {
+      await deleteDoc(doc(db, "patients", id));
+      toast.success("Patient deleted");
+      setPatients(prev => prev.filter(p => p.id !== id));
+    } catch { toast.error("Failed to delete patient"); }
+  };
 
   const handleAdd = async () => {
     if (!form.name) { toast.error("Patient name is required"); return; }
@@ -239,7 +250,18 @@ export default function AdminPatients() {
                     {p.createdAt?.toDate?.()?.toLocaleDateString("en-IN") || "—"}
                   </td>
                   <td className="px-3 py-3">
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
+                    <div className="flex items-center gap-1 justify-end">
+                      {isAdmin && (
+                        <button
+                          onClick={(e) => { e.preventDefault(); handleDelete(p.id, p.name); }}
+                          className="p-1 text-muted-foreground/40 hover:text-red-500 hover:bg-red-50 rounded transition-colors opacity-0 group-hover:opacity-100"
+                          title="Delete patient"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
+                    </div>
                   </td>
                 </tr>
               ))}

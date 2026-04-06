@@ -3,14 +3,16 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
-  doc, getDoc, collection, getDocs, query, where,
+  doc, getDoc, deleteDoc, collection, getDocs, query, where,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAuthContext } from "@/providers/AuthProvider";
 import {
   ArrowLeft, User, Phone, Mail, Droplets, Calendar, CreditCard,
-  Receipt, Pill, FileText, Activity, IndianRupee, Stethoscope,
+  Receipt, Pill, FileText, Activity, IndianRupee, Stethoscope, Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -64,6 +66,8 @@ export default function PatientDetail() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
+  const { isAdmin } = useAuthContext();
+
   const [patient, setPatient]     = useState<Patient | null>(null);
   const [cards, setCards]         = useState<Card[]>([]);
   const [invoices, setInvoices]   = useState<Invoice[]>([]);
@@ -71,6 +75,16 @@ export default function PatientDetail() {
   const [appts, setAppts]         = useState<Appointment[]>([]);
   const [loading, setLoading]     = useState(true);
   const [tab, setTab]             = useState("cards");
+
+  const handleDelete = async () => {
+    if (!patient) return;
+    if (!window.confirm(`Delete patient "${patient.name}"? This only removes the patient record — linked invoices and cards are not deleted.`)) return;
+    try {
+      await deleteDoc(doc(db, "patients", id));
+      toast.success("Patient deleted");
+      router.back();
+    } catch { toast.error("Failed to delete patient"); }
+  };
 
   useEffect(() => {
     async function load() {
@@ -143,11 +157,19 @@ export default function PatientDetail() {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      {/* Back */}
-      <button onClick={() => router.back()}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Back to Patients
-      </button>
+      {/* Back + Admin delete */}
+      <div className="flex items-center justify-between">
+        <button onClick={() => router.back()}
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Patients
+        </button>
+        {isAdmin && (
+          <button onClick={handleDelete}
+            className="flex items-center gap-2 text-sm text-red-500 hover:text-red-700 hover:bg-red-50 border border-red-200 px-3 py-1.5 rounded-lg transition-colors">
+            <Trash2 className="w-3.5 h-3.5" /> Delete Patient
+          </button>
+        )}
+      </div>
 
       {/* Patient Header */}
       <div className="bg-card border border-border rounded-xl p-6">
