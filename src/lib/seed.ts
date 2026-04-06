@@ -21,6 +21,7 @@ const RESET_COLLECTIONS = [
   "patients", "appointments", "reviews",
   "inpatientCards", "invoices", "pharmacyBills",
   "wishCampaigns", "stockMovements", "contactMessages", "newsletters",
+  "billingServices",
 ];
 
 async function deleteCollection(colName: string) {

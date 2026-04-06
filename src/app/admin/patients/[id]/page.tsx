@@ -85,23 +85,33 @@ export default function PatientDetail() {
         const phone = pat.phone?.trim();
         if (!phone) { setLoading(false); return; }
 
-        // 2. Parallel queries by phone (client-side sort to avoid composite index)
-        const [cardSnap, invSnap, pharmaSnap, apptSnap] = await Promise.all([
+        // 2. Parallel queries — use allSettled so one failure doesn't blank all tabs
+        const byDate = (a: any, b: any) =>
+          (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0);
+
+        const [cardRes, invRes, pharmaRes, apptRes] = await Promise.allSettled([
           getDocs(query(collection(db, "inpatientCards"), where("patientPhone", "==", phone))),
           getDocs(query(collection(db, "invoices"),       where("patientPhone", "==", phone))),
           getDocs(query(collection(db, "pharmacyBills"),  where("patientPhone", "==", phone))),
           getDocs(query(collection(db, "appointments"),   where("patientPhone", "==", phone))),
         ]);
 
-        const byDate = (a: any, b: any) =>
-          (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0);
+        if (cardRes.status === "fulfilled")
+          setCards(cardRes.value.docs.map(d => ({ id: d.id, ...d.data() } as Card)).sort(byDate));
+        if (invRes.status === "fulfilled")
+          setInvoices(invRes.value.docs.map(d => ({ id: d.id, ...d.data() } as Invoice)).sort(byDate));
+        if (pharmaRes.status === "fulfilled")
+          setPharma(pharmaRes.value.docs.map(d => ({ id: d.id, ...d.data() } as PharmaBill)).sort(byDate));
+        if (apptRes.status === "fulfilled")
+          setAppts(apptRes.value.docs.map(d => ({ id: d.id, ...d.data() } as Appointment)).sort(byDate));
 
-        setCards(   cardSnap.docs.map(d => ({ id: d.id, ...d.data() } as Card)).sort(byDate));
-        setInvoices(invSnap.docs.map(d => ({ id: d.id, ...d.data() } as Invoice)).sort(byDate));
-        setPharma(  pharmaSnap.docs.map(d => ({ id: d.id, ...d.data() } as PharmaBill)).sort(byDate));
-        setAppts(   apptSnap.docs.map(d => ({ id: d.id, ...d.data() } as Appointment)).sort(byDate));
+        // Log any failures to console for debugging
+        [cardRes, invRes, pharmaRes, apptRes].forEach((r, i) => {
+          if (r.status === "rejected")
+            console.warn(`Patient detail query [${i}] failed:`, r.reason?.message);
+        });
       } catch (e) {
-        console.error(e);
+        console.error("Patient detail load error:", e);
       } finally {
         setLoading(false);
       }
