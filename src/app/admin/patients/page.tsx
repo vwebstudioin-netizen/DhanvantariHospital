@@ -6,6 +6,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Plus, Search, RefreshCw, User, Phone, Mail, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -26,6 +27,11 @@ interface Patient {
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 
 export default function AdminPatients() {
+  const pathname = usePathname();
+  const basePath = pathname.startsWith("/desk") ? "/desk/patients"
+    : pathname.startsWith("/doctor") ? "/doctor/patients"
+    : "/admin/patients";
+
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -172,7 +178,7 @@ export default function AdminPatients() {
               ) : filtered.map((p) => (
                 <tr key={p.id} className="border-b border-border/50 hover:bg-muted/30 cursor-pointer group">
                   <td className="px-5 py-3">
-                    <Link href={`/admin/patients/${p.id}`} className="flex items-center gap-2">
+                    <Link href={`${basePath}/${p.id}`} className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                         <User className="w-4 h-4 text-primary" />
                       </div>
