@@ -1,5 +1,5 @@
 import {
-  doc, getDoc, setDoc, updateDoc, collection,
+  doc, getDoc, setDoc, updateDoc, deleteDoc, collection,
   query, where, getDocs, limit, Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -94,6 +94,46 @@ export async function upsertPatientByPhone(
   } catch (err) {
     // Don't block the main operation if patient upsert fails
     console.warn("[patients] upsertPatientByPhone failed:", err);
+  }
+}
+
+/**
+ * Called after Google sign-in when patient provides their phone number.
+ * If a token/card-created record exists with the same phone (uid = ""),
+ * merges it with the Google-authenticated record and deletes the duplicate.
+ * Otherwise just updates the portal record with the phone.
+ */
+export async function linkPatientPhone(uid: string, phone: string): Promise<void> {
+  const cleanPhone = phone.trim();
+
+  // Look for an existing phone-based record (created via token/card, uid = "")
+  const q = query(collection(db, "patients"), where("phone", "==", cleanPhone), limit(2));
+  const snap = await getDocs(q);
+
+  // Find the phantom record (created by token/card, not this portal user)
+  const phantom = snap.docs.find(d => d.id !== uid && d.data().uid === "");
+
+  if (phantom) {
+    // Get the portal record's data
+    const portalSnap = await getDoc(doc(db, "patients", uid));
+    const portalData = portalSnap.data() ?? {};
+
+    // Merge: update the phone-based record with Google auth details
+    await updateDoc(phantom.ref, {
+      uid,
+      email:      portalData.email     || "",
+      name:       portalData.name      || phantom.data().name,
+      photoURL:   portalData.photoURL  || "",
+      source:     "portal",
+      phone:      cleanPhone,
+      lastLoginAt: Timestamp.now(),
+    });
+
+    // Delete the now-duplicate portal record (no phone)
+    await deleteDoc(doc(db, "patients", uid));
+  } else {
+    // No phantom record — just save phone to the portal record
+    await updateDoc(doc(db, "patients", uid), { phone: cleanPhone });
   }
 }
 

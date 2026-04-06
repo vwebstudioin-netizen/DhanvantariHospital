@@ -2,67 +2,61 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Calendar, MessageSquare, Star, ArrowRight, Phone } from "lucide-react";
+import {
+  Calendar, MessageSquare, Star, ArrowRight, Phone,
+  CreditCard, Receipt, Ticket, Activity,
+} from "lucide-react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { useAuthContext } from "@/providers/AuthProvider";
-import { getPatient, updatePatient } from "@/lib/patients";
-import toast from "react-hot-toast";
-
-function PhonePrompt({ uid, onDone }: { uid: string; onDone: () => void }) {
-  const [phone, setPhone] = useState("");
-  const [saving, setSaving] = useState(false);
-
-  const handleSave = async () => {
-    if (!phone.trim() || phone.length < 10) { toast.error("Enter a valid 10-digit phone number"); return; }
-    setSaving(true);
-    try {
-      await updatePatient(uid, { phone: phone.trim() });
-      toast.success("Phone number saved!");
-      onDone();
-    } catch {
-      toast.error("Failed to save");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-5">
-      <div className="flex items-center gap-2 mb-2">
-        <Phone className="h-4 w-4 text-amber-600" />
-        <h3 className="font-semibold text-amber-800">Add Your Phone Number</h3>
-      </div>
-      <p className="text-sm text-amber-700 mb-3">
-        Add your phone number so we can send appointment reminders and WhatsApp notifications.
-      </p>
-      <div className="flex gap-3">
-        <input
-          type="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder="9876543210"
-          maxLength={10}
-          className="flex-1 border border-amber-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-400"
-        />
-        <button onClick={handleSave} disabled={saving}
-          className="px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 disabled:opacity-50">
-          {saving ? "Saving..." : "Save"}
-        </button>
-        <button onClick={onDone} className="px-3 py-2 text-sm text-amber-600 hover:underline">Skip</button>
-      </div>
-    </div>
-  );
-}
+import { getPatient } from "@/lib/patients";
 
 export default function PortalDashboard() {
-  const [showPhonePrompt, setShowPhonePrompt] = useState(false);
-  // Use AuthContext for reactive user state (avoids auth.currentUser race condition)
   const { user, loading } = useAuthContext();
+  const [patient, setPatient]     = useState<any>(null);
+  const [appointments, setAppts]  = useState<any[]>([]);
+  const [invoices, setInvoices]   = useState<any[]>([]);
+  const [cards, setCards]         = useState<any[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
-    getPatient(user.uid).then((patient) => {
-      if (patient && !patient.phone) setShowPhonePrompt(true);
-    });
+    if (!user) { setDataLoading(false); return; }
+    async function load() {
+      setDataLoading(true);
+      try {
+        const pat = await getPatient(user!.uid);
+        setPatient(pat);
+        const phone = pat?.phone?.trim();
+        const email = user!.email?.trim();
+
+        // Fetch all collections and filter client-side by email or phone
+        const [apptSnap, invSnap, cardSnap] = await Promise.allSettled([
+          getDocs(collection(db, "appointments")),
+          getDocs(collection(db, "invoices")),
+          getDocs(collection(db, "inpatientCards")),
+        ]);
+
+        if (apptSnap.status === "fulfilled") {
+          const all = apptSnap.value.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
+          setAppts(all.filter(a =>
+            (email && a.patientEmail === email) ||
+            (phone && a.patientPhone === phone)
+          ).sort((a, b) => (b.date > a.date ? 1 : -1)).slice(0, 5));
+        }
+        if (invSnap.status === "fulfilled" && phone) {
+          const all = invSnap.value.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
+          setInvoices(all.filter(i => i.patientPhone === phone)
+            .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0))
+            .slice(0, 5));
+        }
+        if (cardSnap.status === "fulfilled" && phone) {
+          const all = cardSnap.value.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
+          setCards(all.filter(c => c.patientPhone === phone && c.isActive));
+        }
+      } catch { /* silent */ }
+      finally { setDataLoading(false); }
+    }
+    load();
   }, [user]);
 
   if (loading) {
@@ -73,61 +67,129 @@ export default function PortalDashboard() {
     );
   }
 
-  return (
-    <div>
-      <h1 className="mb-2 text-2xl font-bold text-foreground">
-        Welcome{user?.displayName ? `, ${user.displayName.split(" ")[0]}` : ""}!
-      </h1>
-      <p className="text-muted-foreground text-sm mb-6">Your patient portal</p>
+  const firstName = user?.displayName?.split(" ")[0] || "Patient";
 
-      {showPhonePrompt && user && (
-        <PhonePrompt uid={user.uid} onDone={() => setShowPhonePrompt(false)} />
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Welcome, {firstName}!</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">{user?.email}</p>
+      </div>
+
+      {/* No phone warning */}
+      {!dataLoading && patient && !patient.phone && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 flex items-start gap-3">
+          <Phone className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-amber-800">Phone number not linked</p>
+            <p className="text-xs text-amber-700 mt-0.5">
+              Your bills and in-patient cards can't be shown without a phone number.{" "}
+              <Link href="/portal/profile" className="underline font-medium">Add it in your profile →</Link>
+            </p>
+          </div>
+        </div>
       )}
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-xl border border-border bg-card p-6">
-          <div className="mb-4 flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-primary" />
-            <h2 className="font-semibold text-foreground">Appointments</h2>
+      {/* Active cards */}
+      {cards.length > 0 && (
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <div className="px-5 py-3 border-b border-border flex items-center gap-2">
+            <CreditCard className="w-4 h-4 text-primary" />
+            <h2 className="font-semibold text-foreground text-sm">Active In-Patient / OPD Cards</h2>
           </div>
-          <p className="text-sm text-muted-foreground mb-4">View and manage your appointments.</p>
-          <Link href="/portal/appointments" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-            View appointments <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          <div className="divide-y divide-border">
+            {cards.map(c => (
+              <div key={c.id} className="px-5 py-3 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold">{c.cardNumber}</p>
+                  <p className="text-xs text-muted-foreground">{c.diagnosis} · Dr. {c.doctorName}</p>
+                </div>
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                  c.type === "room" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"
+                }`}>{c.type === "room" ? "IPD" : "OPD"}</span>
+              </div>
+            ))}
+          </div>
         </div>
+      )}
 
-        <div className="rounded-xl border border-border bg-card p-6">
-          <div className="mb-4 flex items-center gap-2">
-            <Phone className="h-5 w-5 text-primary" />
-            <h2 className="font-semibold text-foreground">Queue Status</h2>
+      {/* Upcoming appointments */}
+      {appointments.length > 0 && (
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <div className="px-5 py-3 border-b border-border flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-primary" />
+              <h2 className="font-semibold text-foreground text-sm">Your Appointments</h2>
+            </div>
+            <Link href="/portal/appointments" className="text-xs text-primary hover:underline">View all</Link>
           </div>
-          <p className="text-sm text-muted-foreground mb-4">Check your token position in the queue.</p>
-          <Link href="/queue" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-            Check queue <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          <div className="divide-y divide-border">
+            {appointments.map(a => (
+              <div key={a.id} className="px-5 py-3 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">{a.serviceSlug || a.purpose || "Appointment"}</p>
+                  <p className="text-xs text-muted-foreground">{a.date} · {a.time}</p>
+                </div>
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${
+                  a.status === "confirmed" ? "bg-blue-100 text-blue-700" :
+                  a.status === "completed" ? "bg-green-100 text-green-700" :
+                  a.status === "cancelled" ? "bg-red-100 text-red-700" :
+                  "bg-amber-100 text-amber-700"
+                }`}>{a.status}</span>
+              </div>
+            ))}
+          </div>
         </div>
+      )}
 
-        <div className="rounded-xl border border-border bg-card p-6">
-          <div className="mb-4 flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-primary" />
-            <h2 className="font-semibold text-foreground">Messages</h2>
+      {/* Recent bills */}
+      {invoices.length > 0 && (
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <div className="px-5 py-3 border-b border-border flex items-center gap-2">
+            <Receipt className="w-4 h-4 text-primary" />
+            <h2 className="font-semibold text-foreground text-sm">Recent Invoices</h2>
           </div>
-          <p className="text-sm text-muted-foreground mb-4">View messages from the hospital.</p>
-          <Link href="/portal/messages" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-            View messages <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          <div className="divide-y divide-border">
+            {invoices.map(inv => (
+              <div key={inv.id} className="px-5 py-3 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold">{inv.invoiceNumber}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {inv.createdAt?.toDate?.()?.toLocaleDateString("en-IN") ?? "—"}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold">₹{(inv.total ?? 0).toLocaleString("en-IN")}</p>
+                  <span className={`text-xs font-medium ${inv.paymentStatus === "paid" ? "text-green-600" : "text-amber-600"}`}>
+                    {inv.paymentStatus}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
+      )}
 
-        <div className="rounded-xl border border-border bg-card p-6">
-          <div className="mb-4 flex items-center gap-2">
-            <Star className="h-5 w-5 text-primary" />
-            <h2 className="font-semibold text-foreground">Leave a Review</h2>
-          </div>
-          <p className="text-sm text-muted-foreground mb-4">Share your experience with us.</p>
-          <Link href="/reviews/submit" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-            Write review <ArrowRight className="h-3.5 w-3.5" />
+      {/* Quick links */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          { href: "/portal/appointments", label: "Appointments",  icon: Calendar,      desc: "View & book" },
+          { href: "/book",                label: "Book Appointment",icon: Ticket,       desc: "New appointment" },
+          { href: "/portal/messages",     label: "Messages",      icon: MessageSquare,  desc: "From hospital" },
+          { href: "/reviews/submit",      label: "Leave a Review", icon: Star,          desc: "Share feedback" },
+        ].map(link => (
+          <Link key={link.href} href={link.href}
+            className="rounded-xl border border-border bg-card p-5 hover:border-primary hover:shadow-sm transition-all group flex items-center gap-3">
+            <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+              <link.icon className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground group-hover:text-primary">{link.label}</p>
+              <p className="text-xs text-muted-foreground">{link.desc}</p>
+            </div>
           </Link>
-        </div>
+        ))}
       </div>
     </div>
   );

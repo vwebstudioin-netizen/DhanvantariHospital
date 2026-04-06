@@ -22,11 +22,18 @@ export function usePatientLookup(phone: string, patientId?: string): {
 } {
   const [match, setMatch] = useState<PatientMatch | null>(null);
   const [loading, setLoading] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef = useRef(true);
+
+  // Track mount state to avoid setState after unmount
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    setMatch(null);
+    if (mountedRef.current) setMatch(null);
 
     const cleanPhone = phone.trim().replace(/\D/g, "");
     const cleanId    = patientId?.trim().toUpperCase() ?? "";
@@ -36,45 +43,36 @@ export function usePatientLookup(phone: string, patientId?: string): {
 
     if (!shouldLookupPhone && !shouldLookupId) return;
 
-    setLoading(true);
+    if (mountedRef.current) setLoading(true);
+
     timerRef.current = setTimeout(async () => {
       try {
         if (shouldLookupId) {
-          // Look up by inpatient card patientId (PAT-XXXX) — fills name, phone, doctor
           const snap = await getDocs(
             query(collection(db, "inpatientCards"), where("patientId", "==", cleanId), limit(1))
           );
+          if (!mountedRef.current) return;
           if (!snap.empty) {
             const d = snap.docs[0].data();
-            setMatch({
-              name: d.patientName ?? "",
-              phone: d.patientPhone ?? "",
-              doctorName: d.doctorName ?? "",
-            });
+            setMatch({ name: d.patientName ?? "", phone: d.patientPhone ?? "", doctorName: d.doctorName ?? "" });
             return;
           }
         }
 
         if (shouldLookupPhone) {
-          // Look up by phone in patients collection
           const snap = await getDocs(
             query(collection(db, "patients"), where("phone", "==", cleanPhone), limit(1))
           );
+          if (!mountedRef.current) return;
           if (!snap.empty) {
             const d = snap.docs[0].data();
-            setMatch({
-              name: d.name ?? "",
-              phone: cleanPhone,
-              bloodGroup: d.bloodGroup,
-              email: d.email,
-              address: d.address,
-            });
+            setMatch({ name: d.name ?? "", phone: cleanPhone, bloodGroup: d.bloodGroup, email: d.email, address: d.address });
           }
         }
       } catch {
         // silent — autofill is best-effort
       } finally {
-        setLoading(false);
+        if (mountedRef.current) setLoading(false);
       }
     }, 500);
 

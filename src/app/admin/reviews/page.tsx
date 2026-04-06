@@ -52,22 +52,24 @@ export default function AdminReviews() {
     : "—";
 
   const handle = async (action: "approve" | "reject" | "delete", id: string) => {
+    const prev = reviews; // snapshot for rollback
     try {
       if (action === "approve") {
+        setReviews(p => p.map(r => r.id === id ? { ...r, status: "approved" as const } : r));
         await approveReview(id);
-        setReviews(prev => prev.map(r => r.id === id ? { ...r, status: "approved" as const } : r));
         toast.success("Review approved — now visible on website");
       } else if (action === "reject") {
+        setReviews(p => p.map(r => r.id === id ? { ...r, status: "rejected" as const } : r));
         await rejectReview(id);
-        setReviews(prev => prev.map(r => r.id === id ? { ...r, status: "rejected" as const } : r));
         toast.success("Review hidden");
       } else {
+        setReviews(p => p.filter(r => r.id !== id));
         await deleteReview(id);
-        setReviews(prev => prev.filter(r => r.id !== id));
         toast.success("Review deleted");
       }
     } catch {
-      toast.error("Action failed");
+      setReviews(prev); // rollback on failure
+      toast.error("Action failed — please try again");
     }
   };
 
