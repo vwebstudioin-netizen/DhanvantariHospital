@@ -1,20 +1,11 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuthContext } from "@/providers/AuthProvider";
-import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
-import {
-  LayoutDashboard,
-  Calendar,
-  MessageSquare,
-  User,
-  Star,
-  Bell,
-  LogIn,
-} from "lucide-react";
+import { LayoutDashboard, Calendar, MessageSquare, User, Star, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const portalLinks = [
@@ -29,30 +20,18 @@ const portalLinks = [
 export default function PortalLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuthContext();
   const pathname = usePathname();
+  const router = useRouter();
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !user && pathname !== "/portal/login" && pathname !== "/portal/register") {
+      router.push("/portal/login");
+    }
+  }, [user, loading, pathname, router]);
+
+  if (loading || (!user && pathname !== "/portal/login" && pathname !== "/portal/register")) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center px-4">
-        <div className="text-center">
-          <LogIn className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
-          <h1 className="mb-2 text-2xl font-bold text-foreground">
-            Sign In Required
-          </h1>
-          <p className="mb-6 text-muted-foreground">
-            Please sign in to access the Patient Portal.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Demo: In production, this would redirect to Firebase Auth sign-in.
-          </p>
-        </div>
       </div>
     );
   }
@@ -66,7 +45,7 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
             <div className="mb-4 border-b border-border pb-4">
               <p className="font-semibold text-foreground">Patient Portal</p>
               <p className="text-xs text-muted-foreground">
-                {user.email}
+                {user?.email}
               </p>
             </div>
             <nav className="space-y-1">
