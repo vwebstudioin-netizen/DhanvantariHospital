@@ -10,7 +10,7 @@ import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import {
   LayoutDashboard, Calendar, Users, FileText, MessageSquare,
   Star, Settings, Image, BarChart3, Shield,
-  Ticket, Pill, LogOut,
+  Ticket, Pill, LogOut, HardDrive,
   CreditCard, Receipt, Stethoscope,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ const ADMIN_CORE_LINKS = [
   { label: "Gallery",      href: "/admin/gallery",      icon: Image },
   { label: "Analytics",    href: "/admin/analytics",    icon: BarChart3 },
   { label: "Roles",        href: "/admin/roles",        icon: Shield },
+  { label: "Backup",       href: "/admin/backup",       icon: HardDrive },
   { label: "Settings",     href: "/admin/settings",     icon: Settings },
 ];
 
