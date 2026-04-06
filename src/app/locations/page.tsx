@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PageHero from "@/components/layout/PageHero";
+import GoogleMap from "@/components/shared/GoogleMap";
 import { locations } from "@/data/locations";
 import { MapPin, Phone, Clock, ArrowRight } from "lucide-react";
 
@@ -58,6 +59,31 @@ export default function LocationsPage() {
           ))}
         </div>
       </section>
+
+      {/* Map for each location */}
+      {locations.filter(l => l.coordinates).map(loc => (
+        <section key={loc.slug} className="px-4 pb-16">
+          <div className="mx-auto max-w-7xl">
+            <h2 className="mb-4 text-lg font-bold text-foreground flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-primary" /> Get Directions
+            </h2>
+            <GoogleMap
+              lat={loc.coordinates!.lat}
+              lng={loc.coordinates!.lng}
+              label={loc.name}
+              height="400px"
+            />
+            <div className="mt-3 flex flex-wrap gap-4 text-sm text-muted-foreground">
+              <span>{loc.address}, {loc.city}, {loc.state} {loc.zipCode}</span>
+              <a href={`https://maps.google.com/?q=${loc.coordinates!.lat},${loc.coordinates!.lng}`}
+                target="_blank" rel="noopener noreferrer"
+                className="text-primary hover:underline font-medium">
+                Open in Google Maps →
+              </a>
+            </div>
+          </div>
+        </section>
+      ))}
     </>
   );
 }

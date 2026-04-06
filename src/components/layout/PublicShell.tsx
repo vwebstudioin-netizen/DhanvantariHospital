@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Header from "./Header";
 import Footer from "./Footer";
+import WhatsAppFloat from "@/components/shared/WhatsAppFloat";
 
 // Routes that are app/software views — no website header/footer
 const APP_PREFIXES = [
@@ -26,6 +27,7 @@ export default function PublicShell({ children }: { children: React.ReactNode })
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
+      <WhatsAppFloat />
     </div>
   );
 }

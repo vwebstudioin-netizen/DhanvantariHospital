@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import PageHero from "@/components/layout/PageHero";
 import ContactForm from "@/components/forms/ContactForm";
+import GoogleMap from "@/components/shared/GoogleMap";
 import { locations } from "@/data/locations";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 
@@ -66,6 +67,25 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+
+      {/* Map */}
+      {locations[0]?.coordinates && (
+        <section className="px-4 pb-16">
+          <div className="mx-auto max-w-7xl">
+            <h2 className="mb-4 text-xl font-bold text-foreground">Find Us</h2>
+            <GoogleMap
+              lat={locations[0].coordinates.lat}
+              lng={locations[0].coordinates.lng}
+              label={locations[0].name}
+              height="420px"
+            />
+            <p className="mt-3 text-sm text-muted-foreground flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5 text-primary" />
+              {locations[0].address}, {locations[0].city}, {locations[0].state}
+            </p>
+          </div>
+        </section>
+      )}
     </>
   );
 }
