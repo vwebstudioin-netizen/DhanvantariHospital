@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pages Overview — Dhanvantari Hospital Digital System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Lato', sans-serif; background: #f8fafc; color: #1e293b; font-size: 13px; }
+
+    .header { background: linear-gradient(135deg, #0d2240 0%, #1e3a5f 100%); color: #fff; padding: 36px 48px; }
+    .header h1 { font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+    .header p { color: rgba(255,255,255,0.6); font-size: 13px; margin-top: 4px; }
+    .header .counts { display: flex; gap: 32px; margin-top: 20px; }
+    .header .count-box { text-align: center; }
+    .header .count-box .num { font-size: 32px; font-weight: 900; color: #facc15; }
+    .header .count-box .lbl { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 36px 24px 60px; }
+
+    .section { margin-bottom: 36px; }
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+    .section-header h2 { font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-header .badge { font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 12px; }
+
+    .badge-public   { background: #dbeafe; color: #1d4ed8; }
+    .badge-admin    { background: #ede9fe; color: #7c3aed; }
+    .badge-desk     { background: #dcfce7; color: #16a34a; }
+    .badge-doctor   { background: #fef3c7; color: #d97706; }
+    .badge-pharmacy { background: #fce7f3; color: #9d174d; }
+    .badge-portal   { background: #f0fdf4; color: #15803d; }
+
+    .pages-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+    .page-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+    .page-card .route { font-family: 'Courier New', monospace; font-size: 12px; font-weight: 700; color: #1e3a5f; }
+    .page-card .desc  { font-size: 11.5px; color: #64748b; }
+    .page-card .tags  { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 2px; }
+    .tag { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 10px; }
+    .tag-auth      { background: #fef3c7; color: #92400e; }
+    .tag-firestore { background: #dbeafe; color: #1e40af; }
+    .tag-print     { background: #f3e8ff; color: #6b21a8; }
+    .tag-dynamic   { background: #dcfce7; color: #166534; }
+    .tag-public    { background: #e0f2fe; color: #0369a1; }
+    .tag-pdf       { background: #fce7f3; color: #9d174d; }
+
+    .summary-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+    .summary-table th { background: #1e3a5f; color: #fff; padding: 10px 14px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .summary-table td { padding: 9px 14px; border-bottom: 1px solid #e2e8f0; font-size: 12.5px; }
+    .summary-table tr:last-child td { border-bottom: none; }
+    .summary-table tr:nth-child(even) td { background: #f8fafc; }
+    .total-row td { font-weight: 900; background: #f0fdf4 !important; color: #166534; }
+
+    .footer { text-align: center; font-size: 11px; color: #94a3b8; margin-top: 40px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+
+    @media (max-width: 600px) {
+      .header { padding: 24px 20px; }
+      .header .counts { flex-wrap: wrap; gap: 16px; }
+      .container { padding: 20px 14px 40px; }
+      .pages-grid { grid-template-columns: 1fr; }
+      table { display: block; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Dhanvantari Hospital — Pages &amp; Routes Overview</h1>
+  <p>Complete list of all pages, staff panels, and features in the digital system</p>
+  <div class="counts">
+    <div class="count-box"><div class="num">104</div><div class="lbl">Total Pages</div></div>
+    <div class="count-box"><div class="num">37</div><div class="lbl">Public Pages</div></div>
+    <div class="count-box"><div class="num">22</div><div class="lbl">Admin Pages</div></div>
+    <div class="count-box"><div class="num">11</div><div class="lbl">Desk Pages</div></div>
+    <div class="count-box"><div class="num">7</div><div class="lbl">Pharmacy Pages</div></div>
+    <div class="count-box"><div class="num">13</div><div class="lbl">Portal Pages</div></div>
+    <div class="count-box"><div class="num">4</div><div class="lbl">Doctor Pages</div></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Summary Table -->
+  <div class="section">
+    <div class="section-header"><h2>Summary by Area</h2></div>
+    <table class="summary-table">
+      <thead><tr><th>Area</th><th>Route Prefix</th><th>Who Accesses</th><th>Page Count</th><th>Key Features</th></tr></thead>
+      <tbody>
+        <tr><td>Public Website</td><td>/</td><td>Everyone (no login)</td><td>37</td><td>Home, services, doctors, blog, gallery, reviews, careers, contact, booking</td></tr>
+        <tr><td>Admin Panel</td><td>/admin</td><td>Admin only</td><td>22</td><td>Dashboard, patients, appointments, pharmacy, analytics, backup, roles, blog, gallery</td></tr>
+        <tr><td>Desk / Reception</td><td>/desk</td><td>Admin + Receptionist</td><td>11</td><td>Queue, IPD/OPD cards, billing, invoices, enquiries, festive wishes</td></tr>
+        <tr><td>Pharmacy Panel</td><td>/pharmacy</td><td>Admin + Pharmacist</td><td>7</td><td>Medicine catalog, stock management, billing, suppliers, reports</td></tr>
+        <tr><td>Doctor Panel</td><td>/doctor</td><td>Admin + Doctor</td><td>4</td><td>Queue view, appointments, patients, doctor-specific queue</td></tr>
+        <tr><td>Patient Portal</td><td>/portal</td><td>Patients (Google login)</td><td>13</td><td>Dashboard, appointments, messages, reviews, profile, notifications</td></tr>
+        <tr><td>Queue Display</td><td>/queue</td><td>Public (TV screen)</td><td>2</td><td>TV display with Telugu voice, patient-facing queue status</td></tr>
+        <tr><td>API Routes</td><td>/api</td><td>Server-side only</td><td>8+</td><td>Appointment booking, contact form, WhatsApp send/webhook, email</td></tr>
+        <tr class="total-row"><td colspan="3"><strong>TOTAL</strong></td><td><strong>104+</strong></td><td>All routes combined</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Public Pages -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Public Website</h2>
+      <span class="badge badge-public">37 pages</span>
+    </div>
+    <div class="pages-grid">
+      <div class="page-card"><div class="route">/</div><div class="desc">Homepage — hero, stats, services, departments, doctors, testimonials, CTA</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/about</div><div class="desc">About the hospital — mission, values, history</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/doctors</div><div class="desc">Doctor listing — all specialists with profiles</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/doctors/[slug]</div><div class="desc">Individual doctor profile page</div><div class="tags"><span class="tag tag-dynamic">Dynamic</span></div></div>
+      <div class="page-card"><div class="route">/services</div><div class="desc">All medical services listing</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/services/[slug]</div><div class="desc">Individual service detail page (15+ services)</div><div class="tags"><span class="tag tag-dynamic">Dynamic</span></div></div>
+      <div class="page-card"><div class="route">/departments</div><div class="desc">All hospital departments</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/departments/[slug]</div><div class="desc">Department detail (8 departments)</div><div class="tags"><span class="tag tag-dynamic">Dynamic</span></div></div>
+      <div class="page-card"><div class="route">/book</div><div class="desc">Multi-step online appointment booking form</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/blog</div><div class="desc">Blog listing — loads published posts from Firestore</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/blog/[slug]</div><div class="desc">Individual blog post from Firestore</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-dynamic">Dynamic</span></div></div>
+      <div class="page-card"><div class="route">/gallery</div><div class="desc">Photo gallery — loads images from Firestore with category filter</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/reviews</div><div class="desc">Patient reviews — approved reviews from Firestore, average rating</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/reviews/submit</div><div class="desc">Public review submission form — saves to Firestore for admin approval</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/careers</div><div class="desc">Job listings from Firestore — Apply Now modal saves to Firestore</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/careers/[slug]</div><div class="desc">Individual job detail page</div><div class="tags"><span class="tag tag-dynamic">Dynamic</span></div></div>
+      <div class="page-card"><div class="route">/contact</div><div class="desc">Contact form + location map + Google Maps embed</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/locations</div><div class="desc">Location listing with Google Maps embed, directions link</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/locations/[slug]</div><div class="desc">Location detail page</div><div class="tags"><span class="tag tag-dynamic">Dynamic</span></div></div>
+      <div class="page-card"><div class="route">/news</div><div class="desc">Hospital news and announcements</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/news/[slug]</div><div class="desc">News article detail</div><div class="tags"><span class="tag tag-dynamic">Dynamic</span></div></div>
+      <div class="page-card"><div class="route">/faq</div><div class="desc">Frequently asked questions</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/insurance</div><div class="desc">Insurance plans accepted</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/telehealth</div><div class="desc">Telehealth / online consultation info</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/billing</div><div class="desc">Online billing / payment information</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/billing/pay</div><div class="desc">Payment gateway page (Razorpay ready)</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/resources</div><div class="desc">Patient resources hub</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/resources/forms</div><div class="desc">Downloadable forms</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/resources/new-patient</div><div class="desc">New patient guide</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/resources/prepare</div><div class="desc">How to prepare for your visit</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/queue</div><div class="desc">Patient-facing queue status checker</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/queue/display</div><div class="desc">Full-screen TV display — live token, Telugu voice announcement</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/login</div><div class="desc">Staff login — role-based redirect after sign-in</div><div class="tags"><span class="tag tag-auth">Auth</span></div></div>
+      <div class="page-card"><div class="route">/privacy</div><div class="desc">Privacy policy</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/terms</div><div class="desc">Terms of service</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/accessibility</div><div class="desc">Accessibility statement</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+      <div class="page-card"><div class="route">/sitemap-page</div><div class="desc">Full sitemap page</div><div class="tags"><span class="tag tag-public">Public</span></div></div>
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Admin Panel</h2>
+      <span class="badge badge-admin">22 pages · Admin only</span>
+    </div>
+    <div class="pages-grid">
+      <div class="page-card"><div class="route">/admin</div><div class="desc">Dashboard — live stats, period filter (Today/Monthly/Quarterly/Yearly), revenue charts</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/patients</div><div class="desc">Patient list with search, CSV export, admin delete, click to view full record</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/patients/[id]</div><div class="desc">Unified patient record — 4 tabs: cards, hospital bills, pharmacy bills, appointments</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-dynamic">Dynamic</span></div></div>
+      <div class="page-card"><div class="route">/admin/appointments</div><div class="desc">Appointment management — patient + MR visits, status workflow, search &amp; filter</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/messages</div><div class="desc">Unified enquiries inbox — contact forms + appointment requests</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/queue</div><div class="desc">Token queue — issue, call next, serve, complete/skip/no-show, PDF log export</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-pdf">PDF</span></div></div>
+      <div class="page-card"><div class="route">/admin/queue/doctor</div><div class="desc">Doctor-view of today's queue (read-only token list)</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/reviews</div><div class="desc">Review moderation — approve/reject/delete, shows on public site when approved</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/blog</div><div class="desc">Blog post CRUD — create, edit, publish/draft, delete</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/gallery</div><div class="desc">Gallery management — add images by URL, category, delete</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/analytics</div><div class="desc">Analytics — 8 metrics, patient sources, appointment status, review ratings, 7-day chart</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/billing-services</div><div class="desc">Configure quick-add billing items — name, type, price (shows in billing form)</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/applications</div><div class="desc">Job applications — filter by status, shortlist/review/reject, click to call</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/roles</div><div class="desc">Staff role assignment — assign Admin/Receptionist/Doctor/Pharmacist per user</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-auth">Auth</span></div></div>
+      <div class="page-card"><div class="route">/admin/pharmacy</div><div class="desc">Pharmacy dashboard — live stock stats, low stock alerts, quick navigation</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/backup</div><div class="desc">Full JSON backup of 14 Firestore collections — download &amp; restore, 30-day reminder</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/settings</div><div class="desc">Demo data management — Load Fresh Demo (20 patients + full linked data), Delete All</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/doctors</div><div class="desc">Doctor profiles management</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/services</div><div class="desc">Services management</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/departments</div><div class="desc">Departments management</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/careers</div><div class="desc">Job openings management — create/edit/toggle active listings</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/admin/login</div><div class="desc">Admin login page (redirects to /login)</div><div class="tags"><span class="tag tag-auth">Auth</span></div></div>
+    </div>
+  </div>
+
+  <!-- Desk / Reception -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Desk / Reception Panel</h2>
+      <span class="badge badge-desk">11 pages · Admin + Receptionist</span>
+    </div>
+    <div class="pages-grid">
+      <div class="page-card"><div class="route">/desk</div><div class="desc">Reception dashboard — quick stats and actions</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/desk/queue</div><div class="desc">Token queue — issue, call, serve, complete, PDF log</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-pdf">PDF</span></div></div>
+      <div class="page-card"><div class="route">/desk/queue/doctor</div><div class="desc">Doctor view of queue</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/desk/inpatient-card</div><div class="desc">IPD/OPD card management — create, print, WhatsApp, discharge, discharge summary PDF</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-print">Print</span><span class="tag tag-pdf">PDF</span></div></div>
+      <div class="page-card"><div class="route">/desk/patients</div><div class="desc">Patient list with search, export, click for full record</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/desk/patients/[id]</div><div class="desc">Unified patient record — cards, bills, pharmacy, appointments</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-dynamic">Dynamic</span></div></div>
+      <div class="page-card"><div class="route">/desk/appointments</div><div class="desc">Appointment management for reception</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/desk/billing</div><div class="desc">Create hospital invoice — quick-add items, print, WhatsApp share</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-print">Print</span></div></div>
+      <div class="page-card"><div class="route">/desk/bills</div><div class="desc">Invoice history — search, filter, reprint</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/desk/enquiries</div><div class="desc">Messages inbox — contact forms + appointment requests</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/desk/wishes</div><div class="desc">Festive wishes — bulk WhatsApp to all patients</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+    </div>
+  </div>
+
+  <!-- Pharmacy -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Pharmacy Panel</h2>
+      <span class="badge badge-pharmacy">7 pages · Admin + Pharmacist</span>
+    </div>
+    <div class="pages-grid">
+      <div class="page-card"><div class="route">/pharmacy</div><div class="desc">Pharmacy dashboard — total medicines, low stock, out of stock, quick navigation</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/pharmacy/medicines</div><div class="desc">Medicine catalog — add/edit/delete, search, stock level badges</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/pharmacy/stock</div><div class="desc">Stock management — purchase in, dispense, adjustments, movement log</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/pharmacy/billing</div><div class="desc">Pharmacy invoice — search medicine, add to cart, auto-deduct stock on bill</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-print">Print</span></div></div>
+      <div class="page-card"><div class="route">/pharmacy/bills</div><div class="desc">Pharmacy bill history — search, filter, reprint</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/pharmacy/suppliers</div><div class="desc">Supplier management — name, contact, GSTIN, address</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/pharmacy/reports</div><div class="desc">Reports — stock status, expiry alerts (30/90 days), dispensing log with date filter</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+    </div>
+  </div>
+
+  <!-- Doctor Panel -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Doctor Panel</h2>
+      <span class="badge badge-doctor">4 pages · Admin + Doctor</span>
+    </div>
+    <div class="pages-grid">
+      <div class="page-card"><div class="route">/doctor</div><div class="desc">Auto-redirects to /doctor/queue</div><div class="tags"><span class="tag tag-auth">Auth</span></div></div>
+      <div class="page-card"><div class="route">/doctor/queue</div><div class="desc">Queue management — issue token, call next, serve, complete</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/doctor/queue/doctor</div><div class="desc">Doctor-specific queue view</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/doctor/appointments</div><div class="desc">Appointments list — read access</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/doctor/patients</div><div class="desc">Patient list with full record access</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/doctor/patients/[id]</div><div class="desc">Unified patient record view</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-dynamic">Dynamic</span></div></div>
+    </div>
+  </div>
+
+  <!-- Patient Portal -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Patient Portal</h2>
+      <span class="badge badge-portal">13 pages · Google login required</span>
+    </div>
+    <div class="pages-grid">
+      <div class="page-card"><div class="route">/portal/login</div><div class="desc">Google Sign-In — collects phone number on first login, merges with existing record</div><div class="tags"><span class="tag tag-auth">Auth</span><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/portal</div><div class="desc">Dashboard — active cards, upcoming appointments, recent invoices, quick links</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/portal/appointments</div><div class="desc">My appointments — filtered from Firestore by patient email/phone</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/portal/appointments/[id]</div><div class="desc">Appointment detail</div><div class="tags"><span class="tag tag-firestore">Firestore</span><span class="tag tag-dynamic">Dynamic</span></div></div>
+      <div class="page-card"><div class="route">/portal/messages</div><div class="desc">My messages — contact messages sent to hospital</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/portal/messages/new</div><div class="desc">Send a new message to hospital</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/portal/reviews</div><div class="desc">My reviews — submitted reviews with approval status</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/portal/reviews/new</div><div class="desc">Write a review — star rating, department, comment → Firestore</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/portal/profile</div><div class="desc">Patient profile — view/edit personal details</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/portal/notifications</div><div class="desc">Notification preferences — email &amp; WhatsApp toggles, saved to Firestore</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/portal/book</div><div class="desc">Book appointment from portal (pre-fills patient details)</div><div class="tags"><span class="tag tag-firestore">Firestore</span></div></div>
+      <div class="page-card"><div class="route">/portal/register</div><div class="desc">Redirects to /portal/login</div><div class="tags"><span class="tag tag-auth">Auth</span></div></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Prepared by <strong>Vwebstudio</strong> · Dhanvantari Hospital Digital System · &copy; 2026 Vwebstudio. All rights reserved.
+  </div>
+
+</div>
+</body>
+</html>
