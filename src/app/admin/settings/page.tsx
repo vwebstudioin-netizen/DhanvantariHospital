@@ -1,17 +1,36 @@
 "use client";
 
 import { useState } from "react";
-import { Database, Trash2, RefreshCw, CheckCircle, AlertTriangle } from "lucide-react";
+import { Database, Trash2, RefreshCw, CheckCircle, AlertTriangle, Zap } from "lucide-react";
 import { seedDemoData, resetDemoData } from "@/lib/seed";
 import toast from "react-hot-toast";
 
 export default function AdminSettings() {
   const [seeding, setSeeding] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [freshDemo, setFreshDemo] = useState(false);
   const [seedResult, setSeedResult] = useState<string[] | null>(null);
   const [seedError, setSeedError] = useState<string | null>(null);
   const [resetDone, setResetDone] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
+
+  const handleFreshDemo = async () => {
+    if (!window.confirm("This will DELETE all existing data then load fresh demo data.\n\nContinue?")) return;
+    setFreshDemo(true);
+    setSeedResult(null);
+    setSeedError(null);
+    try {
+      await resetDemoData();
+      const result = await seedDemoData();
+      setSeedResult(result.seeded);
+      toast.success("Fresh demo loaded — 20 patients with fully linked records!");
+    } catch (err: any) {
+      setSeedError(err?.message || "Failed");
+      toast.error(err?.message || "Failed");
+    } finally {
+      setFreshDemo(false);
+    }
+  };
 
   const handleSeed = async () => {
     setSeeding(true);
@@ -63,12 +82,32 @@ export default function AdminSettings() {
 
         <div className="p-6 space-y-6">
 
+          {/* Fresh Demo — one-click reset + seed */}
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <Zap className="h-4 w-4 text-primary" />
+                <h3 className="font-semibold text-foreground">Fresh Demo (Reset + Seed)</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Clears all existing data and loads a full simulated day: <strong>20 patients</strong> each with linked IPD/OPD cards, hospital invoices, pharmacy bills, appointments, queue tokens, and reviews — all connected by phone number so patient detail pages show complete history.
+              </p>
+            </div>
+            <button onClick={handleFreshDemo} disabled={freshDemo || seeding || resetting}
+              className="shrink-0 flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#152d4a] disabled:opacity-50 transition-colors">
+              {freshDemo ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+              {freshDemo ? "Loading…" : "Load Fresh Demo"}
+            </button>
+          </div>
+
+          <div className="border-t border-border" />
+
           {/* Seed */}
           <div className="flex flex-col sm:flex-row sm:items-start gap-4">
             <div className="flex-1">
-              <h3 className="font-medium text-foreground">Load Demo Data</h3>
+              <h3 className="font-medium text-foreground">Add Demo Data (keep existing)</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Seeds realistic data for presentations: 5 patients, 5 queue tokens, 2 in-patient cards, 3 invoices, 3 appointments, 3 reviews, 8 medicines (if empty).
+                Adds demo records on top of existing data. Best used on a clean database. Includes 20 patients, 20 queue tokens, 6 inpatient cards, 10 invoices, 8 pharmacy bills, 8 appointments, 6 reviews, 10 medicines (only if collection is empty).
               </p>
               {seedResult && (
                 <div className="mt-3 bg-green-50 border border-green-200 rounded-lg p-3">
