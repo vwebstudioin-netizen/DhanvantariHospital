@@ -282,5 +282,26 @@ export async function seedDemoData(): Promise<{ seeded: string[] }> {
   }
   seeded.push(`contactMessages (${MESSAGES.length})`);
 
+  // 10. Billing Services quick-add items (only if empty)
+  const bsSnap = await getDocs(collection(db, "billingServices"));
+  if (bsSnap.empty) {
+    const BILLING_SERVICES = [
+      { name: "Consultation Fee",       type: "consultation", price: 500,  isActive: true },
+      { name: "Follow-up Visit",        type: "consultation", price: 300,  isActive: true },
+      { name: "Blood Test (CBC)",       type: "lab",          price: 350,  isActive: true },
+      { name: "X-Ray",                  type: "lab",          price: 400,  isActive: true },
+      { name: "Ultrasound",             type: "procedure",    price: 1200, isActive: true },
+      { name: "Room Charges (per day)", type: "room",         price: 1000, isActive: true },
+      { name: "ICU Charges (per day)",  type: "room",         price: 3000, isActive: true },
+      { name: "Dressing",               type: "procedure",    price: 150,  isActive: true },
+      { name: "IV Fluids",              type: "medicine",     price: 200,  isActive: true },
+      { name: "ECG",                    type: "procedure",    price: 300,  isActive: true },
+    ];
+    for (const bs of BILLING_SERVICES) {
+      await addDoc(collection(db, "billingServices"), { ...bs, createdAt: now });
+    }
+    seeded.push(`billingServices (${BILLING_SERVICES.length})`);
+  }
+
   return { seeded };
 }

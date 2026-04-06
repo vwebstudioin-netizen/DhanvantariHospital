@@ -3,23 +3,14 @@
 import { useState, useRef, useEffect } from "react";
 import { usePatientLookup } from "@/hooks/usePatientLookup";
 import { Plus, Trash2, Printer, IndianRupee } from "lucide-react";
+import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { createInvoice } from "@/lib/invoices";
 import { SITE_NAME, HOSPITAL_ADDRESS, CONTACT_PHONE, INVOICE_PAYMENT_METHODS } from "@/lib/constants";
 import type { InvoiceItem, InvoiceItemType, InvoicePaymentMethod } from "@/types/invoice";
 import toast from "react-hot-toast";
 
 const ITEM_TYPES: InvoiceItemType[] = ["consultation", "procedure", "medicine", "room", "lab", "other"];
-
-const QUICK_ITEMS: { name: string; type: InvoiceItemType; price: number }[] = [
-  { name: "Consultation Fee", type: "consultation", price: 500 },
-  { name: "Follow-up Visit", type: "consultation", price: 300 },
-  { name: "Blood Test", type: "lab", price: 250 },
-  { name: "X-Ray", type: "lab", price: 400 },
-  { name: "Room Charges (per day)", type: "room", price: 1000 },
-  { name: "ICU Charges (per day)", type: "room", price: 3000 },
-  { name: "Dressing", type: "procedure", price: 150 },
-  { name: "IV Fluids", type: "medicine", price: 200 },
-];
 
 function InvoicePrint({ data }: { data: any }) {
   return (
@@ -124,6 +115,17 @@ export default function BillingPage() {
   const [discount, setDiscount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<InvoicePaymentMethod>("cash");
   const [newItem, setNewItem] = useState({ name: "", type: "consultation" as InvoiceItemType, quantity: 1, unitPrice: 0 });
+  const [quickItems, setQuickItems] = useState<{ name: string; type: InvoiceItemType; price: number }[]>([]);
+
+  // Load admin-configured quick items from Firestore
+  useEffect(() => {
+    getDocs(query(collection(db, "billingServices"), where("isActive", "==", true), orderBy("createdAt", "asc")))
+      .then(snap => setQuickItems(snap.docs.map(d => {
+        const data = d.data();
+        return { name: data.name, type: data.type as InvoiceItemType, price: data.price };
+      })))
+      .catch(() => {}); // silent — billing still works without quick items
+  }, []);
 
   const subtotal = items.reduce((s, i) => s + i.total, 0);
   const total = Math.max(0, subtotal - discount);
@@ -134,7 +136,7 @@ export default function BillingPage() {
     setNewItem({ name: "", type: "consultation", quantity: 1, unitPrice: 0 });
   };
 
-  const addQuickItem = (qi: typeof QUICK_ITEMS[0]) => {
+  const addQuickItem = (qi: { name: string; type: InvoiceItemType; price: number }) => {
     setItems([...items, { name: qi.name, type: qi.type, quantity: 1, unitPrice: qi.price, total: qi.price }]);
   };
 
@@ -270,20 +272,22 @@ export default function BillingPage() {
       </div>
 
       {/* Quick add items */}
-      <div className="bg-white rounded-xl border border-slate-100 p-5">
-        <h3 className="font-semibold text-slate-700 mb-3 text-sm uppercase tracking-wider">Quick Add</h3>
-        <div className="flex flex-wrap gap-2">
-          {QUICK_ITEMS.map((qi) => (
-            <button
-              key={qi.name}
-              onClick={() => addQuickItem(qi)}
-              className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-[#1e3a5f] hover:text-white hover:border-[#1e3a5f] transition-colors"
-            >
-              {qi.name} — ₹{qi.price}
-            </button>
-          ))}
+      {quickItems.length > 0 && (
+        <div className="bg-white rounded-xl border border-slate-100 p-5">
+          <h3 className="font-semibold text-slate-700 mb-3 text-sm uppercase tracking-wider">Quick Add</h3>
+          <div className="flex flex-wrap gap-2">
+            {quickItems.map((qi) => (
+              <button
+                key={qi.name}
+                onClick={() => addQuickItem(qi)}
+                className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-[#1e3a5f] hover:text-white hover:border-[#1e3a5f] transition-colors"
+              >
+                {qi.name} — ₹{qi.price}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Add custom item */}
       <div className="bg-white rounded-xl border border-slate-100 p-5">

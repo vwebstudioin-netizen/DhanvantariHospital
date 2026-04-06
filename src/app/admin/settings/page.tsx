@@ -102,47 +102,6 @@ export default function AdminSettings() {
 
           <div className="border-t border-border" />
 
-          {/* Seed */}
-          <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-            <div className="flex-1">
-              <h3 className="font-medium text-foreground">Add Demo Data (keep existing)</h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                Adds demo records on top of existing data. Best used on a clean database. Includes 20 patients, 20 queue tokens, 6 inpatient cards, 10 invoices, 8 pharmacy bills, 8 appointments, 6 reviews, 10 medicines (only if collection is empty).
-              </p>
-              {seedResult && (
-                <div className="mt-3 bg-green-50 border border-green-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-700">Seeded successfully:</span>
-                  </div>
-                  <ul className="text-xs text-green-600 space-y-0.5 ml-6">
-                    {seedResult.map((s) => <li key={s}>• {s}</li>)}
-                  </ul>
-                </div>
-              )}
-              {seedError && (
-                <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
-                  <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-red-700">Seed failed:</p>
-                    <p className="text-xs text-red-600 mt-0.5">{seedError}</p>
-                    <p className="text-xs text-red-500 mt-1">Make sure you are logged in as admin and Firebase is connected.</p>
-                  </div>
-                </div>
-              )}
-            </div>
-            <button
-              onClick={handleSeed}
-              disabled={seeding}
-              className="shrink-0 flex items-center gap-2 bg-[#1e3a5f] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#152d4a] transition-colors disabled:opacity-50"
-            >
-              <RefreshCw className={`h-4 w-4 ${seeding ? "animate-spin" : ""}`} />
-              {seeding ? "Seeding..." : "Seed Demo Data"}
-            </button>
-          </div>
-
-          <div className="border-t border-border" />
-
           {/* Reset */}
           <div className="flex flex-col sm:flex-row sm:items-start gap-4">
             <div className="flex-1">

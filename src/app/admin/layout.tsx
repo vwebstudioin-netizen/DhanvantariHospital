@@ -26,6 +26,7 @@ const ADMIN_CORE_LINKS = [
   { label: "Reviews",      href: "/admin/reviews",      icon: Star },
   { label: "Gallery",      href: "/admin/gallery",      icon: Image },
   { label: "Analytics",    href: "/admin/analytics",    icon: BarChart3 },
+  { label: "Billing Items", href: "/admin/billing-services", icon: Receipt },
   { label: "Roles",        href: "/admin/roles",        icon: Shield },
   { label: "Backup",       href: "/admin/backup",       icon: HardDrive },
   { label: "Settings",     href: "/admin/settings",     icon: Settings },
