@@ -3,109 +3,128 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dhanvantari Hospital — Deployment & Testing Guide</title>
+  <title>Dhanvantari Hospital — Deployment Guide</title>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Lato', sans-serif; color: #1e293b; line-height: 1.8; background: #f8fafc; }
 
     .header {
-      background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%);
+      background: linear-gradient(135deg, #0d2240 0%, #1e3a5f 60%, #2d5a8e 100%);
       color: #fff;
-      padding: 48px 40px;
-      text-align: center;
+      padding: 52px 44px 44px;
     }
-    .header h1 { font-size: 2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; }
-    .header p { color: rgba(255,255,255,0.7); margin-top: 8px; font-size: 1rem; }
+    .header .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      background: rgba(253,230,138,0.12);
+      border: 1px solid rgba(253,230,138,0.3);
+      color: #fde68a;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      border-radius: 100px;
+      margin-bottom: 14px;
+    }
+    .header h1 { font-size: 2rem; font-weight: 900; margin-bottom: 10px; }
+    .header p { color: rgba(255,255,255,0.65); font-size: 0.95rem; max-width: 680px; }
+    .header .stack-badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    .stack-badge {
+      padding: 4px 14px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.85);
+    }
 
-    .container { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+    .container { max-width: 980px; margin: 0 auto; padding: 36px 28px 80px; }
 
     /* TOC */
     .toc {
       background: #fff;
       border: 1px solid #e2e8f0;
       border-radius: 12px;
-      padding: 24px;
+      padding: 22px 28px;
       margin-bottom: 40px;
     }
-    .toc h2 { font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #1e3a5f; margin-bottom: 12px; }
-    .toc ol { padding-left: 20px; }
-    .toc li { padding: 3px 0; font-size: 0.9rem; }
+    .toc h2 { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: #64748b; margin-bottom: 14px; }
+    .toc ol { padding-left: 20px; column-count: 2; column-gap: 32px; }
+    .toc li { padding: 3px 0; font-size: 0.87rem; break-inside: avoid; }
     .toc a { color: #1e3a5f; text-decoration: none; }
     .toc a:hover { text-decoration: underline; }
 
     /* Section */
-    .section { margin-bottom: 48px; }
+    .deploy-section { margin-bottom: 56px; scroll-margin-top: 20px; }
+    .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 2px solid #e2e8f0; }
     .section-num {
       display: inline-flex;
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
       background: #1e3a5f;
-      color: #fff;
+      color: #fde68a;
+      font-size: 0.9rem;
       font-weight: 900;
-      font-size: 0.85rem;
       align-items: center;
       justify-content: center;
-      border-radius: 50%;
-      margin-right: 10px;
-      vertical-align: middle;
+      flex-shrink: 0;
     }
-    h2 {
-      font-size: 1.3rem;
-      font-weight: 900;
-      color: #1e3a5f;
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #e2e8f0;
-      scroll-margin-top: 20px;
-    }
-    h3 { font-size: 1rem; font-weight: 700; color: #1e293b; margin: 20px 0 8px; }
+    .section-header h2 { font-size: 1.3rem; font-weight: 900; color: #1e3a5f; }
+
+    /* Sub-sections */
+    h3 { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin: 24px 0 12px; }
     p { font-size: 0.9rem; color: #475569; margin-bottom: 10px; }
 
     /* Steps */
-    .steps { counter-reset: step; }
+    .steps { counter-reset: step-counter; }
     .step {
       display: flex;
-      gap: 16px;
-      padding: 14px 0;
+      gap: 14px;
+      padding: 13px 0;
       border-bottom: 1px solid #f1f5f9;
+      counter-increment: step-counter;
     }
     .step:last-child { border-bottom: none; }
     .step-num {
-      counter-increment: step;
       min-width: 28px;
       height: 28px;
+      border-radius: 50%;
       background: #e2e8f0;
       color: #64748b;
-      font-weight: 700;
       font-size: 0.75rem;
+      font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 50%;
       flex-shrink: 0;
       margin-top: 2px;
     }
-    .step-num::before { content: counter(step); }
-    .step-content { flex: 1; }
-    .step-content strong { font-weight: 700; color: #1e293b; }
+    .step-num::before { content: counter(step-counter); }
+    .step-body { flex: 1; font-size: 0.89rem; color: #334155; }
+    .step-body strong { color: #1e293b; }
 
-    /* Code */
+    /* Code blocks */
     .code-block {
-      background: #0f172a;
-      color: #e2e8f0;
-      border-radius: 8px;
-      padding: 16px 20px;
+      background: #0d1117;
+      color: #e6edf3;
+      border-radius: 10px;
+      padding: 18px 22px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.82rem;
       overflow-x: auto;
-      margin: 12px 0;
-      line-height: 1.7;
+      margin: 14px 0;
+      line-height: 1.75;
+      border: 1px solid #1e2d3d;
     }
-    .code-block .comment { color: #64748b; }
-    .code-block .key { color: #93c5fd; }
-    .code-block .val { color: #86efac; }
+    .code-block .comment { color: #5d7291; }
+    .code-block .key { color: #79c0ff; }
+    .code-block .val { color: #a5d6a7; }
     .code-block .cmd { color: #fde68a; }
+    .code-block .path { color: #f8948b; }
+    .code-block .label { color: #ffa657; }
 
     code {
       background: #f1f5f9;
@@ -113,99 +132,78 @@
       padding: 2px 6px;
       border-radius: 4px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem;
+      font-size: 0.81rem;
     }
 
     /* Info cards */
-    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px 24px; margin-bottom: 16px; }
     .card.blue { border-left: 4px solid #1e3a5f; }
-    .card.green { border-left: 4px solid #16a34a; }
-    .card.amber { border-left: 4px solid #f59e0b; }
-    .card.red { border-left: 4px solid #dc2626; }
+    .card.green { border-left: 4px solid #16a34a; background: #f0fdf4; border-color: #86efac; }
+    .card.amber { border-left: 4px solid #f59e0b; background: #fffbeb; border-color: #fde68a; }
+    .card.red { border-left: 4px solid #dc2626; background: #fff1f2; border-color: #fecdd3; }
 
-    /* Role table */
-    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 12px 0; }
-    th {
-      background: #1e3a5f;
-      color: #fff;
-      text-align: left;
-      padding: 10px 14px;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; }
+    .tip { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 12px 16px; font-size: 0.85rem; color: #0369a1; margin: 14px 0; }
+    .warn { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; font-size: 0.85rem; color: #92400e; margin: 14px 0; }
+    .danger { background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px 16px; font-size: 0.85rem; color: #9f1239; margin: 14px 0; }
+    .success { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 12px 16px; font-size: 0.85rem; color: #166534; margin: 14px 0; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.87rem; }
+    th { background: #1e3a5f; color: #fff; text-align: left; padding: 10px 14px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
     tr:nth-child(even) td { background: #f8fafc; }
+    td code { font-size: 0.78rem; }
+    td .desc { font-size: 0.78rem; color: #64748b; margin-top: 2px; }
 
-    .badge {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 100px;
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
-    .badge-admin { background: #e9d5ff; color: #6b21a8; }
-    .badge-pharmacist { background: #dbeafe; color: #1d4ed8; }
-    .badge-receptionist { background: #dcfce7; color: #166534; }
+    /* URL tag */
+    .url-tag { display: inline-block; background: #eff6ff; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
 
-    .url {
-      display: inline-block;
-      background: #eff6ff;
-      color: #1d4ed8;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem;
-      text-decoration: none;
-    }
-
+    /* Checklist */
     .checklist { list-style: none; padding: 0; }
     .checklist li {
-      padding: 6px 0;
-      font-size: 0.9rem;
-      color: #475569;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 7px 0; font-size: 0.88rem; color: #334155;
+      border-bottom: 1px solid #f1f5f9;
     }
-    .checklist li::before {
-      content: '☐';
-      font-size: 1rem;
-      line-height: 1;
-      flex-shrink: 0;
-    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li::before { content: '☐'; font-size: 1rem; flex-shrink: 0; color: #94a3b8; line-height: 1.4; }
+    .checklist li.group { font-weight: 700; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; background: #f8fafc; padding: 7px 0; }
+    .checklist li.group::before { content: ''; }
 
-    .tip {
-      background: #f0f9ff;
-      border: 1px solid #bae6fd;
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 0.85rem;
-      color: #0369a1;
-      margin: 12px 0;
-    }
-    .warn {
-      background: #fffbeb;
-      border: 1px solid #fde68a;
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 0.85rem;
-      color: #92400e;
-      margin: 12px 0;
-    }
+    /* Route table grid */
+    .route-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 16px; }
+    .route-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; }
+    .route-card .path { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #1d4ed8; font-weight: 700; margin-bottom: 4px; }
+    .route-card .who { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 4px; }
+    .route-card p { font-size: 0.82rem; color: #475569; margin: 0; }
 
-    @media (max-width: 600px) {
+    @media (max-width: 640px) {
       .header { padding: 32px 20px; }
-      .header h1 { font-size: 1.4rem; }
+      .header h1 { font-size: 1.5rem; }
       .container { padding: 24px 16px 60px; }
+      .toc ol { column-count: 1; }
+    }
+    @media print {
+      body { background: #fff; }
+      .code-block { border: 1px solid #333; }
+      .header { padding: 28px 32px; }
     }
   </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>Dhanvantari Hospital — Deployment & Testing Guide</h1>
-  <p>Step-by-step guide to set up Firebase, run locally, and test all 3 roles</p>
+  <div class="badge">Technical Deployment Guide</div>
+  <h1>Dhanvantari Hospital — Deployment Guide</h1>
+  <p>Complete step-by-step guide to deploy the Hospital Management System from scratch — Firebase setup, environment variables, first admin user, Vercel deployment, and post-launch configuration.</p>
+  <div class="stack-badges">
+    <span class="stack-badge">Next.js 14</span>
+    <span class="stack-badge">Firebase Firestore</span>
+    <span class="stack-badge">Firebase Auth</span>
+    <span class="stack-badge">Vercel</span>
+    <span class="stack-badge">Resend Email</span>
+    <span class="stack-badge">Twilio WhatsApp</span>
+  </div>
 </div>
 
 <div class="container">
@@ -214,450 +212,736 @@
   <div class="toc">
     <h2>Contents</h2>
     <ol>
-      <li><a href="#prereqs">Prerequisites</a></li>
-      <li><a href="#firebase">Firebase Setup</a></li>
-      <li><a href="#env">Environment Variables (.env.local)</a></li>
-      <li><a href="#run">Run Locally</a></li>
-      <li><a href="#first-admin">Create First Admin User</a></li>
-      <li><a href="#roles">Create Staff Users & Assign Roles</a></li>
-      <li><a href="#test-admin">Test Admin Role</a></li>
-      <li><a href="#test-pharmacist">Test Pharmacist Role</a></li>
-      <li><a href="#test-receptionist">Test Receptionist Role</a></li>
-      <li><a href="#test-queue">Test Token Queue & TV Display</a></li>
-      <li><a href="#test-desk">Test Desk App (Cards & Billing)</a></li>
-      <li><a href="#test-pharmacy">Test Pharmacy Inventory</a></li>
-      <li><a href="#twilio">Setup Twilio WhatsApp (Optional)</a></li>
-      <li><a href="#checklist">Full Test Checklist</a></li>
+      <li><a href="#prereqs">1. Prerequisites</a></li>
+      <li><a href="#firebase">2. Firebase Project Setup</a></li>
+      <li><a href="#envvars">3. Environment Variables</a></li>
+      <li><a href="#first-admin">4. First Admin User Setup</a></li>
+      <li><a href="#local">5. Run Locally (Development)</a></li>
+      <li><a href="#vercel">6. Deploy to Vercel</a></li>
+      <li><a href="#postdeploy">7. Post-Deploy Verification</a></li>
+      <li><a href="#domain">8. Custom Domain Setup</a></li>
+      <li><a href="#whatsapp">9. WhatsApp Setup (Twilio — Optional)</a></li>
+      <li><a href="#routes">10. Route Structure Reference</a></li>
+      <li><a href="#checklist">11. Deployment Checklist</a></li>
     </ol>
   </div>
 
   <!-- 1. Prerequisites -->
-  <div class="section" id="prereqs">
-    <h2><span class="section-num">1</span>Prerequisites</h2>
-    <div class="card blue">
-      <p>Install these before starting:</p>
-      <ul style="padding-left:20px; font-size:0.9rem; color:#475569;">
-        <li style="padding:4px 0;"><strong>Node.js 18+</strong> — <a href="https://nodejs.org" style="color:#1e3a5f;">nodejs.org</a></li>
-        <li style="padding:4px 0;"><strong>Git</strong> (optional but recommended)</li>
-        <li style="padding:4px 0;"><strong>Google account</strong> for Firebase</li>
-        <li style="padding:4px 0;"><strong>Twilio account</strong> (only if testing WhatsApp)</li>
-      </ul>
+  <div class="deploy-section" id="prereqs">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Prerequisites</h2>
     </div>
-    <p>Project location: <code>Clients/ABHospital/</code> inside your TemplateS folder.</p>
+    <div class="card blue">
+      <p>Ensure the following are installed and ready before starting:</p>
+      <table style="margin-top:10px;">
+        <thead><tr><th>Tool</th><th>Minimum Version</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Node.js</strong></td>
+            <td><code>18.0.0</code> or higher</td>
+            <td>Required to run Next.js. Verify: <code>node -v</code></td>
+          </tr>
+          <tr>
+            <td><strong>npm</strong></td>
+            <td><code>9.0.0</code> or higher</td>
+            <td>Package manager. Comes with Node.js. Verify: <code>npm -v</code></td>
+          </tr>
+          <tr>
+            <td><strong>Git</strong></td>
+            <td>Any recent version</td>
+            <td>Required for Vercel deployment via GitHub.</td>
+          </tr>
+          <tr>
+            <td><strong>Google Account</strong></td>
+            <td>Any</td>
+            <td>Required to create a Firebase project.</td>
+          </tr>
+          <tr>
+            <td><strong>GitHub Account</strong></td>
+            <td>Any</td>
+            <td>Required to connect repo to Vercel.</td>
+          </tr>
+          <tr>
+            <td><strong>Vercel Account</strong></td>
+            <td>Any (free Hobby plan works)</td>
+            <td>Hosting platform. Sign up at vercel.com.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tip"><strong>No Firebase Admin SDK required.</strong> This project uses Firestore-based role management — no service account JSON key is needed at any point. Only the client-side Firebase config keys are required.</div>
   </div>
 
   <!-- 2. Firebase Setup -->
-  <div class="section" id="firebase">
-    <h2><span class="section-num">2</span>Firebase Setup</h2>
-    <p>We need a Firebase project for authentication, database, and file storage.</p>
+  <div class="deploy-section" id="firebase">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Firebase Project Setup</h2>
+    </div>
 
-    <h3>2.1 Create Firebase Project</h3>
+    <h3>2.1 Create a New Firebase Project</h3>
     <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a href="https://console.firebase.google.com" style="color:#1e3a5f;" target="_blank">console.firebase.google.com</a></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Add project"</strong> → Name it <code>dhanvantari-hospital</code> → Continue</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Disable Google Analytics (not needed) → <strong>Create project</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Wait for project to be created → Click <strong>Continue</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Go to <strong>console.firebase.google.com</strong> → Click <strong>"Add project"</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Name the project <code>dhanvantari-hospital</code> (or your preferred name) → Continue.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Disable Google Analytics (not required) → Click <strong>"Create project"</strong> → Wait for setup → Click <strong>Continue</strong>.
+      </div></div>
     </div>
 
     <h3>2.2 Enable Authentication</h3>
     <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">In left sidebar: <strong>Build → Authentication</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Get started"</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Under "Sign-in method" tab → Click <strong>Email/Password</strong> → Enable → Save</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        In the Firebase Console left sidebar: <strong>Build → Authentication</strong> → Click <strong>"Get started"</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Under the <strong>"Sign-in method"</strong> tab → Click <strong>Email/Password</strong> → Enable the first toggle → Click <strong>Save</strong>.
+        <br><em>This is used for all staff logins (admin, receptionist, pharmacist, doctor).</em>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Click <strong>Google</strong> provider → Enable → Set the support email → Click <strong>Save</strong>.
+        <br><em>This is used for the patient portal (<code>/portal</code>) — patients log in with Google.</em>
+      </div></div>
     </div>
 
     <h3>2.3 Create Firestore Database</h3>
     <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">In left sidebar: <strong>Build → Firestore Database</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Create database"</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Choose <strong>"Start in test mode"</strong> → Next</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Select <strong>asia-south1 (Mumbai)</strong> for India → Click <strong>Enable</strong></div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Sidebar: <strong>Build → Firestore Database</strong> → Click <strong>"Create database"</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Choose <strong>"Start in production mode"</strong> — you will deploy proper security rules in the next step. Click <strong>Next</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Select location: <strong>asia-south1 (Mumbai)</strong> for India. Click <strong>Enable</strong>. Wait for provisioning.
+      </div></div>
     </div>
 
-    <h3>2.4 Enable Storage</h3>
+    <h3>2.4 Deploy Firestore Security Rules</h3>
+    <p>The project includes pre-written Firestore security rules. Deploy them from the project folder:</p>
+    <div class="code-block">
+<span class="comment"># Install Firebase CLI if not already installed</span>
+<span class="cmd">npm install -g firebase-tools</span>
+
+<span class="comment"># Log in to Firebase</span>
+<span class="cmd">firebase login</span>
+
+<span class="comment"># Navigate to the project folder</span>
+<span class="cmd">cd "C:\Users\z004n5ra\Desktop\SUB Projects\MYW\TemplateS\Clients\ABHospital"</span>
+
+<span class="comment"># Deploy Firestore rules only</span>
+<span class="cmd">firebase deploy --only firestore:rules</span>
+
+<span class="comment"># Deploy Storage rules only</span>
+<span class="cmd">firebase deploy --only storage</span>
+    </div>
+    <div class="tip">If <code>firebase deploy</code> asks to select a project, run <code>firebase use --add</code> first and select your Firebase project.</div>
+
+    <h3>2.5 Get Firebase Client Config Keys</h3>
     <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">In left sidebar: <strong>Build → Storage</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Get started"</strong> → Start in test mode → Next → Done</div></div>
-    </div>
-
-    <h3>2.5 Get Client Config Keys</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Click the <strong>gear icon ⚙</strong> (top left) → <strong>Project settings</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Scroll to <strong>"Your apps"</strong> → Click <strong>Web icon (&lt;/&gt;)</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Register app as <code>dhanvantari-hospital-web</code> → Continue</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Copy the <code>firebaseConfig</code> object — you'll need these values for .env.local</div></div>
-    </div>
-
-    <div class="tip">
-      <strong>✅ No service account key needed.</strong> This project uses Firestore-based role management — the Firebase Admin SDK and service account JSON are not required.
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        In Firebase Console: click the <strong>gear icon (Settings)</strong> top-left → <strong>Project settings</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Scroll to <strong>"Your apps"</strong> → Click the <strong>Web icon (&lt;/&gt;)</strong> → Register the app as <code>dhanvantari-hospital-web</code> → Continue.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Copy the values from the <code>firebaseConfig</code> object shown — you will need these in the next section.
+      </div></div>
     </div>
   </div>
 
-  <!-- 3. .env.local -->
-  <div class="section" id="env">
-    <h2><span class="section-num">3</span>Environment Variables (.env.local)</h2>
-    <p>Open <code>Clients/ABHospital/.env.local</code> and fill in your values:</p>
+  <!-- 3. Environment Variables -->
+  <div class="deploy-section" id="envvars">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Environment Variables</h2>
+    </div>
+    <p>Create a file named <code>.env.local</code> in the project root (same directory as <code>package.json</code>). Do <strong>not</strong> commit this file to Git — it is already listed in <code>.gitignore</code>.</p>
 
     <div class="code-block">
-<span class="comment"># Hospital Branding</span>
+<span class="comment"># =========================================================</span>
+<span class="comment"># Hospital Branding — used throughout the site and emails</span>
+<span class="comment"># =========================================================</span>
 <span class="key">NEXT_PUBLIC_HOSPITAL_NAME</span>=<span class="val">Dhanvantari Hospital</span>
+<span class="key">NEXT_PUBLIC_HOSPITAL_TAGLINE</span>=<span class="val">Multi-Specialty Hospital with Critical Care</span>
 <span class="key">NEXT_PUBLIC_HOSPITAL_PHONE</span>=<span class="val">9876543210</span>
-<span class="key">NEXT_PUBLIC_HOSPITAL_ADDRESS</span>=<span class="val">Your Hospital Address, City</span>
-<span class="key">NEXT_PUBLIC_HOSPITAL_EMAIL</span>=<span class="val">hospital@email.com</span>
-<span class="key">NEXT_PUBLIC_HOSPITAL_WHATSAPP</span>=<span class="val">91XXXXXXXXXX</span>
+<span class="key">NEXT_PUBLIC_HOSPITAL_EMERGENCY_PHONE</span>=<span class="val">9876543210</span>
+<span class="key">NEXT_PUBLIC_HOSPITAL_EMAIL</span>=<span class="val">info@dhanvantarihospital.in</span>
+<span class="key">NEXT_PUBLIC_HOSPITAL_ADDRESS</span>=<span class="val">123 Hospital Road, Mysuru, Karnataka 570001</span>
+<span class="key">NEXT_PUBLIC_HOSPITAL_WHATSAPP</span>=<span class="val">919876543210</span>
 
-<span class="comment"># Firebase Client Keys (from Step 2.5)</span>
-<span class="key">NEXT_PUBLIC_FIREBASE_API_KEY</span>=<span class="val">AIzaSy...</span>
+<span class="comment"># =========================================================</span>
+<span class="comment"># Firebase Client Keys (from Firebase Console Project Settings)</span>
+<span class="comment"># All values prefixed NEXT_PUBLIC_ are exposed to the browser</span>
+<span class="comment"># =========================================================</span>
+<span class="key">NEXT_PUBLIC_FIREBASE_API_KEY</span>=<span class="val">AIzaSy_your_api_key_here</span>
 <span class="key">NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN</span>=<span class="val">dhanvantari-hospital.firebaseapp.com</span>
 <span class="key">NEXT_PUBLIC_FIREBASE_PROJECT_ID</span>=<span class="val">dhanvantari-hospital</span>
 <span class="key">NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET</span>=<span class="val">dhanvantari-hospital.appspot.com</span>
-<span class="key">NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID</span>=<span class="val">123456789</span>
-<span class="key">NEXT_PUBLIC_FIREBASE_APP_ID</span>=<span class="val">1:123:web:abc</span>
+<span class="key">NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID</span>=<span class="val">123456789012</span>
+<span class="key">NEXT_PUBLIC_FIREBASE_APP_ID</span>=<span class="val">1:123456789012:web:abcdef1234567890</span>
 
-<span class="comment"># ✅ No Firebase Admin SDK / service account key required!</span>
-<span class="comment"># Roles stored in Firestore /userRoles/{uid} — see Step 5</span>
+<span class="comment"># =========================================================</span>
+<span class="comment"># NO Firebase Admin SDK / Service Account Key required!</span>
+<span class="comment"># Roles are stored in Firestore /userRoles/{uid} — see Section 4</span>
+<span class="comment"># =========================================================</span>
 
-<span class="comment"># Resend Email (get free API key from resend.com — 100 emails/day free)</span>
-<span class="key">RESEND_API_KEY</span>=<span class="val">re_your_api_key_here</span>
-<span class="key">RESEND_FROM_EMAIL</span>=<span class="val">Dhanvantari Hospital &lt;noreply@dhanvantarihospital.com&gt;</span>
+<span class="comment"># =========================================================</span>
+<span class="comment"># Resend Email (free API key from resend.com — 100 emails/day)</span>
+<span class="comment"># Used for appointment confirmation emails to patients</span>
+<span class="comment"># =========================================================</span>
+<span class="key">RESEND_API_KEY</span>=<span class="val">re_your_resend_api_key_here</span>
+<span class="key">RESEND_FROM_EMAIL</span>=<span class="val">Dhanvantari Hospital &lt;noreply@dhanvantarihospital.in&gt;</span>
+<span class="key">HOSPITAL_EMAIL</span>=<span class="val">info@dhanvantarihospital.in</span>
 
-<span class="comment"># Twilio WhatsApp (optional — skip for now)</span>
+<span class="comment"># =========================================================</span>
+<span class="comment"># Twilio WhatsApp (optional — skip for initial deployment)</span>
+<span class="comment"># Add these only when WhatsApp feature is being activated</span>
+<span class="comment"># =========================================================</span>
 <span class="key">TWILIO_ACCOUNT_SID</span>=<span class="val">ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
 <span class="key">TWILIO_AUTH_TOKEN</span>=<span class="val">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
 <span class="key">TWILIO_WHATSAPP_FROM</span>=<span class="val">whatsapp:+14155238886</span>
 
-<span class="comment"># Site</span>
-<span class="key">NEXT_PUBLIC_SITE_URL</span>=<span class="val">http://localhost:3000</span>
-<span class="key">HOSPITAL_EMAIL</span>=<span class="val">info@dhanvantarihospital.com</span>
-<span class="key">REVALIDATION_SECRET</span>=<span class="val">any-random-string-here-123</span>
+<span class="comment"># =========================================================</span>
+<span class="comment"># Site Configuration</span>
+<span class="comment"># =========================================================</span>
+<span class="key">NEXT_PUBLIC_SITE_URL</span>=<span class="val">https://www.dhanvantarihospital.in</span>
+<span class="key">REVALIDATION_SECRET</span>=<span class="val">replace-with-a-random-secure-string-48chars</span>
     </div>
 
-    <div class="tip">
-      <strong>No service account key needed!</strong> Roles are stored in Firestore — the Firebase Admin SDK is not required. Only the client-side Firebase keys above are needed to run the app.
-    </div>
-  </div>
-
-  <!-- 4. Run Locally -->
-  <div class="section" id="run">
-    <h2><span class="section-num">4</span>Run Locally</h2>
-    <p>Open a terminal in the project folder:</p>
-    <div class="code-block">
-<span class="comment"># Navigate to the project</span>
-<span class="cmd">cd "c:\Users\z004n5ra\Desktop\SUB Projects\MYW\TemplateS\Clients\ABHospital"</span>
-
-<span class="comment"># Install dependencies (if not done already)</span>
-<span class="cmd">npm install</span>
-
-<span class="comment"># Start development server</span>
-<span class="cmd">npm run dev</span>
+    <div class="warn">
+      <strong>For local development only:</strong> Set <code>NEXT_PUBLIC_SITE_URL=http://localhost:3000</code> in your local <code>.env.local</code>. On Vercel, set it to the actual production domain. The same variable is used for email links and review submission URLs.
     </div>
 
-    <p>The app will open at <a class="url" href="http://localhost:3000" target="_blank">http://localhost:3000</a></p>
-
-    <div class="tip">
-      If port 3000 is busy, use: <code>npx next dev --port 3001</code>
-    </div>
-  </div>
-
-  <!-- 5. First Admin User -->
-  <div class="section" id="first-admin">
-    <h2><span class="section-num">5</span>Create First Admin User</h2>
-    <p>No service account key or script needed. Roles are stored directly in Firestore. Just 3 steps:</p>
-
-    <h3>5.1 Create the admin user in Firebase Auth</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Firebase Console → <strong>Authentication → Users</strong> → <strong>Add user</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Email: <code>admin@dhanvantarihospital.com</code>, Password: <code>Admin@12345</code> → <strong>Add user</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Copy the <strong>User UID</strong> shown (e.g. <code>abc123xyz...</code>)</div></div>
-    </div>
-
-    <h3>5.2 Set the admin role in Firestore</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Firebase Console → <strong>Firestore Database</strong> → <strong>Start collection</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Collection ID: <code>userRoles</code> → Next</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Document ID: <strong>paste the UID from step 5.1</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Add these fields:<br>
-        Field: <code>role</code> — Type: string — Value: <code>admin</code><br>
-        Field: <code>email</code> — Type: string — Value: <code>admin@dhanvantarihospital.com</code>
-      </div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>Save</strong></div></div>
-    </div>
-
-    <div class="tip">
-      That's it — no scripts, no service account key needed. Roles are just Firestore documents.
-    </div>
-
-    <h3>5.3 Test admin login</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/login">http://localhost:3000/login</a></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Login with <code>admin@dhanvantarihospital.com</code> / <code>Admin@12345</code></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Should redirect to <a class="url" href="http://localhost:3000/admin">/admin</a> with full sidebar</div></div>
-    </div>
-  </div>
-
-  <!-- 6. Create Staff Users -->
-  <div class="section" id="roles">
-    <h2><span class="section-num">6</span>Create Staff Users &amp; Assign Roles</h2>
-    <p>Once you have admin access, create all other staff from the admin panel — no Firebase Console needed.</p>
-
-    <h3>6.1 Create staff accounts from admin panel (recommended)</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Login as admin → go to <a class="url" href="http://localhost:3000/admin/roles">/admin/roles</a></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Fill: Email, Password, Display Name, Role → Click <strong>"Create Account"</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Account is created in Firebase Auth and role is saved to Firestore automatically</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Share the email + password with the staff member</div></div>
-    </div>
-
-    <h3>Test accounts to create:</h3>
+    <h3>All Environment Variables — Quick Reference</h3>
     <table>
-      <thead><tr><th>Email</th><th>Password</th><th>Role</th></tr></thead>
+      <thead><tr><th>Variable</th><th>Required?</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>pharmacist@dhanvantarihospital.com</td><td>Pharma@12345</td><td><span class="badge badge-pharmacist">Pharmacist</span></td></tr>
-        <tr><td>reception@dhanvantarihospital.com</td><td>Recep@12345</td><td><span class="badge badge-receptionist">Receptionist</span></td></tr>
+        <tr><td><code>NEXT_PUBLIC_HOSPITAL_NAME</code></td><td>Yes</td><td>Appears in header, emails, invoices, cards</td></tr>
+        <tr><td><code>NEXT_PUBLIC_HOSPITAL_PHONE</code></td><td>Yes</td><td>Shown in header, contact page, emails</td></tr>
+        <tr><td><code>NEXT_PUBLIC_HOSPITAL_EMAIL</code></td><td>Yes</td><td>Shown on contact page</td></tr>
+        <tr><td><code>NEXT_PUBLIC_HOSPITAL_ADDRESS</code></td><td>Yes</td><td>Shown on contact page, invoices, cards</td></tr>
+        <tr><td><code>NEXT_PUBLIC_HOSPITAL_WHATSAPP</code></td><td>Yes</td><td>WhatsApp click-to-chat button (include country code)</td></tr>
+        <tr><td><code>NEXT_PUBLIC_FIREBASE_API_KEY</code></td><td>Yes</td><td>From Firebase Console</td></tr>
+        <tr><td><code>NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN</code></td><td>Yes</td><td>From Firebase Console</td></tr>
+        <tr><td><code>NEXT_PUBLIC_FIREBASE_PROJECT_ID</code></td><td>Yes</td><td>From Firebase Console</td></tr>
+        <tr><td><code>NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET</code></td><td>Yes</td><td>From Firebase Console</td></tr>
+        <tr><td><code>NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID</code></td><td>Yes</td><td>From Firebase Console</td></tr>
+        <tr><td><code>NEXT_PUBLIC_FIREBASE_APP_ID</code></td><td>Yes</td><td>From Firebase Console</td></tr>
+        <tr><td><code>RESEND_API_KEY</code></td><td>Yes</td><td>For appointment email confirmations (resend.com)</td></tr>
+        <tr><td><code>RESEND_FROM_EMAIL</code></td><td>Yes</td><td>"From" name and email for outgoing emails</td></tr>
+        <tr><td><code>HOSPITAL_EMAIL</code></td><td>Yes</td><td>Hospital inbox — receives copies of contact messages</td></tr>
+        <tr><td><code>NEXT_PUBLIC_SITE_URL</code></td><td>Yes</td><td>Full production URL (used in review links, email links)</td></tr>
+        <tr><td><code>REVALIDATION_SECRET</code></td><td>Yes</td><td>Random string for ISR revalidation API protection</td></tr>
+        <tr><td><code>TWILIO_ACCOUNT_SID</code></td><td>Optional</td><td>WhatsApp notifications via Twilio</td></tr>
+        <tr><td><code>TWILIO_AUTH_TOKEN</code></td><td>Optional</td><td>WhatsApp notifications via Twilio</td></tr>
+        <tr><td><code>TWILIO_WHATSAPP_FROM</code></td><td>Optional</td><td>Twilio sandbox or approved WhatsApp number</td></tr>
       </tbody>
     </table>
-
-    <div class="tip">Role takes effect immediately on next login — no sign out needed.</div>
   </div>
 
-  <!-- 7. Test Admin -->
-  <div class="section" id="test-admin">
-    <h2><span class="section-num">7</span>Test — Admin Role</h2>
-    <div class="card blue">
-      <p><strong>Login:</strong> <code>admin@dhanvantarihospital.com</code> at <a class="url" href="http://localhost:3000/login">/login</a></p>
-      <p style="margin-top:6px;"><strong>Expected redirect:</strong> <code>/admin</code> — full sidebar</p>
+  <!-- 4. First Admin -->
+  <div class="deploy-section" id="first-admin">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>First Admin User Setup</h2>
+    </div>
+    <p>No scripts, no service account key, no Firebase Admin SDK. Just two steps in the Firebase Console.</p>
+    <div class="card green">
+      <strong>How role management works:</strong> Every staff user's role is stored as a Firestore document at <code>/userRoles/{uid}</code> with a single field <code>role: "admin"</code> (or receptionist, pharmacist, doctor). The app reads this document on login and redirects the user to their panel.
     </div>
 
-    <h3>What to verify:</h3>
-    <ul class="checklist">
-      <li>Admin sees Dashboard, Token Queue, Appointments, Patients, In-Patient Cards, Invoices, Pharmacy, Services, Blog...</li>
-      <li>Can create staff accounts from <code>/admin/roles</code></li>
-      <li>Can access <code>/admin/pharmacy</code> → pharmacy dashboard</li>
-      <li>Can access <code>/desk</code> → desk panel</li>
-      <li>Visiting <code>/admin</code> stays on admin panel (not redirected)</li>
-    </ul>
+    <h3>Step 1 — Create the admin user in Firebase Auth</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Firebase Console → <strong>Authentication → Users</strong> → Click <strong>"Add user"</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Email: <code>admin@dhanvantarihospital.in</code>, Password: a strong password → Click <strong>Add user</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        The new user appears in the list. <strong>Copy the User UID</strong> (long alphanumeric string in the UID column — e.g., <code>aBc123xyz...</code>).
+      </div></div>
+    </div>
+
+    <h3>Step 2 — Set the admin role in Firestore</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Firebase Console → <strong>Firestore Database</strong> → Click <strong>"Start collection"</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Collection ID: <code>userRoles</code> → Click <strong>Next</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Document ID: <strong>paste the UID you copied from Authentication</strong> (do not use "Auto-ID").
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Add field: Name = <code>role</code>, Type = <code>string</code>, Value = <code>admin</code>. Click <strong>Save</strong>.
+      </div></div>
+    </div>
+    <div class="code-block">
+<span class="comment"># Firestore document structure for the admin user:</span>
+<span class="label">Collection:</span> <span class="val">userRoles</span>
+  <span class="label">Document ID:</span> <span class="val">{firebase_auth_uid}</span>  <span class="comment">← paste the UID here</span>
+    <span class="key">role</span>: <span class="val">"admin"</span>
+    <span class="key">email</span>: <span class="val">"admin@dhanvantarihospital.in"</span>
+    </div>
+
+    <h3>Step 3 — Test the admin login</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Go to <span class="url-tag">http://localhost:3000/login</span> (or your production URL once deployed).
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Log in with the admin email and password.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Should redirect to <span class="url-tag">/admin</span> with the full admin sidebar visible.
+      </div></div>
+    </div>
+
+    <h3>Step 4 — Create other staff accounts (from admin panel)</h3>
+    <p>Once you have admin access, create all other staff accounts directly from the system — no Firebase Console needed:</p>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Login as admin → Go to <span class="url-tag">/admin/roles</span>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Fill in: Email, Password, Display Name, Role (Receptionist / Pharmacist / Doctor) → Click <strong>"Create Account"</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        The account is created in Firebase Auth and the Firestore <code>userRoles</code> document is written automatically.
+      </div></div>
+    </div>
+    <div class="success">After this step, staff can log in at <code>/login</code> and be redirected to their role-specific panel immediately.</div>
   </div>
 
-  <!-- 8. Test Pharmacist -->
-  <div class="section" id="test-pharmacist">
-    <h2><span class="section-num">8</span>Test — Pharmacist Role</h2>
-    <div class="card blue">
-      <p><strong>Login:</strong> <code>pharmacist@dhanvantarihospital.com</code> at <a class="url" href="http://localhost:3000/login">/login</a></p>
-      <p style="margin-top:6px;"><strong>Expected redirect:</strong> <code>/admin/pharmacy</code> — pharmacy-only sidebar</p>
+  <!-- 5. Run Locally -->
+  <div class="deploy-section" id="local">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Run Locally (Development)</h2>
     </div>
 
-    <h3>What to verify:</h3>
-    <ul class="checklist">
-      <li>Pharmacist sidebar shows: Dashboard, Medicines, Stock, New Bill, Bill History, Suppliers, Reports</li>
-      <li>Trying <code>/admin</code> (dashboard) → redirected to <code>/admin/pharmacy</code></li>
-      <li>Can browse medicine catalog at <code>/admin/pharmacy/medicines</code></li>
-      <li>Can add stock and see movement log at <code>/admin/pharmacy/stock</code></li>
-      <li>Can create pharmacy bill at <code>/admin/pharmacy/billing</code> — medicines auto-deducted from stock</li>
-      <li>Bill history at <code>/admin/pharmacy/bills</code> — shows PHRM-XXXX bills with print</li>
-      <li>Can see expiry report at <code>/admin/pharmacy/reports</code></li>
-    </ul>
-  </div>
+    <div class="code-block">
+<span class="comment"># Navigate to the project folder</span>
+<span class="cmd">cd "C:\Users\z004n5ra\Desktop\SUB Projects\MYW\TemplateS\Clients\ABHospital"</span>
 
-  <!-- 9. Test Receptionist -->
-  <div class="section" id="test-receptionist">
-    <h2><span class="section-num">9</span>Test — Receptionist Role</h2>
-    <div class="card blue">
-      <p><strong>Login:</strong> <code>reception@dhanvantarihospital.com</code> at <a class="url" href="http://localhost:3000/login">/login</a></p>
-      <p style="margin-top:6px;"><strong>Expected redirect:</strong> <code>/desk/queue</code> — reception desk panel</p>
+<span class="comment"># Install all dependencies</span>
+<span class="cmd">npm install</span>
+
+<span class="comment"># Start the development server</span>
+<span class="cmd">npm run dev</span>
+
+<span class="comment"># App is now running at:</span>
+<span class="val">http://localhost:3000</span>
     </div>
 
-    <h3>What to verify:</h3>
-    <ul class="checklist">
-      <li>Desk sidebar shows: Dashboard, Token Queue, In-Patient Cards, Patients, Appointments, Enquiries, New Invoice, Invoice History, Festive Wishes</li>
-      <li>Trying <code>/admin</code> → redirected to <code>/desk/queue</code> (never leaves desk layout)</li>
-      <li>Trying <code>/admin/pharmacy</code> → redirected to login</li>
-      <li>Token Queue at <code>/desk/queue</code> — issue tokens, call next, start, done, skip</li>
-      <li>In-Patient Cards: Room Card (IPD-XXXX, no expiry) and Visit Card (OPD-XXXX, 14-day) tabs</li>
-      <li>Creating a Visit Card auto-issues a queue token for the patient</li>
-      <li>Enquiries at <code>/desk/enquiries</code> — unified inbox: appointment requests + contact messages, filter by type</li>
-      <li>Appointments at <code>/desk/appointments</code> — manage patient + MR/visitor appointments</li>
-    </ul>
-  </div>
+    <div class="tip">If port 3000 is occupied: <code>npx next dev --port 3001</code></div>
+    <div class="tip">Make sure <code>.env.local</code> exists in the project root with all required variables filled in before running <code>npm run dev</code>. The app will not connect to Firebase without these.</div>
 
-  <!-- 10. Test Token Queue -->
-  <div class="section" id="test-queue">
-    <h2><span class="section-num">10</span>Test — Token Queue &amp; TV Display</h2>
-
-    <h3>10.1 Test reception queue</h3>
+    <h3>Load Demo Data (after first login)</h3>
     <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/admin/queue">/admin/queue</a> (as admin or receptionist)</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Fill: Patient Name, Phone, Purpose → Click <strong>"Issue Token"</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Token #001 should appear in the waiting list on the right</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Issue 2-3 more tokens for different patients</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Call Next Patient"</strong> → Token moves to "Called" state (amber). WhatsApp would fire to patient.</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Start Consultation"</strong> → Token moves to "In Consultation" (green)</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Done — Call Next"</strong> → complete and auto-call next</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>Print</strong> to test the token slip printout (logo appears)</div></div>
-    </div>
-
-    <h3>10.2 Test TV Display (open in separate tab/window)</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Open a new browser tab → <a class="url" href="http://localhost:3000/queue/display">/queue/display</a></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Should show full-screen dark background with large "Now Serving" number</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Go back to the queue page and click "Call Next" again</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">TV display should update in real-time AND play an audio chime</div></div>
-    </div>
-
-    <h3>10.3 Test patient queue check</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Open <a class="url" href="http://localhost:3000/queue">/queue</a> in browser (public page)</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Enter the phone number used when issuing a token</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Should show queue position and estimated wait time</div></div>
-    </div>
-  </div>
-
-  <!-- 11. Test Desk App -->
-  <div class="section" id="test-desk">
-    <h2><span class="section-num">11</span>Test — Desk App (Cards &amp; Billing)</h2>
-
-    <h3>11.1 In-Patient Card</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/desk/inpatient-card">/desk/inpatient-card</a></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"New Card"</strong> → Fill patient name, doctor, ward, room, diagnosis</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>"Create Card"</strong> → Card should appear with auto-generated ID and expiry date (+14 days)</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>Print</strong> → Should open print dialog with 85×54mm card layout</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click <strong>Discharge</strong> → Card should disappear from active list</div></div>
-    </div>
-
-    <h3>11.2 Invoice/Billing</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/desk/billing">/desk/billing</a></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Fill patient name and phone</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Click quick-add buttons (Consultation Fee, Blood Test, etc.) to add line items</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Add a discount, select payment method → Click <strong>"Generate Invoice"</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Invoice preview should appear with print button</div></div>
-    </div>
-
-    <h3>11.3 Festive Wishes</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/desk/wishes">/desk/wishes</a></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Select an occasion (e.g., Diwali) → Message auto-fills</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Edit message if needed → Click <strong>"Send Diwali Wishes"</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Should show success and log the campaign to Firestore</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Log in as admin → Navigate to <span class="url-tag">/admin/settings</span>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Click <strong>"Load Fresh Demo"</strong> (or "Seed Demo Data").
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Green success panel confirms all seeded collections: 20 patients, invoices, cards, pharmacy bills, appointments, queue tokens.
+      </div></div>
     </div>
   </div>
 
-  <!-- 12. Test Pharmacy -->
-  <div class="section" id="test-pharmacy">
-    <h2><span class="section-num">12</span>Test — Pharmacy Inventory</h2>
+  <!-- 6. Deploy to Vercel -->
+  <div class="deploy-section" id="vercel">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Deploy to Vercel</h2>
+    </div>
+
+    <h3>6.1 Push code to GitHub</h3>
+    <div class="code-block">
+<span class="comment"># Inside the project folder, initialise git if not done</span>
+<span class="cmd">git init</span>
+<span class="cmd">git add .</span>
+<span class="cmd">git commit -m "Initial commit — Dhanvantari Hospital system"</span>
+
+<span class="comment"># Create a new private GitHub repository (via github.com)</span>
+<span class="comment"># Then push to it:</span>
+<span class="cmd">git remote add origin https://github.com/your-username/dhanvantari-hospital.git</span>
+<span class="cmd">git push -u origin main</span>
+    </div>
+    <div class="warn">Make sure <code>.env.local</code> is listed in <code>.gitignore</code> before pushing. Never commit environment variables to a public repository.</div>
+
+    <h3>6.2 Import into Vercel</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Go to <strong>vercel.com</strong> → Sign in → Click <strong>"Add New Project"</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Click <strong>"Import Git Repository"</strong> → Connect your GitHub account if not already connected → Select the <code>dhanvantari-hospital</code> repository.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Vercel auto-detects the framework as <strong>Next.js</strong>. Leave all build settings at their defaults.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        <strong>Before clicking Deploy</strong> — expand the <strong>"Environment Variables"</strong> section. Add every variable from your <code>.env.local</code> file one by one. This is critical — the deployment will fail without Firebase keys.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Set <code>NEXT_PUBLIC_SITE_URL</code> to your intended production URL (e.g., <code>https://www.dhanvantarihospital.in</code>) — even before the domain is configured.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Click <strong>"Deploy"</strong>. Vercel builds the project (usually 2–4 minutes). Watch the build logs for any errors.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        On success, Vercel assigns a URL like <code>dhanvantari-hospital.vercel.app</code>. Open it and verify the homepage loads.
+      </div></div>
+    </div>
+
+    <h3>6.3 Add Firebase Authorized Domain</h3>
+    <p>Firebase Auth requires your Vercel domain to be whitelisted before login will work:</p>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Firebase Console → <strong>Authentication → Settings → Authorized domains</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Click <strong>"Add domain"</strong> → Add <code>dhanvantari-hospital.vercel.app</code>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        After custom domain is configured (Section 8), add the custom domain as well: e.g., <code>www.dhanvantarihospital.in</code>.
+      </div></div>
+    </div>
+    <div class="tip">Without this step, Firebase Auth will throw an "auth/unauthorized-domain" error when staff try to log in from the Vercel URL.</div>
+  </div>
+
+  <!-- 7. Post-Deploy -->
+  <div class="deploy-section" id="postdeploy">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Post-Deploy Verification</h2>
+    </div>
+    <p>After the first successful deployment, run through these checks before handing over to the client:</p>
 
     <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/admin/pharmacy">/admin/pharmacy</a></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Dashboard shows low stock alerts with sample data</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/admin/pharmacy/medicines">/admin/pharmacy/medicines</a> → Click <strong>"Add Medicine"</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Fill: Name, Generic Name, Category, Unit, Cost, Selling Price, Stock, Reorder Level → Save</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Go to <a class="url" href="http://localhost:3000/admin/pharmacy/stock">/admin/pharmacy/stock</a> → Switch to <strong>Dispense</strong> tab</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Select medicine, enter quantity, patient name → Click Dispense</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Go to <strong>Log</strong> tab — movement should appear in history</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Check <a class="url" href="http://localhost:3000/admin/pharmacy/reports">/admin/pharmacy/reports</a> → Expiry tracking view</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Open the deployed URL → verify the homepage loads with the correct hospital name (not a placeholder).
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Go to <code>/login</code> → log in as admin → confirm redirect to <code>/admin</code>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Load demo data from <code>/admin/settings</code> → verify all 4 role logins work (admin, receptionist, pharmacist, doctor).
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Issue a queue token → call next → verify TV display at <code>/queue/display</code> updates.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Create an in-patient card (IPD and OPD) → verify print layout.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Create a hospital invoice → print it → verify it opens correctly.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Submit a test appointment from <code>/appointments</code> → verify it appears in <code>/desk/enquiries</code>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Test patient portal at <code>/portal/login</code> → log in with Google → verify profile page.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Download a backup from <code>/admin/settings</code> → verify the JSON file contains all collections.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Clear demo data (<code>Reset Data</code>) before the client starts using the system with real data.
+      </div></div>
     </div>
   </div>
 
-  <!-- 13. Twilio WhatsApp -->
-  <div class="section" id="twilio">
-    <h2><span class="section-num">13</span>Setup Twilio WhatsApp (Optional)</h2>
-    <p>Skip this for initial testing. Do this when the client wants live WhatsApp messages.</p>
-
-    <h3>13.1 Create Twilio account</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Sign up at <a href="https://www.twilio.com" style="color:#1e3a5f;" target="_blank">twilio.com</a></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Go to Console → copy <strong>Account SID</strong> and <strong>Auth Token</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Paste into <code>.env.local</code>: TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN</div></div>
+  <!-- 8. Domain Setup -->
+  <div class="deploy-section" id="domain">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>Custom Domain Setup</h2>
     </div>
 
-    <h3>13.2 Enable WhatsApp Sandbox (for testing)</h3>
+    <h3>8.1 Add domain in Vercel</h3>
     <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Twilio Console → <strong>Messaging → Try it Out → Send a WhatsApp message</strong></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Follow instructions: send "join [code]" from your phone to the Twilio sandbox number</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Sandbox number is: <code>+1 415 523 8886</code> — this is your TWILIO_WHATSAPP_FROM</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Restart dev server → Issue a token and call next → Check if WhatsApp message arrives</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Vercel Dashboard → Select your project → <strong>Settings → Domains</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Enter your domain (e.g., <code>dhanvantarihospital.in</code>) → Click <strong>Add</strong>. Add both the apex domain and <code>www</code> subdomain.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Vercel will show you the DNS records to add. Copy them — you need to add these at your domain registrar.
+      </div></div>
     </div>
 
-    <h3>13.3 Test WhatsApp Bot</h3>
+    <h3>8.2 Configure DNS at your registrar</h3>
+    <p>Log in to wherever you registered the domain (GoDaddy, Bigrock, Hostinger, etc.) and add these DNS records:</p>
+    <table>
+      <thead><tr><th>Type</th><th>Name / Host</th><th>Value / Points To</th><th>TTL</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>A</td>
+          <td><code>@</code> (apex domain)</td>
+          <td><code>76.76.21.21</code> (Vercel IP)</td>
+          <td>Auto / 3600</td>
+        </tr>
+        <tr>
+          <td>CNAME</td>
+          <td><code>www</code></td>
+          <td><code>cname.vercel-dns.com</code></td>
+          <td>Auto / 3600</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="tip">DNS propagation can take 10 minutes to 48 hours. Once active, Vercel automatically provisions and renews the SSL certificate. No manual SSL configuration needed.</div>
+
+    <h3>8.3 Add domain to Firebase Auth authorized domains</h3>
     <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-content">Set webhook URL in Twilio: <code>https://your-domain.com/api/whatsapp/webhook</code></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">For local testing, use <a href="https://ngrok.com" style="color:#1e3a5f;" target="_blank">ngrok</a>: <code>ngrok http 3000</code> → copy the HTTPS URL</div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Paste in Twilio: Messaging → Sandbox → "When a message comes in" → your ngrok URL + <code>/api/whatsapp/webhook</code></div></div>
-      <div class="step"><div class="step-num"></div><div class="step-content">Send "APPOINTMENT" or "HELP" to the sandbox number → should get an auto-reply</div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Firebase Console → <strong>Authentication → Settings → Authorized domains</strong> → Click <strong>"Add domain"</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Add both: <code>dhanvantarihospital.in</code> and <code>www.dhanvantarihospital.in</code>.
+      </div></div>
+    </div>
+
+    <h3>8.4 Update NEXT_PUBLIC_SITE_URL in Vercel</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Vercel Dashboard → Project → <strong>Settings → Environment Variables</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Update <code>NEXT_PUBLIC_SITE_URL</code> to your final production URL: <code>https://www.dhanvantarihospital.in</code>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Trigger a redeploy: Vercel Dashboard → <strong>Deployments → Redeploy</strong> (latest deployment).
+      </div></div>
     </div>
   </div>
 
-  <!-- 14. Full Checklist -->
-  <div class="section" id="checklist">
-    <h2><span class="section-num">14</span>Full Test Checklist</h2>
-    <p>Use this before handing over to the client:</p>
+  <!-- 9. WhatsApp -->
+  <div class="deploy-section" id="whatsapp">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <h2>WhatsApp Setup via Twilio (Optional)</h2>
+    </div>
+    <p>Skip this section for initial go-live. Add WhatsApp when the client is ready to activate automated patient notifications.</p>
 
-    <h3>Authentication & Roles</h3>
-    <ul class="checklist">
-      <li>Admin login → redirects to /admin with full sidebar</li>
-      <li>Pharmacist login → redirects to /admin/pharmacy with pharmacy-only sidebar</li>
-      <li>Receptionist login → redirects to /desk with Token Queue link</li>
-      <li>Pharmacist cannot access /admin (redirected)</li>
-      <li>Receptionist cannot access /admin (redirected)</li>
-      <li>Receptionist cannot access /admin/pharmacy (redirected)</li>
-      <li>Role assignment via /admin/roles works</li>
-      <li>Logout redirects to /login</li>
-    </ul>
+    <h3>9.1 Create Twilio Account &amp; Get Credentials</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Sign up at <strong>twilio.com</strong> → Verify phone number → Go to Console.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Copy <strong>Account SID</strong> and <strong>Auth Token</strong> from the Console Dashboard.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Add both to Vercel environment variables and to your <code>.env.local</code>:
+        <code>TWILIO_ACCOUNT_SID</code> and <code>TWILIO_AUTH_TOKEN</code>.
+      </div></div>
+    </div>
 
-    <h3>Public Website</h3>
-    <ul class="checklist">
-      <li>Homepage loads with hospital branding from env variables</li>
-      <li>Services, Doctors, About, Contact pages load</li>
-      <li>Patient portal login works</li>
-      <li>Book appointment form works</li>
-    </ul>
+    <h3>9.2 Test with WhatsApp Sandbox (Development)</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Twilio Console → <strong>Messaging → Try it out → Send a WhatsApp message</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Follow instructions to join the sandbox: send <code>join [your-code]</code> from your phone to <code>+14155238886</code>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Set <code>TWILIO_WHATSAPP_FROM=whatsapp:+14155238886</code> in your env vars.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Issue a token from <code>/desk/queue</code> → click Call Next → verify WhatsApp message received.
+      </div></div>
+    </div>
 
-    <h3>Queue System</h3>
-    <ul class="checklist">
-      <li>Issue token — appears in waiting list</li>
-      <li>Call next — token moves to "Now Serving"</li>
-      <li>TV display updates in real-time</li>
-      <li>Audio chime plays on TV display when token changes</li>
-      <li>Patient can check queue status at /queue</li>
-      <li>Token slip prints correctly</li>
-    </ul>
+    <h3>9.3 Production WhatsApp Business Setup</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Apply for a Twilio WhatsApp Business Sender at <strong>Twilio Console → Messaging → WhatsApp senders</strong>.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Provide: business name (Dhanvantari Hospital), Facebook Business Manager ID, website URL.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Twilio submits the approval request to Meta. Approval typically takes 1–5 business days.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        On approval, update <code>TWILIO_WHATSAPP_FROM</code> with the approved WhatsApp number: <code>whatsapp:+91XXXXXXXXXX</code>.
+      </div></div>
+    </div>
 
-    <h3>Desk App</h3>
-    <ul class="checklist">
-      <li>Create in-patient card — expiry date auto-set to +14 days</li>
-      <li>Discharge patient — removed from active list</li>
-      <li>Print patient card — 85×54mm layout</li>
-      <li>Create invoice with multiple line items</li>
-      <li>Discount applies correctly</li>
-      <li>Invoice prints correctly</li>
-      <li>Invoice appears in /desk/bills history</li>
-      <li>Festive wishes campaign saves to Firestore</li>
-    </ul>
-
-    <h3>Pharmacy</h3>
-    <ul class="checklist">
-      <li>Add a medicine — appears in catalog</li>
-      <li>Edit medicine — updates correctly</li>
-      <li>Add stock — stock count increases, movement logged</li>
-      <li>Dispense medicine — stock count decreases</li>
-      <li>Low stock alert appears on dashboard when stock ≤ reorder level</li>
-      <li>Add supplier — appears in list</li>
-      <li>Reports: stock status and expiry tracking show data</li>
-    </ul>
-
-    <h3>WhatsApp (if configured)</h3>
-    <ul class="checklist">
-      <li>Token called → WhatsApp notification sent to patient's phone</li>
-      <li>In-patient card created → card details sent via WhatsApp</li>
-      <li>Festive wishes → bulk WhatsApp sent</li>
-      <li>Bot: send "APPOINTMENT" → auto-reply received</li>
-      <li>Bot: send "HELP" → menu received</li>
-    </ul>
+    <h3>9.4 Configure Webhook for WhatsApp Bot</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        In Twilio Console → <strong>Messaging → Senders → WhatsApp → your sender</strong> → Find "Webhook URL" field.
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Set the webhook URL to: <code>https://www.dhanvantarihospital.in/api/whatsapp/webhook</code>
+      </div></div>
+      <div class="step"><div class="step-num"></div><div class="step-body">
+        Test by sending "HELP" or "APPOINTMENT" to the WhatsApp number. Bot should auto-reply.
+      </div></div>
+    </div>
+    <div class="tip">For local webhook testing, use <strong>ngrok</strong>: run <code>ngrok http 3000</code> and use the HTTPS URL as your Twilio webhook (e.g., <code>https://abc123.ngrok.io/api/whatsapp/webhook</code>).</div>
   </div>
 
-  <div class="card green" style="margin-top:40px;">
-    <h3 style="color:#166534; margin-bottom:6px;">✓ All done!</h3>
-    <p>If all items above pass, the system is ready for the client. Remember to update the branding in <code>.env.local</code> with the actual hospital name, phone, address, and UPI details before handing over.</p>
+  <!-- 10. Route Structure -->
+  <div class="deploy-section" id="routes">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <h2>Route Structure Reference</h2>
+    </div>
+    <p>All application routes and who can access them:</p>
+
+    <div class="route-grid">
+      <div class="route-card">
+        <div class="who">Public — No login</div>
+        <div class="path">/</div>
+        <p>Hospital homepage with hero, departments, stats, blog preview</p>
+      </div>
+      <div class="route-card">
+        <div class="who">Public — No login</div>
+        <div class="path">/departments &nbsp; /services</div>
+        <p>Department and service pages — all 8 departments, 15+ services</p>
+      </div>
+      <div class="route-card">
+        <div class="who">Public — No login</div>
+        <div class="path">/appointments</div>
+        <p>Appointment booking form — no login required</p>
+      </div>
+      <div class="route-card">
+        <div class="who">Public — No login</div>
+        <div class="path">/queue</div>
+        <p>Patient queue position check by phone or token number</p>
+      </div>
+      <div class="route-card">
+        <div class="who">Waiting Room TV</div>
+        <div class="path">/queue/display</div>
+        <p>Full-screen TV display — no header/footer, voice announcements</p>
+      </div>
+      <div class="route-card">
+        <div class="who">Public — No login</div>
+        <div class="path">/reviews/submit</div>
+        <p>Patient review submission — standalone page, no website nav</p>
+      </div>
+      <div class="route-card">
+        <div class="who">Patients (Google login)</div>
+        <div class="path">/portal</div>
+        <p>Patient portal — appointments, records, profile (Google Sign-In)</p>
+      </div>
+      <div class="route-card">
+        <div class="who">Staff (Email login)</div>
+        <div class="path">/login</div>
+        <p>Single staff login page — redirects by role on success</p>
+      </div>
+      <div class="route-card">
+        <div class="who">Admin only</div>
+        <div class="path">/admin</div>
+        <p>Admin dashboard, analytics, blog, gallery, reviews, roles, settings</p>
+      </div>
+      <div class="route-card">
+        <div class="who">Receptionist + Admin</div>
+        <div class="path">/desk</div>
+        <p>Desk panel — queue, cards, billing, enquiries, appointments, wishes</p>
+      </div>
+      <div class="route-card">
+        <div class="who">Doctor + Admin</div>
+        <div class="path">/doctor</div>
+        <p>Doctor queue view — call next, serve, done, skip. Read-only records.</p>
+      </div>
+      <div class="route-card">
+        <div class="who">Pharmacist + Admin</div>
+        <div class="path">/admin/pharmacy</div>
+        <p>Pharmacy ERP — medicines, stock, billing, suppliers, reports</p>
+      </div>
+    </div>
+
+    <div class="warn" style="margin-top:20px;">
+      <strong>Role redirect behaviour:</strong> If a user navigates to a route outside their role, the app redirects them to their own panel (e.g., receptionist trying <code>/admin</code> is sent to <code>/desk/queue</code>). Firestore security rules enforce this at the data layer as well — not just the UI.
+    </div>
+  </div>
+
+  <!-- 11. Deployment Checklist -->
+  <div class="deploy-section" id="checklist">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <h2>Deployment Checklist</h2>
+    </div>
+    <div class="card blue" style="margin-bottom:20px;">
+      <p>Use this checklist for every fresh deployment or environment setup.</p>
+    </div>
+    <ul class="checklist">
+      <li class="group">Firebase Setup</li>
+      <li>Firebase project created (separate project for production — not the same as dev)</li>
+      <li>Email/Password authentication enabled in Firebase Auth</li>
+      <li>Google Sign-In enabled in Firebase Auth (for patient portal)</li>
+      <li>Firestore database created in asia-south1 (Mumbai)</li>
+      <li>Firestore security rules deployed from <code>firestore.rules</code></li>
+      <li>Firebase Storage enabled and storage rules deployed from <code>storage.rules</code></li>
+      <li>Firebase web app registered and config keys copied</li>
+
+      <li class="group">Environment Variables</li>
+      <li>All <code>NEXT_PUBLIC_FIREBASE_*</code> variables filled in <code>.env.local</code></li>
+      <li>All hospital branding variables set (name, phone, address, email, WhatsApp)</li>
+      <li><code>RESEND_API_KEY</code> obtained from resend.com and added</li>
+      <li><code>NEXT_PUBLIC_SITE_URL</code> set to production domain URL</li>
+      <li><code>REVALIDATION_SECRET</code> set to a unique random string</li>
+      <li>All env vars added to Vercel project settings (not just .env.local)</li>
+      <li><code>.env.local</code> is NOT committed to Git (in .gitignore)</li>
+
+      <li class="group">First Admin User</li>
+      <li>Admin user created in Firebase Auth → UID copied</li>
+      <li>Firestore <code>userRoles/{uid}</code> document created with <code>role: "admin"</code></li>
+      <li>Admin login tested — redirects to <code>/admin</code> with full sidebar</li>
+      <li>All other staff accounts created from <code>/admin/roles</code></li>
+      <li>All 4 role logins tested and redirected correctly</li>
+
+      <li class="group">Vercel Deployment</li>
+      <li>Code pushed to private GitHub repository</li>
+      <li>Repository imported into Vercel and deployed</li>
+      <li>Build completed successfully (no build errors in Vercel logs)</li>
+      <li>Vercel deployment URL tested — homepage loads correctly</li>
+      <li>Vercel URL added to Firebase Auth authorized domains</li>
+
+      <li class="group">Custom Domain</li>
+      <li>Domain registered (e.g., dhanvantarihospital.in)</li>
+      <li>A record and CNAME added at domain registrar pointing to Vercel</li>
+      <li>Domain added in Vercel project → SSL certificate issued automatically</li>
+      <li>Custom domain added to Firebase Auth authorized domains</li>
+      <li><code>NEXT_PUBLIC_SITE_URL</code> updated to production domain in Vercel env vars</li>
+      <li>Redeployment triggered after env var update</li>
+
+      <li class="group">Content &amp; Branding</li>
+      <li>Hospital logo at <code>/public/images/logo.jpg</code></li>
+      <li>Emergency phone number correct on header banner</li>
+      <li>Doctor profiles filled with real names, credentials, specialties</li>
+      <li>Billing quick-add services configured for hospital's actual charges</li>
+      <li>Medicine catalog populated with core medicines</li>
+
+      <li class="group">Post-Launch</li>
+      <li>Demo data loaded, all modules tested end-to-end</li>
+      <li>Demo data cleared before client starts using the system</li>
+      <li>First real backup downloaded and stored safely</li>
+      <li>Staff training completed — admin, receptionist, pharmacist panels</li>
+      <li>Client has credentials for all staff accounts</li>
+      <li>Twilio WhatsApp configured (if requested)</li>
+    </ul>
+
+    <div class="success" style="margin-top:28px;">
+      <strong>All done.</strong> Once all items above are checked, the system is live and ready for Dhanvantari Hospital to operate fully. Reach out to Vwebstudio for any post-launch support or questions.
+    </div>
   </div>
 
 </div>

@@ -3,286 +3,741 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quotation — Dhanvantari Hospital Digital System</title>
+  <title>Quotation — Dhanvantari Hospital Digital Management System</title>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Lato', sans-serif; color: #1e293b; line-height: 1.7; font-size: 14px; }
+    body { font-family: 'Lato', sans-serif; color: #1e293b; line-height: 1.7; font-size: 14px; background: #f8fafc; }
 
+    /* Header */
     .header {
-      background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%);
+      background: linear-gradient(135deg, #0d2240 0%, #1e3a5f 60%, #2d5a8e 100%);
       color: #fff;
-      padding: 40px;
+      padding: 40px 48px;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 24px;
     }
-    .header h1 { font-size: 1.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; }
-    .header .subtitle { font-size: 0.75rem; color: rgba(255,255,255,0.6); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
-    .header .right { text-align: right; }
-    .header .right .doc-title { font-size: 1.4rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.15em; }
-    .header .right p { font-size: 0.8rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
+    .header .brand h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: #fff;
+    }
+    .header .brand p { font-size: 0.75rem; color: rgba(255,255,255,0.5); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 3px; }
+    .header .doc-info { text-align: right; }
+    .header .doc-info .doc-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #fde68a;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      display: block;
+    }
+    .header .doc-info p { font-size: 0.82rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
+    .header .doc-info .ref { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px; font-family: monospace; letter-spacing: 0.05em; }
 
-    .container { max-width: 880px; margin: 0 auto; padding: 40px; }
+    /* Container */
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 48px 64px; background: #fff; }
 
+    /* Info Grid */
     .info-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 32px;
       margin-bottom: 36px;
       padding-bottom: 28px;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 2px solid #e2e8f0;
     }
-    .info-grid h3 { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #94a3b8; margin-bottom: 6px; }
-    .info-grid p { font-size: 0.9rem; color: #1e293b; }
+    .info-block h3 {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+    .info-block p { font-size: 0.9rem; color: #1e293b; line-height: 1.6; }
+    .info-block .name { font-size: 1rem; font-weight: 900; color: #1e3a5f; margin-bottom: 3px; }
+    .info-block .sub { font-size: 0.8rem; color: #64748b; }
 
-    table { width: 100%; border-collapse: collapse; margin-bottom: 28px; }
+    /* Section heading */
+    .table-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #64748b;
+      margin-bottom: 12px;
+      margin-top: 32px;
+      display: block;
+    }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
     thead th {
-      text-align: left; padding: 10px 14px;
-      background: #1e3a5f; color: #fff; font-weight: 700;
-      text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.08em;
+      text-align: left;
+      padding: 10px 14px;
+      background: #1e3a5f;
+      color: #fff;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
     }
     thead th:last-child { text-align: right; }
-    tbody td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; font-size: 0.85rem; }
-    tbody td:last-child { text-align: right; font-weight: 700; }
+    tbody td { padding: 11px 14px; border-bottom: 1px solid #e2e8f0; font-size: 0.86rem; vertical-align: top; }
+    tbody td:last-child { text-align: right; font-weight: 700; white-space: nowrap; }
     tbody tr:nth-child(even) td { background: #f8fafc; }
-    tbody .section-row td { background: #1e3a5f; color: #fff; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 7px 14px; }
 
-    .totals { text-align: right; margin-bottom: 36px; }
-    .totals .row { display: flex; justify-content: flex-end; gap: 40px; padding: 6px 0; font-size: 0.9rem; }
-    .totals .row.total { font-size: 1.3rem; font-weight: 900; border-top: 2px solid #1e3a5f; padding-top: 12px; margin-top: 8px; color: #1e3a5f; }
-    .totals .label { color: #64748b; min-width: 200px; }
-    .totals .value { font-weight: 700; min-width: 120px; }
-
-    .hosting-box {
-      background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%);
-      color: #fff; padding: 24px; margin-bottom: 36px; border-radius: 8px; text-align: center;
+    .module-row td {
+      background: #1e3a5f !important;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 8px 14px;
     }
-    .hosting-box h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
-    .hosting-box .price { font-size: 2.2rem; font-weight: 900; }
-    .hosting-box .price span { font-size: 0.9rem; font-weight: 400; color: rgba(255,255,255,0.6); }
-    .hosting-box .badge { display: inline-block; margin-top: 10px; padding: 4px 20px; background: rgba(255,255,255,0.15); border-radius: 100px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; }
-    .hosting-box .note { font-size: 0.8rem; color: rgba(255,255,255,0.55); margin-top: 10px; }
+    .module-row td:last-child { text-align: left; }
 
-    .note-box { background: #fef9c3; border: 1px solid #fde047; padding: 14px 18px; border-radius: 8px; margin-bottom: 28px; font-size: 0.82rem; color: #713f12; }
+    .amount-row td {
+      background: #f0f9ff !important;
+      color: #1e3a5f;
+      font-weight: 700;
+      font-size: 0.88rem;
+      border-top: 2px solid #bfdbfe;
+    }
+    .amount-row td:last-child { font-size: 1rem; }
 
-    .payment-summary { background: #f8fafc; border: 1px solid #e2e8f0; padding: 24px; margin-bottom: 36px; border-radius: 8px; }
-    .payment-summary h3 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 14px; }
-    .payment-summary .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.85rem; }
-    .payment-summary .row.bold { font-weight: 900; font-size: 1rem; border-top: 1px solid #e2e8f0; padding-top: 10px; margin-top: 6px; color: #1e3a5f; }
+    td .desc { font-size: 0.78rem; color: #64748b; margin-top: 2px; font-weight: 400; }
+    td .included { font-size: 0.72rem; color: #16a34a; font-weight: 700; }
 
-    .terms h3 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 12px; }
-    .terms ul { list-style: none; }
-    .terms li { padding: 5px 0 5px 16px; font-size: 0.85rem; color: #475569; position: relative; }
-    .terms li::before { content: ''; position: absolute; left: 0; top: 12px; width: 5px; height: 5px; background: #1e3a5f; border-radius: 50%; }
+    /* Totals */
+    .totals-section {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 24px 28px;
+      margin: 28px 0;
+    }
+    .totals-section .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .totals-section .total-row:last-child { border-bottom: none; }
+    .totals-section .total-row .lbl { color: #475569; }
+    .totals-section .total-row .val { font-weight: 700; color: #1e293b; }
+    .totals-section .total-row.grand {
+      margin-top: 8px;
+      padding-top: 16px;
+      border-top: 2px solid #1e3a5f;
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #1e3a5f;
+    }
+    .totals-section .total-row.grand .lbl { color: #1e3a5f; }
+    .totals-section .total-row.grand .val { font-size: 1.3rem; }
 
-    .footer { background: #1e3a5f; color: rgba(255,255,255,0.6); padding: 28px 40px; text-align: center; }
-    .footer .brand { font-size: 1rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.2em; }
+    /* Recurring costs */
+    .recurring-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .recurring-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px 22px;
+    }
+    .recurring-card h4 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+    .recurring-card .price { font-size: 1.5rem; font-weight: 900; color: #1e3a5f; }
+    .recurring-card .price span { font-size: 0.82rem; font-weight: 400; color: #94a3b8; }
+    .recurring-card .note { font-size: 0.78rem; color: #64748b; margin-top: 6px; }
+    .recurring-card .badge-free {
+      display: inline-block;
+      padding: 3px 12px;
+      background: #dcfce7;
+      color: #166534;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: 100px;
+      margin-top: 6px;
+    }
 
-    @media (max-width: 600px) {
-      .header { flex-direction: column; }
-      .info-grid { grid-template-columns: 1fr; }
+    /* Payment Summary */
+    .payment-box {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%);
+      color: #fff;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin: 28px 0;
+    }
+    .payment-box h3 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 20px;
+    }
+    .payment-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.9rem;
+    }
+    .payment-row:last-child { border-bottom: none; }
+    .payment-row .plbl { color: rgba(255,255,255,0.7); }
+    .payment-row .pval { font-weight: 700; color: #fff; }
+    .payment-row .pval.green { color: #86efac; }
+    .payment-row.advance {
+      margin-top: 8px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      font-size: 1.05rem;
+      font-weight: 900;
+    }
+    .payment-row.advance .plbl { color: #fde68a; }
+    .payment-row.advance .pval { color: #fde68a; font-size: 1.2rem; }
+
+    /* Note boxes */
+    .note-box { background: #fefce8; border: 1px solid #fde047; border-radius: 8px; padding: 14px 18px; margin: 20px 0; font-size: 0.83rem; color: #713f12; line-height: 1.6; }
+    .note-box strong { color: #92400e; }
+    .info-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px 18px; margin: 20px 0; font-size: 0.83rem; color: #0369a1; line-height: 1.6; }
+
+    /* Terms */
+    .terms { margin-top: 32px; }
+    .terms h3 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #64748b;
+      margin-bottom: 14px;
+    }
+    .terms ul { list-style: none; padding: 0; }
+    .terms li {
+      padding: 6px 0 6px 18px;
+      font-size: 0.86rem;
+      color: #475569;
+      position: relative;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .terms li:last-child { border-bottom: none; }
+    .terms li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 14px;
+      width: 6px;
+      height: 6px;
+      background: #1e3a5f;
+      border-radius: 50%;
+    }
+    .terms li strong { color: #1e293b; }
+
+    /* Signature */
+    .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 48px; padding-top: 32px; border-top: 1px solid #e2e8f0; }
+    .sig-block h4 { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 40px; }
+    .sig-block .sig-line { border-bottom: 1px solid #1e3a5f; margin-bottom: 6px; }
+    .sig-block p { font-size: 0.82rem; color: #64748b; }
+    .sig-block strong { font-size: 0.88rem; color: #1e293b; display: block; }
+
+    /* Footer */
+    .footer { background: #0d2240; color: rgba(255,255,255,0.5); padding: 28px 48px; text-align: center; }
+    .footer .brand { font-size: 1rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.22em; }
+    .footer .sub { font-size: 0.72rem; margin-top: 4px; }
+    .footer .conf { font-size: 0.68rem; color: rgba(255,255,255,0.25); margin-top: 12px; }
+
+    @media (max-width: 640px) {
+      .header { flex-direction: column; padding: 28px 24px; }
+      .header .doc-info { text-align: left; }
+      .container { padding: 28px 20px 48px; }
+      .info-grid { grid-template-columns: 1fr; gap: 20px; }
+      .recurring-grid { grid-template-columns: 1fr; }
+      .sig-grid { grid-template-columns: 1fr; gap: 28px; }
     }
     @media print {
-      body { font-size: 11px; }
-      .header, .container { padding: 20px; }
+      body { background: #fff; font-size: 11px; }
+      .footer { padding: 20px 40px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <div class="header">
-    <div>
-      <h1>Vwebstudio</h1>
-      <p class="subtitle">Web Design & Development Studio</p>
+<!-- Header -->
+<div class="header">
+  <div class="brand">
+    <h1>Vwebstudio</h1>
+    <p>Web Design &amp; Development Studio</p>
+  </div>
+  <div class="doc-info">
+    <span class="doc-title">Quotation</span>
+    <p>Date: April 6, 2026</p>
+    <p>Valid Until: May 6, 2026 (30 days)</p>
+    <p class="ref">Ref: VWS/DHANVANTARI/2026-04</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Client & Project Info -->
+  <div class="info-grid">
+    <div class="info-block">
+      <h3>Prepared For</h3>
+      <p class="name">Dhanvantari Hospital</p>
+      <p class="sub">Multi-Specialty Hospital, Mysuru, Karnataka</p>
+      <p class="sub" style="margin-top:4px;">General Medicine &middot; Surgery &middot; Gynecology &middot; Pediatrics<br>Orthopedics &middot; Neurology &middot; Cardiology &middot; Critical Care</p>
     </div>
-    <div class="right">
-      <p class="doc-title">Quotation</p>
-      <p>Date: April 5, 2026</p>
-      <p>Ref: VWS/DHANVANTARI/2026-04</p>
+    <div class="info-block">
+      <h3>Project</h3>
+      <p class="name">Complete Digital Hospital Management System</p>
+      <p class="sub">Website &middot; Token Queue &middot; Desk App &middot; Pharmacy ERP<br>Patient Records &middot; Admin Dashboard &middot; WhatsApp</p>
+      <p class="sub" style="margin-top:6px;">Stack: Next.js &middot; Firebase Firestore &middot; Vercel</p>
     </div>
   </div>
 
-  <div class="container">
+  <!-- Scope & Pricing Table -->
+  <span class="table-label">Scope of Work &amp; Module Pricing</span>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:38%;">Module / Feature</th>
+        <th>What's Included</th>
+        <th style="width:110px;">Amount (INR)</th>
+      </tr>
+    </thead>
+    <tbody>
 
-    <!-- Client Info -->
-    <div class="info-grid">
-      <div>
-        <h3>Prepared For</h3>
-        <p><strong>Dhanvantari Hospital</strong></p>
-        <p>Multi-Specialty Hospital with Emergency Critical Care Unit</p>
-        <p style="margin-top:4px; color:#64748b; font-size:0.82rem;">General Medicine · Surgery · Gynecology · Pediatrics<br>Orthopedics · Neurology · Cardiology · Critical Care</p>
-      </div>
-      <div>
-        <h3>Project</h3>
-        <p><strong>Complete Digital Hospital System</strong></p>
-        <p>Website + Queue + Desk App + WhatsApp + Pharmacy</p>
-      </div>
-    </div>
+      <!-- Module 1 -->
+      <tr class="module-row"><td colspan="3">Module 1 — Hospital Website + Patient Portal</td></tr>
+      <tr>
+        <td>
+          Multi-specialty public website
+          <div class="desc">8 department pages with conditions, services, and FAQs. 15+ service detail pages. Doctor profiles with bio and credentials.</div>
+        </td>
+        <td>Homepage, Departments, Services, Doctors, About, Blog, Gallery, Contact, FAQ, Careers — all pages with SEO metadata</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Online appointment booking
+          <div class="desc">4-step wizard with department, doctor, date, and contact details. Email confirmation via Resend.</div>
+        </td>
+        <td>No login required. Booking saved to Firestore enquiries. Email sent to patient and hospital.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Patient portal (Google Sign-In)
+          <div class="desc">Patients log in with their Google account to access their records.</div>
+        </td>
+        <td>View appointments, linked hospital bills, pharmacy bills, and IPD/OPD cards. Health profile: DOB, blood group, address, emergency contact.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Blog, Gallery, Reviews (admin-managed)
+          <div class="desc">Full CRUD from admin panel — no developer needed to add content.</div>
+        </td>
+        <td>Blog: draft/published. Gallery: by category. Reviews: approval workflow before going public.</td>
+        <td></td>
+      </tr>
+      <tr class="amount-row">
+        <td colspan="2" style="font-weight:700;">Module 1 Total</td>
+        <td>&#8377;35,000</td>
+      </tr>
 
-    <!-- Features & Pricing Table -->
-    <h3 style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;margin-bottom:16px;">Scope of Work & Pricing</h3>
-    <table>
-      <thead><tr><th>Module / Feature</th><th>Details</th><th>Amount</th></tr></thead>
-      <tbody>
-        <tr class="section-row"><td colspan="3">1. Hospital Website</td></tr>
-        <tr><td>8 Department pages with conditions & services</td><td>General Medicine, Surgery, Gynecology, Pediatrics, Orthopedics, Neurology, Cardiology, Critical Care</td><td></td></tr>
-        <tr><td>Doctor profiles (Dr. Ayyapa + 8 specialists)</td><td>Bio, credentials, specialties, contact</td><td></td></tr>
-        <tr><td>15 Service pages with FAQs</td><td>Detailed pages for all services across departments</td><td></td></tr>
-        <tr><td>Online appointment booking + email confirmation</td><td>4-step booking wizard</td><td></td></tr>
-        <tr><td>Patient portal</td><td>Appointments, profile, messages, reviews</td><td></td></tr>
-        <tr><td>Blog, Gallery, Reviews, FAQ, Contact</td><td>Complete content management</td><td>&#8377;30,000</td></tr>
+      <!-- Module 2 -->
+      <tr class="module-row"><td colspan="3">Module 2 — Token Queue System + TV Display</td></tr>
+      <tr>
+        <td>
+          Reception token issuance
+          <div class="desc">Issue by phone number (auto-fills patient name) or PAT card ID. 12 purpose types.</div>
+        </td>
+        <td>Token slip printable (thermal-ready with QR code). Auto-numbered sequentially per day.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          5-stage queue management
+          <div class="desc">Waiting → Called → Serving → Completed / Skipped / No-Show</div>
+        </td>
+        <td>Each state change is logged with timestamp. WhatsApp notification fires on "Called" state. Queue exportable as CSV.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Full-screen TV display
+          <div class="desc">Route: /queue/display — designed for a waiting room monitor.</div>
+        </td>
+        <td>Real-time token updates. Voice announcement via Web Speech API (patient name + token number spoken aloud). Audio chime on each call.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Patient queue check (public)
+          <div class="desc">Route: /queue — no login required.</div>
+        </td>
+        <td>Patient enters phone or token number. System shows queue position and estimated wait time.</td>
+        <td></td>
+      </tr>
+      <tr class="amount-row">
+        <td colspan="2" style="font-weight:700;">Module 2 Total</td>
+        <td>&#8377;25,000</td>
+      </tr>
 
-        <tr class="section-row"><td colspan="3">2. Patient Token Queue + TV Display</td></tr>
-        <tr><td>Token issuance at reception</td><td>12 purpose types (Emergency, Surgery, Gynecology, etc.)</td><td></td></tr>
-        <tr><td>Reception management panel</td><td>Call next, Complete, Skip, No Show, print slip</td><td></td></tr>
-        <tr><td>Doctor-facing view</td><td>Current patient + next 5 in queue</td><td></td></tr>
-        <tr><td>Full-screen TV monitor display</td><td>Real-time updates + audio chime</td><td></td></tr>
-        <tr><td>Patient queue check</td><td>Patients check position by phone/token number</td><td>&#8377;25,000</td></tr>
+      <!-- Module 3 -->
+      <tr class="module-row"><td colspan="3">Module 3 — Desk App (In-Patient Cards + Invoicing)</td></tr>
+      <tr>
+        <td>
+          IPD Room Card (IPD-XXXX)
+          <div class="desc">For admitted in-patients. No expiry — active until discharged.</div>
+        </td>
+        <td>Auto-generates card number and patient ID (PAT-XXXX). Fields: ward, room, bed, doctor, diagnosis, admitted date. Print 85x54mm credit-card format.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          OPD Visit Card (OPD-XXXX)
+          <div class="desc">For outpatient visits. Auto-expires after 14 days.</div>
+        </td>
+        <td>Creating an OPD card auto-issues a queue token for the patient. Print-ready in same 85x54mm format. Shareable via WhatsApp.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Hospital Invoicing (INV-XXXX)
+          <div class="desc">Full billing system for all hospital charges.</div>
+        </td>
+        <td>Quick-add service items (admin-configured). Custom line items. Discount field. Payment status: Paid / Pending / Partial. Print-ready A4. WhatsApp share.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Invoice history &amp; enquiries inbox
+          <div class="desc">Invoice history with search. Unified enquiries: appointment bookings + contact messages.</div>
+        </td>
+        <td>Invoice reprint from history. Enquiries: confirm, mark done, cancel. Filter by type (appointment / contact).</td>
+        <td></td>
+      </tr>
+      <tr class="amount-row">
+        <td colspan="2" style="font-weight:700;">Module 3 Total</td>
+        <td>&#8377;20,000</td>
+      </tr>
 
-        <tr class="section-row"><td colspan="3">3. Desk Application (Reception Panel)</td></tr>
-        <tr><td>Room Card (IPD-XXXX)</td><td>Admitted in-patient card — ward, room, bed, doctor, no expiry, active until discharged</td><td></td></tr>
-        <tr><td>Visit Card (OPD-XXXX)</td><td>OPD follow-up card — 14-day expiry, auto-issues queue token on creation</td><td></td></tr>
-        <tr><td>Print 85×54mm cards with logo</td><td>Both card types printable, share via WhatsApp</td><td></td></tr>
-        <tr><td>Hospital invoice (INV-XXXX)</td><td>Consultation, surgery, room, lab, medicines — print with logo, share via WhatsApp</td><td></td></tr>
-        <tr><td>Invoice history & reprint</td><td>Loads from Firestore — search, reprint</td><td></td></tr>
-        <tr><td>Enquiries inbox</td><td>Appointment requests + contact form messages — unified inbox, confirm/done/cancel</td><td></td></tr>
-        <tr><td>MR / Visitor appointment scheduling</td><td>Schedule medical representative and visitor visits with purpose, meeting-with</td><td></td></tr>
-        <tr><td>Festive wishes blast</td><td>11 occasions — actual WhatsApp sent to all patients with progress bar</td><td>&#8377;20,000</td></tr>
+      <!-- Module 4 -->
+      <tr class="module-row"><td colspan="3">Module 4 — Pharmacy ERP (Inventory + Billing)</td></tr>
+      <tr>
+        <td>
+          Medicine catalog
+          <div class="desc">Full inventory management with all key fields.</div>
+        </td>
+        <td>Brand name, generic name, category, unit, cost price, selling price, batch number, expiry date, reorder level. Real-time search.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Stock management
+          <div class="desc">Stock in / out / adjustment / expired — all with movement log.</div>
+        </td>
+        <td>Stock auto-deducted on pharmacy billing. Reorder alerts on dashboard. Low stock warnings. Expiry alerts: 30/60/90 day.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Pharmacy billing (PHRM-XXXX)
+          <div class="desc">Point-of-sale billing integrated with inventory.</div>
+        </td>
+        <td>Search medicines, add to cart, set quantity. Bill saved to Firestore with stock auto-deducted. Print with logo. Export as CSV.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Supplier management + reports
+          <div class="desc">Suppliers linked to stock purchase records.</div>
+        </td>
+        <td>Supplier list (name, contact, GST). Reports: stock status, expiry tracker, dispensing log with date filter.</td>
+        <td></td>
+      </tr>
+      <tr class="amount-row">
+        <td colspan="2" style="font-weight:700;">Module 4 Total</td>
+        <td>&#8377;25,000</td>
+      </tr>
 
-        <tr class="section-row"><td colspan="3">4. WhatsApp Integration (Twilio)</td></tr>
-        <tr><td>Token-called notification</td><td>Auto WhatsApp when token is called</td><td></td></tr>
-        <tr><td>Admission card on WhatsApp</td><td>Sent on room/visit card creation</td><td></td></tr>
-        <tr><td>Review request via WhatsApp</td><td>After billing or discharge — review link sent</td><td></td></tr>
-        <tr><td>WhatsApp bot (4 keywords)</td><td>APPOINTMENT, CARD, STATUS, HELP — auto-reply</td><td></td></tr>
-        <tr><td>Bulk festive wishes</td><td>Real bulk send with progress bar and campaign history</td><td>&#8377;15,000</td></tr>
+      <!-- Module 5 -->
+      <tr class="module-row"><td colspan="3">Module 5 — Patient Records (Unified View)</td></tr>
+      <tr>
+        <td>
+          Patient list with unified record view
+          <div class="desc">Searchable list. Click any patient to see their full history.</div>
+        </td>
+        <td>4 tabs: IPD/OPD Cards, Hospital Bills, Pharmacy Bills, Appointments. Summary: total spend (hospital + pharmacy), active cards, pending appointments.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Patient auto-creation + search
+          <div class="desc">New patient record created automatically on first card or bill.</div>
+        </td>
+        <td>All records linked by phone number. Search by name or phone. Admin-only patient deletion. CSV export of full patient list.</td>
+        <td></td>
+      </tr>
+      <tr class="amount-row">
+        <td colspan="2" style="font-weight:700;">Module 5 Total</td>
+        <td>&#8377;15,000</td>
+      </tr>
 
-        <tr class="section-row"><td colspan="3">5. Pharmacy Inventory (ERP)</td></tr>
-        <tr><td>Medicine catalog</td><td>Brand, generic, category, unit, pricing, batch, expiry — live from Firestore</td><td></td></tr>
-        <tr><td>Stock management</td><td>Purchase in, dispense out, movement log with patient details</td><td></td></tr>
-        <tr><td>Pharmacy invoice (PHRM-XXXX)</td><td>Medicine POS — search medicines, add to cart, qty +/-, auto stock deduction on save, print with logo</td><td></td></tr>
-        <tr><td>Pharmacy bill history</td><td>All pharmacy bills from Firestore — search, print</td><td></td></tr>
-        <tr><td>Pharmacy reports</td><td>Stock status, expiry alerts (expired/30d/90d), dispensing log with date filter — all from Firestore</td><td></td></tr>
-        <tr><td>Supplier management + Low stock alerts</td><td>Dashboard alerts on low stock, reports accessible to pharmacist</td><td>&#8377;20,000</td></tr>
+      <!-- Module 6 -->
+      <tr class="module-row"><td colspan="3">Module 6 — Admin Dashboard + Analytics</td></tr>
+      <tr>
+        <td>
+          Live statistics dashboard
+          <div class="desc">Real-time cards for all key metrics.</div>
+        </td>
+        <td>Revenue (hospital + pharmacy split), patient count, appointments, active queue, messages, pending reviews. Period filter: Today / This Month / Quarterly / This Year.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Content &amp; billing configuration
+          <div class="desc">Admin-controlled settings — no developer needed.</div>
+        </td>
+        <td>Configure quick-add billing services (name, type, price). Manage blog, gallery, reviews, careers. Staff account creation and role assignment.</td>
+        <td></td>
+      </tr>
+      <tr class="amount-row">
+        <td colspan="2" style="font-weight:700;">Module 6 Total</td>
+        <td>&#8377;10,000</td>
+      </tr>
 
-        <tr class="section-row"><td colspan="3">6. Access Control & Setup</td></tr>
-        <tr><td>4-role login system</td><td>Admin, Receptionist, Pharmacist, Doctor — each sees only their panel, no cross-navigation</td><td></td></tr>
-        <tr><td>Admin creates staff accounts</td><td>Create users and assign roles directly from admin panel — no Firebase Console needed</td><td></td></tr>
-        <tr><td>Patient management</td><td>Manual patient entry + Google Sign-In auto-creates patient records. Search by name/phone</td><td></td></tr>
-        <tr><td>Patient portal — Google Sign-In</td><td>Google login, phone prompt, health profile (DOB, blood group, address, emergency contact)</td><td></td></tr>
-        <tr><td>Env-based branding + Resend email</td><td>Name/phone/address from config. Email via Resend (100/day free)</td><td>&#8377;10,000</td></tr>
-      </tbody>
-    </table>
+      <!-- Module 7 -->
+      <tr class="module-row"><td colspan="3">Module 7 — Data Tools (Backup, Export, Seed)</td></tr>
+      <tr>
+        <td>
+          Backup &amp; Restore
+          <div class="desc">Full data backup downloadable as JSON. Restore from backup file.</div>
+        </td>
+        <td>Covers all 12 Firestore collections. 30-day backup reminder. Restore replaces current data. Preserves user roles and medicine catalog on reset.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Seed Demo Data + Reset
+          <div class="desc">For training and testing — one click to load or clear.</div>
+        </td>
+        <td>Seed: 20 patients with fully linked invoices, cards, pharmacy bills, appointments, and queue tokens. Reset: wipes all transactional data.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          CSV Exports
+          <div class="desc">Download key data as spreadsheets anytime.</div>
+        </td>
+        <td>Patients list, inpatient cards list, queue token log — all exportable from respective pages.</td>
+        <td></td>
+      </tr>
+      <tr class="amount-row">
+        <td colspan="2" style="font-weight:700;">Module 7 Total</td>
+        <td>&#8377;5,000</td>
+      </tr>
 
-    <!-- Totals -->
-    <div class="totals">
-      <div class="row">
-        <span class="label">Hospital Website</span>
-        <span class="value">&#8377;30,000</span>
-      </div>
-      <div class="row">
-        <span class="label">Patient Queue + TV Display</span>
-        <span class="value">&#8377;25,000</span>
-      </div>
-      <div class="row">
-        <span class="label">Desk App (Cards + Billing + Wishes)</span>
-        <span class="value">&#8377;20,000</span>
-      </div>
-      <div class="row">
-        <span class="label">Twilio WhatsApp Bot + Notifications</span>
-        <span class="value">&#8377;15,000</span>
-      </div>
-      <div class="row">
-        <span class="label">Pharmacy Inventory</span>
-        <span class="value">&#8377;20,000</span>
-      </div>
-      <div class="row">
-        <span class="label">Access Control + Content Setup</span>
-        <span class="value">&#8377;10,000</span>
-      </div>
-      <div class="row total">
-        <span class="label">Total Development (One-Time)</span>
-        <span class="value">&#8377;1,20,000</span>
-      </div>
-    </div>
+      <!-- Module 8 -->
+      <tr class="module-row"><td colspan="3">Module 8 — WhatsApp Notifications (Twilio)</td></tr>
+      <tr>
+        <td>
+          Automated notifications
+          <div class="desc">Fires automatically at key patient touchpoints — no staff action needed.</div>
+        </td>
+        <td>Token called alert. Admission card on IPD/OPD card creation. Invoice share link. Review request after billing or discharge.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          Festive wishes bulk blast
+          <div class="desc">11 occasions — Diwali, Eid, New Year, and more.</div>
+        </td>
+        <td>Personalised bulk WhatsApp to all patients with progress bar. Campaign history saved to Firestore.</td>
+        <td></td>
+      </tr>
+      <tr class="amount-row">
+        <td colspan="2" style="font-weight:700;">Module 8 Total</td>
+        <td>&#8377;10,000</td>
+      </tr>
 
-    <!-- Twilio note -->
-    <div class="note-box">
-      <strong>&#9888; Twilio WhatsApp Note:</strong> Twilio charges approximately ₹0.70 per WhatsApp message sent. This is billed directly by Twilio to the hospital — separate from our fee. Sandbox testing is free. Production requires WhatsApp Business approval.
-    </div>
+    </tbody>
+  </table>
 
-    <!-- Domain & Additional Setup -->
-    <h3 style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;margin-bottom:16px;">Additional Setup Costs</h3>
-    <table>
-      <thead><tr><th>Item</th><th>Details</th><th>Cost</th></tr></thead>
-      <tbody>
-        <tr><td>Domain Registration</td><td>e.g. dhanvantarihospital.in (.in / .com) — annual renewal</td><td>&#8377;700 – &#8377;1,500 / year</td></tr>
-        <tr><td>SSL Certificate</td><td>Included — auto-managed and renewed</td><td>Included</td></tr>
-        <tr><td>DNS Configuration</td><td>Domain pointing, email DNS setup</td><td>Included in setup</td></tr>
-        <tr><td>Professional Email</td><td>e.g. info@dhanvantarihospital.in (Google Workspace)</td><td>&#8377;125 / user / month (optional)</td></tr>
-        <tr><td>WhatsApp Messaging</td><td>Per message charge via Twilio (optional feature)</td><td>~&#8377;0.70 / message</td></tr>
-      </tbody>
-    </table>
-
-    <!-- Hosting -->
-    <div class="hosting-box">
-      <h3>Monthly Hosting & Maintenance</h3>
-      <div class="price">&#8377;1,699 <span>/ month</span></div>
-      <div class="badge">&#127881; First 3 Months FREE</div>
-      <p class="note">Includes: server hosting, domain renewal management, SSL, database, security updates, backups & minor content changes</p>
-    </div>
-
-    <!-- Payment Summary -->
-    <div class="payment-summary">
-      <h3>Payment Summary</h3>
-      <div class="row">
-        <span>Development — one-time</span>
-        <span>&#8377;1,20,000</span>
-      </div>
-      <div class="row">
-        <span>Hosting — Months 1 to 3</span>
-        <span style="color:#16a34a; font-weight:700;">FREE</span>
-      </div>
-      <div class="row">
-        <span>Hosting — Month 4 onwards</span>
-        <span>&#8377;1,699 / month</span>
-      </div>
-      <div class="row">
-        <span>Domain registration</span>
-        <span>&#8377;700 – &#8377;1,500 / year</span>
-      </div>
-      <div class="row bold">
-        <span>Advance Payment (50% to start)</span>
-        <span>&#8377;60,000</span>
-      </div>
-    </div>
-
-    <!-- Terms -->
-    <div class="terms">
-      <h3>Terms & Notes</h3>
-      <ul>
-        <li>50% advance (₹60,000) required to begin development</li>
-        <li>Balance 50% (₹60,000) payable on project delivery</li>
-        <li>Estimated delivery: 3–4 weeks from advance payment date</li>
-        <li>2 rounds of revisions included per module</li>
-        <li>2 hours of training on admin panel, desk app, and pharmacy included</li>
-        <li>First 3 months of hosting are complimentary</li>
-        <li>All 8 departments, 15 services, and doctor data pre-filled during setup</li>
-        <li>Hospital name, phone, address, and branding configurable without code changes</li>
-        <li>Twilio WhatsApp account to be set up by hospital — we assist with setup and approval</li>
-        <li>Quotation valid for 30 days from date of issue</li>
-      </ul>
-    </div>
-
+  <!-- Totals -->
+  <div class="totals-section">
+    <div class="total-row"><span class="lbl">Module 1 — Hospital Website + Patient Portal</span><span class="val">&#8377;35,000</span></div>
+    <div class="total-row"><span class="lbl">Module 2 — Token Queue System + TV Display</span><span class="val">&#8377;25,000</span></div>
+    <div class="total-row"><span class="lbl">Module 3 — Desk App (In-Patient Cards + Invoicing)</span><span class="val">&#8377;20,000</span></div>
+    <div class="total-row"><span class="lbl">Module 4 — Pharmacy ERP (Inventory + Billing)</span><span class="val">&#8377;25,000</span></div>
+    <div class="total-row"><span class="lbl">Module 5 — Patient Records (Unified View)</span><span class="val">&#8377;15,000</span></div>
+    <div class="total-row"><span class="lbl">Module 6 — Admin Dashboard + Analytics</span><span class="val">&#8377;10,000</span></div>
+    <div class="total-row"><span class="lbl">Module 7 — Data Tools (Backup, Export, Seed)</span><span class="val">&#8377;5,000</span></div>
+    <div class="total-row"><span class="lbl">Module 8 — WhatsApp Notifications (Twilio)</span><span class="val">&#8377;10,000</span></div>
+    <div class="total-row grand"><span class="lbl">Total Development — One-Time</span><span class="val">&#8377;1,45,000</span></div>
   </div>
 
-  <div class="footer">
-    <p class="brand">Vwebstudio</p>
-    <p style="margin-top:6px;">Web Design & Development Studio</p>
-    <p style="margin-top:12px; font-size:0.72rem; color:rgba(255,255,255,0.3);">Confidential — prepared for Dhanvantari Hospital · Ref: VWS/DHANVANTARI/2026-04</p>
+  <div class="note-box">
+    <strong>WhatsApp Messaging Costs (Twilio):</strong> Twilio charges approximately &#8377;0.70 per WhatsApp message sent. This is billed directly by Twilio to the hospital — it is separate from our development fee. Sandbox testing is free. Production use requires WhatsApp Business approval (we assist with this). Festive wishes are bulk messages and may have volume pricing.
   </div>
+
+  <!-- Recurring Costs -->
+  <span class="table-label">Recurring Costs</span>
+  <div class="recurring-grid">
+    <div class="recurring-card">
+      <h4>Vercel Hosting Setup</h4>
+      <div class="price">&#8377;2,499 <span>/ month</span></div>
+      <span class="badge-free">First Month Free</span>
+      <p class="note">Vercel Pro hosting for Next.js. Includes global CDN, SSL, automatic deployments. Month 1 is complimentary.</p>
+    </div>
+    <div class="recurring-card">
+      <h4>Annual Maintenance</h4>
+      <div class="price">&#8377;12,000 <span>/ year</span></div>
+      <p class="note" style="margin-top:12px;">Covers minor content updates, security patches, dependency upgrades, and up to 4 hours of support per year.</p>
+    </div>
+  </div>
+
+  <!-- Additional Setup Costs Table -->
+  <span class="table-label">Additional Setup Costs (One-Time / Annual)</span>
+  <table>
+    <thead>
+      <tr><th>Item</th><th>Details</th><th>Cost</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Domain Registration</td>
+        <td>e.g. dhanvantarihospital.in or .com — billed annually on renewal</td>
+        <td>&#8377;700 – &#8377;1,500 / year</td>
+      </tr>
+      <tr>
+        <td>SSL Certificate</td>
+        <td>Auto-managed and renewed by Vercel — no action needed</td>
+        <td><span class="included">Included</span></td>
+      </tr>
+      <tr>
+        <td>DNS Configuration</td>
+        <td>Domain pointing, email DNS (SPF, DKIM) setup — done by us</td>
+        <td><span class="included">Included in setup</span></td>
+      </tr>
+      <tr>
+        <td>Firebase (Firestore + Auth)</td>
+        <td>Free tier covers most hospital workloads. Paid plan only if usage exceeds free limits.</td>
+        <td><span class="included">Free tier sufficient</span></td>
+      </tr>
+      <tr>
+        <td>Professional Email</td>
+        <td>e.g. info@dhanvantarihospital.in (Google Workspace) — optional</td>
+        <td>&#8377;125 / user / month</td>
+      </tr>
+      <tr>
+        <td>WhatsApp Business Messaging</td>
+        <td>Per-message charge via Twilio — direct Twilio billing to hospital</td>
+        <td>~&#8377;0.70 / message</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Payment Summary -->
+  <div class="payment-box">
+    <h3>Payment Schedule</h3>
+    <div class="payment-row">
+      <span class="plbl">Development — one-time total</span>
+      <span class="pval">&#8377;1,45,000</span>
+    </div>
+    <div class="payment-row">
+      <span class="plbl">50% Advance (to begin development)</span>
+      <span class="pval">&#8377;72,500</span>
+    </div>
+    <div class="payment-row">
+      <span class="plbl">50% On Delivery (on project handover)</span>
+      <span class="pval">&#8377;72,500</span>
+    </div>
+    <div class="payment-row">
+      <span class="plbl">Vercel Hosting — Month 1</span>
+      <span class="pval green">FREE</span>
+    </div>
+    <div class="payment-row">
+      <span class="plbl">Vercel Hosting — Month 2 onwards</span>
+      <span class="pval">&#8377;2,499 / month</span>
+    </div>
+    <div class="payment-row">
+      <span class="plbl">Annual Maintenance (Year 1 — optional)</span>
+      <span class="pval">&#8377;12,000 / year</span>
+    </div>
+    <div class="payment-row advance">
+      <span class="plbl">Amount Due to Start</span>
+      <span class="pval">&#8377;72,500</span>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <strong>Payment Methods:</strong> Bank transfer (IMPS/NEFT/RTGS), UPI, or cheque in favour of Vwebstudio. A formal invoice will be issued on receipt of advance payment. GST applicable as per prevailing rates if applicable.
+  </div>
+
+  <!-- Terms -->
+  <div class="terms">
+    <h3>Terms &amp; Conditions</h3>
+    <ul>
+      <li><strong>50% advance payment</strong> (&#8377;72,500) required before development begins. Balance payable on project delivery and client sign-off.</li>
+      <li><strong>Delivery timeline:</strong> 3–4 weeks from the date of advance payment and receipt of all required content (logo, doctor profiles, hospital details).</li>
+      <li><strong>Revisions:</strong> 2 rounds of revisions included per module. Additional changes beyond scope will be quoted separately.</li>
+      <li><strong>Training included:</strong> 2-hour hands-on training session for admin panel, desk app, and pharmacy — conducted remotely or on-site in Mysuru.</li>
+      <li><strong>Content setup included:</strong> All 8 departments, 15+ service pages, and doctor profile data pre-filled during setup from content provided by hospital.</li>
+      <li><strong>Branding:</strong> Hospital name, phone, address, logo, and WhatsApp number configurable without code changes via environment variables.</li>
+      <li><strong>WhatsApp (Twilio):</strong> Hospital to create a Twilio account. We assist with setup and WhatsApp Business verification at no additional charge.</li>
+      <li><strong>Data ownership:</strong> All Firestore data belongs to the hospital. Full backup downloadable at any time from the admin panel.</li>
+      <li><strong>Quotation validity:</strong> This quotation is valid for 30 days from the date of issue (valid until May 6, 2026). Prices may be revised after this date.</li>
+      <li><strong>Source code:</strong> Delivered via private GitHub repository. Hospital retains access to the repository on full payment.</li>
+    </ul>
+  </div>
+
+  <!-- Signature -->
+  <div class="sig-grid">
+    <div class="sig-block">
+      <h4>For Vwebstudio</h4>
+      <div class="sig-line"></div>
+      <strong>Authorised Signatory</strong>
+      <p>Vwebstudio</p>
+      <p>Date: ____________________</p>
+    </div>
+    <div class="sig-block">
+      <h4>For Dhanvantari Hospital</h4>
+      <div class="sig-line"></div>
+      <strong>Authorised Signatory</strong>
+      <p>Dhanvantari Hospital, Mysuru</p>
+      <p>Date: ____________________</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <div class="brand">Vwebstudio</div>
+  <div class="sub">Web Design &amp; Development Studio</div>
+  <div class="conf">Confidential — Prepared exclusively for Dhanvantari Hospital, Mysuru &middot; Ref: VWS/DHANVANTARI/2026-04 &middot; Valid until May 6, 2026</div>
+</div>
 
 </body>
 </html>

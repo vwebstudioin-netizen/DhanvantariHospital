@@ -3,366 +3,827 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dhanvantari Hospital — Feature Brochure</title>
+  <title>Dhanvantari Hospital — Digital Management System Brochure</title>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Lato', sans-serif; color: #1e293b; line-height: 1.8; }
 
-    .hero { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%); color: #fff; text-align: center; padding: 80px 24px; }
-    .hero .tag { display: inline-block; padding: 6px 20px; border: 1px solid rgba(255,255,255,0.3); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.8); margin-bottom: 20px; border-radius: 100px; }
-    .hero h1 { font-size: 3rem; font-weight: 900; letter-spacing: 0.05em; margin-bottom: 8px; }
-    .hero .tagline { font-size: 1.1rem; color: #fde68a; font-weight: 700; margin-bottom: 10px; }
-    .hero p { color: rgba(255,255,255,0.75); font-size: 0.95rem; max-width: 600px; margin: 0 auto; }
-
-    .emergency { background: #dc2626; color: #fff; text-align: center; padding: 12px 24px; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.05em; }
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #0d2240 0%, #1e3a5f 50%, #2d5a8e 100%);
+      color: #fff;
+      text-align: center;
+      padding: 96px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 70% 30%, rgba(253,230,138,0.07) 0%, transparent 60%);
+    }
+    .hero .tag {
+      display: inline-block;
+      padding: 6px 22px;
+      border: 1px solid rgba(253,230,138,0.4);
+      background: rgba(253,230,138,0.08);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: #fde68a;
+      margin-bottom: 28px;
+      border-radius: 100px;
+    }
+    .hero h1 {
+      font-size: 3.2rem;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      margin-bottom: 16px;
+      line-height: 1.15;
+    }
+    .hero h1 span { color: #fde68a; }
+    .hero .tagline {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.85);
+      max-width: 640px;
+      margin: 0 auto 36px;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+    .hero-stats {
+      display: inline-flex;
+      gap: 0;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .hero-stat {
+      padding: 18px 32px;
+      border-right: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
+    .hero-stat:last-child { border-right: none; }
+    .hero-stat .num { font-size: 1.8rem; font-weight: 900; color: #fde68a; display: block; line-height: 1; }
+    .hero-stat .lbl { font-size: 0.72rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; display: block; }
 
     .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
-    .section { padding: 56px 0; }
+    .section { padding: 72px 0; }
     .section-dark { background: #0f172a; color: #fff; }
     .section-muted { background: #f8fafc; }
-    .section-title { font-size: 1.5rem; font-weight: 900; color: #1e3a5f; margin-bottom: 6px; }
-    .section-dark .section-title { color: #93c5fd; }
-    .section-sub { color: #64748b; margin-bottom: 36px; font-size: 0.9rem; }
-    .section-dark .section-sub { color: #94a3b8; }
+    .section-navy { background: #1e3a5f; color: #fff; }
 
-    /* Departments */
-    .dept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
-    .dept-card { background: #fff; border: 1px solid #e2e8f0; border-left: 4px solid #1e3a5f; padding: 16px 18px; border-radius: 0 8px 8px 0; }
-    .dept-card.emergency { border-left-color: #dc2626; background: #fff5f5; }
-    .dept-card h3 { font-size: 0.9rem; font-weight: 700; color: #1e3a5f; margin-bottom: 3px; }
-    .dept-card.emergency h3 { color: #dc2626; }
-    .dept-card p { font-size: 0.78rem; color: #64748b; }
+    .section-label {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #fde68a;
+      margin-bottom: 10px;
+    }
+    .section-label.dark { color: #1e3a5f; }
+    .section-title { font-size: 2rem; font-weight: 900; color: #1e3a5f; margin-bottom: 10px; line-height: 1.2; }
+    .section-dark .section-title, .section-navy .section-title { color: #fff; }
+    .section-sub { color: #64748b; font-size: 0.95rem; max-width: 620px; }
+    .section-dark .section-sub, .section-navy .section-sub { color: rgba(255,255,255,0.65); }
+    .centered { text-align: center; }
+    .centered .section-sub { margin: 0 auto; }
 
-    /* Features */
-    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
-    .feature-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px; }
-    .feature-card:hover { border-color: #1e3a5f; box-shadow: 0 4px 16px rgba(30,58,95,0.07); }
-    .feature-card .icon { font-size: 1.8rem; margin-bottom: 10px; }
-    .feature-card h3 { font-size: 0.9rem; font-weight: 700; color: #1e3a5f; margin-bottom: 5px; }
-    .feature-card p { font-size: 0.8rem; color: #64748b; }
+    /* Value Props */
+    .value-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 48px; }
+    .value-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 28px;
+      transition: box-shadow 0.2s, border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .value-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #1e3a5f, #2d5a8e);
+    }
+    .value-card:hover { box-shadow: 0 8px 32px rgba(30,58,95,0.1); border-color: #cbd5e1; }
+    .value-card .icon { font-size: 2rem; margin-bottom: 14px; display: block; }
+    .value-card h3 { font-size: 1rem; font-weight: 900; color: #1e3a5f; margin-bottom: 8px; }
+    .value-card p { font-size: 0.86rem; color: #475569; line-height: 1.7; }
+
+    /* Role Cards */
+    .role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 48px; }
+    .role-card { border-radius: 12px; padding: 28px; }
+    .role-card.admin { background: linear-gradient(135deg, #f5f3ff, #ede9fe); border: 1px solid #c4b5fd; }
+    .role-card.receptionist { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #86efac; }
+    .role-card.pharmacist { background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #93c5fd; }
+    .role-card.doctor { background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 1px solid #fcd34d; }
+    .role-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .role-card.admin .role-badge { background: #7c3aed; color: #fff; }
+    .role-card.receptionist .role-badge { background: #16a34a; color: #fff; }
+    .role-card.pharmacist .role-badge { background: #1d4ed8; color: #fff; }
+    .role-card.doctor .role-badge { background: #d97706; color: #fff; }
+    .role-card h3 { font-size: 1rem; font-weight: 900; color: #1e293b; margin-bottom: 6px; }
+    .role-card .role-desc { font-size: 0.82rem; color: #64748b; margin-bottom: 14px; font-style: italic; }
+    .role-card ul { padding-left: 0; list-style: none; }
+    .role-card li {
+      font-size: 0.83rem;
+      color: #374151;
+      padding: 4px 0;
+      padding-left: 18px;
+      position: relative;
+    }
+    .role-card li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 11px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.5;
+    }
+    .role-card.admin li::before { background: #7c3aed; }
+    .role-card.receptionist li::before { background: #16a34a; }
+    .role-card.pharmacist li::before { background: #1d4ed8; }
+    .role-card.doctor li::before { background: #d97706; }
+
+    /* Patient Journey */
+    .journey { margin-top: 56px; }
+    .journey-step {
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      padding: 28px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+    }
+    .journey-step:last-child { border-bottom: none; }
+    .journey-num {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e3a5f, #2d5a8e);
+      border: 2px solid rgba(253,230,138,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #fde68a;
+      flex-shrink: 0;
+    }
+    .journey-body h3 { font-size: 1rem; font-weight: 900; color: #fff; margin-bottom: 6px; }
+    .journey-body p { font-size: 0.86rem; color: rgba(255,255,255,0.65); line-height: 1.7; }
+    .journey-tag {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 3px 12px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: rgba(253,230,138,0.12);
+      color: #fde68a;
+      border: 1px solid rgba(253,230,138,0.2);
+    }
+
+    /* Feature Deep Dive */
+    .feature-block { margin-bottom: 56px; }
+    .feature-block:last-child { margin-bottom: 0; }
+    .feature-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1e3a5f, #2d5a8e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .feature-header h3 { font-size: 1.3rem; font-weight: 900; color: #1e3a5f; }
+    .feature-header p { font-size: 0.86rem; color: #64748b; margin-top: 2px; }
+
+    .feature-points { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .feature-point {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px 18px;
+    }
+    .feature-point strong { display: block; font-size: 0.86rem; color: #1e3a5f; margin-bottom: 4px; }
+    .feature-point span { font-size: 0.8rem; color: #64748b; }
 
     /* Queue flow */
-    .queue-flow { display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; margin-top: 28px; }
-    .queue-step { flex: 1; min-width: 120px; padding: 20px 12px; text-align: center; position: relative; }
-    .queue-step::after { content: '→'; position: absolute; right: -8px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); font-size: 1.2rem; font-weight: 900; }
-    .queue-step:last-child::after { display: none; }
-    .step-badge { display: inline-block; padding: 4px 12px; border-radius: 100px; font-size: 0.7rem; font-weight: 700; margin-bottom: 8px; }
+    .queue-flow { display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; margin-top: 32px; }
+    .queue-step { flex: 1; min-width: 130px; padding: 22px 14px; text-align: center; position: relative; background: rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.07); }
+    .queue-step:last-child { border-right: none; }
+    .step-badge { display: inline-block; padding: 5px 14px; border-radius: 100px; font-size: 0.7rem; font-weight: 700; margin-bottom: 10px; letter-spacing: 0.04em; }
     .badge-wait { background: #dbeafe; color: #1e40af; }
     .badge-call { background: #fef3c7; color: #92400e; }
-    .badge-start { background: #d1fae5; color: #065f46; }
-    .badge-done { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
-    .badge-skip { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
-    .badge-noshow { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
-    .queue-step h4 { font-size: 0.82rem; font-weight: 700; color: #fff; margin-bottom: 3px; }
-    .queue-step p { font-size: 0.72rem; color: #94a3b8; }
+    .badge-serve { background: #d1fae5; color: #065f46; }
+    .badge-done { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .badge-skip { background: #fff7ed; color: #c2410c; }
+    .queue-step h4 { font-size: 0.86rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .queue-step p { font-size: 0.76rem; color: #94a3b8; line-height: 1.5; }
+    .queue-arrow {
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      color: rgba(255,255,255,0.2);
+      font-size: 1.2rem;
+      font-weight: 900;
+    }
 
-    /* Roles */
-    .role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
-    .role-card { padding: 22px; border-radius: 10px; }
-    .role-card.admin { background: #ede9fe; border: 1px solid #c4b5fd; }
-    .role-card.pharmacist { background: #dbeafe; border: 1px solid #93c5fd; }
-    .role-card.receptionist { background: #dcfce7; border: 1px solid #86efac; }
-    .role-card.doctor { background: #fef3c7; border: 1px solid #fcd34d; }
-    .role-badge { display: inline-block; padding: 3px 14px; border-radius: 100px; font-size: 0.72rem; font-weight: 700; margin-bottom: 10px; }
-    .role-card.admin .role-badge { background: #7c3aed; color: #fff; }
-    .role-card.pharmacist .role-badge { background: #1d4ed8; color: #fff; }
-    .role-card.receptionist .role-badge { background: #16a34a; color: #fff; }
-    .role-card.doctor .role-badge { background: #d97706; color: #fff; }
-    .role-card h3 { font-size: 0.9rem; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
-    .role-card ul { padding-left: 16px; font-size: 0.78rem; color: #475569; }
-    .role-card li { padding: 1px 0; }
+    /* Tech Stack */
+    .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 40px; }
+    .tech-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .tech-card .tech-name { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #fde68a; margin-bottom: 8px; }
+    .tech-card h4 { font-size: 1rem; font-weight: 900; color: #fff; margin-bottom: 8px; }
+    .tech-card p { font-size: 0.82rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
 
-    /* In-patient card visual */
-    .card-visual { background: #fff; border: 2px solid #1e3a5f; border-radius: 8px; padding: 16px 20px; max-width: 340px; margin: 0 auto; font-family: Arial, sans-serif; }
-    .card-visual .cv-header { border-bottom: 1.5px solid #1e3a5f; padding-bottom: 8px; margin-bottom: 10px; }
-    .card-visual .cv-title { font-size: 1rem; font-weight: 900; color: #1e3a5f; text-transform: uppercase; letter-spacing: 1px; }
-    .card-visual .cv-sub { font-size: 0.7rem; color: #64748b; }
-    .card-visual .cv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.78rem; }
-    .cv-label { color: #64748b; }
-    .cv-value { font-weight: 700; }
-    .card-visual .cv-expiry { border-top: 1px solid #e2e8f0; margin-top: 10px; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; }
-    .cv-expiry-date { font-weight: 900; color: #dc2626; font-size: 0.9rem; }
+    /* Implementation */
+    .impl-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 40px; }
+    .impl-step {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .impl-step .step-num {
+      display: inline-flex;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #1e3a5f;
+      color: #fde68a;
+      font-size: 1rem;
+      font-weight: 900;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+    .impl-step h4 { font-size: 0.9rem; font-weight: 700; color: #1e3a5f; margin-bottom: 6px; }
+    .impl-step p { font-size: 0.8rem; color: #64748b; line-height: 1.6; }
 
-    /* Feature table */
-    .feature-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    .feature-table th { text-align: left; padding: 9px 14px; background: #1e3a5f; color: #fff; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; }
-    .feature-table td { padding: 9px 14px; border-bottom: 1px solid #e2e8f0; }
-    .feature-table tr:nth-child(even) td { background: #f8fafc; }
-    .feature-table .cat-row td { background: #1e3a5f; color: #93c5fd; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 14px; }
+    /* CTA Banner */
+    .cta-banner {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%);
+      padding: 64px 24px;
+      text-align: center;
+      color: #fff;
+    }
+    .cta-banner h2 { font-size: 2rem; font-weight: 900; margin-bottom: 14px; }
+    .cta-banner p { font-size: 1rem; color: rgba(255,255,255,0.7); max-width: 520px; margin: 0 auto 32px; line-height: 1.7; }
+    .cta-btn {
+      display: inline-block;
+      padding: 14px 40px;
+      background: #fde68a;
+      color: #1e3a5f;
+      font-size: 0.9rem;
+      font-weight: 900;
+      border-radius: 8px;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
 
-    .footer { background: #1e3a5f; color: rgba(255,255,255,0.6); text-align: center; padding: 40px 24px; }
-    .footer .brand { font-size: 1.1rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.2em; }
+    .divider { height: 1px; background: #e2e8f0; }
+
+    .footer { background: #0d2240; color: rgba(255,255,255,0.55); text-align: center; padding: 48px 24px; }
+    .footer .brand { font-size: 1.3rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.25em; margin-bottom: 6px; }
+    .footer .tagline { font-size: 0.82rem; color: rgba(255,255,255,0.5); }
+    .footer .note { margin-top: 24px; font-size: 0.72rem; color: rgba(255,255,255,0.25); }
 
     @media (max-width: 600px) {
-      .hero h1 { font-size: 2rem; }
+      .hero h1 { font-size: 2.1rem; }
+      .hero-stats { flex-direction: column; }
+      .hero-stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+      .hero-stat:last-child { border-bottom: none; }
       .queue-flow { flex-direction: column; }
-      .queue-step::after { content: '↓'; right: 50%; top: auto; bottom: -12px; transform: none; }
+      .section { padding: 48px 0; }
+      .section-title { font-size: 1.5rem; }
     }
   </style>
 </head>
 <body>
 
-<div class="emergency">🚨 Emergency Treatment for Accident Cases — Available 24 Hours, 7 Days a Week</div>
-
+<!-- Hero -->
 <div class="hero">
   <div class="tag">Digital Hospital Management System</div>
-  <h1>Dhanvantari Hospital</h1>
-  <p class="tagline">Emergency Treatment for Accident Cases Available</p>
-  <p>Complete digital ecosystem — hospital website, smart patient queue, desk management, in-patient cards, billing, WhatsApp automation, and pharmacy inventory — all in one system.</p>
+  <h1>Transform Your<br><span>Hospital Operations</span></h1>
+  <p class="tagline">One complete system — from the moment a patient walks in to the moment they walk out. Built exclusively for Dhanvantari Hospital, Mysuru.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="num">4</span><span class="lbl">Staff Roles</span></div>
+    <div class="hero-stat"><span class="num">8</span><span class="lbl">Departments</span></div>
+    <div class="hero-stat"><span class="num">45+</span><span class="lbl">Features</span></div>
+    <div class="hero-stat"><span class="num">100%</span><span class="lbl">Cloud-Based</span></div>
+  </div>
 </div>
 
-<!-- 8 Departments -->
+<!-- Why This System -->
 <div class="section section-muted">
   <div class="container">
-    <h2 class="section-title" style="text-align:center;">8 Medical Departments</h2>
-    <p class="section-sub" style="text-align:center;">All specialties under one roof</p>
-    <div class="dept-grid">
-      <div class="dept-card"><h3>🩺 General Medicine</h3><p>Diabetes, hypertension, fever, infections, thyroid, respiratory</p></div>
-      <div class="dept-card"><h3>✂️ General Surgery</h3><p>Laparoscopic surgery, trauma, appendix, gallbladder, hernia</p></div>
-      <div class="dept-card"><h3>❤️ Gynecology</h3><p>Antenatal care, delivery, caesarean, PCOD, fibroids</p></div>
-      <div class="dept-card"><h3>👶 Pediatrics</h3><p>Newborn care, vaccinations, growth monitoring, child illness</p></div>
-      <div class="dept-card"><h3>🦴 Orthopedics</h3><p>Fractures, joint replacement, arthritis, sports injuries</p></div>
-      <div class="dept-card"><h3>🧠 Neurology</h3><p>Stroke, epilepsy, migraine, Parkinson's, neuropathy</p></div>
-      <div class="dept-card"><h3>❤️ Cardiology</h3><p>Heart attack, angina, ECG, echocardiography, heart failure</p></div>
-      <div class="dept-card emergency"><h3>🚨 Critical Care & Emergency</h3><p>Accident trauma, ICU, ventilator, sepsis — 24/7 coverage</p></div>
+    <div class="centered">
+      <span class="section-label dark">Why Hospitals Choose This System</span>
+      <h2 class="section-title">Stop losing time, revenue, and patients to paperwork</h2>
+      <p class="section-sub">Every feature in this system was designed around one question: what does your team actually need to run a hospital efficiently, every single day?</p>
+    </div>
+    <div class="value-grid">
+      <div class="value-card">
+        <span class="icon">⚡</span>
+        <h3>Zero-Wait Reception</h3>
+        <p>Your receptionist issues a token in under 10 seconds — patient name auto-fills from their phone number. No manual search, no paper registers, no mistakes.</p>
+      </div>
+      <div class="value-card">
+        <span class="icon">💰</span>
+        <h3>Never Miss a Rupee</h3>
+        <p>Every consultation, procedure, and pharmacy sale is tracked with auto-numbered invoices. The admin dashboard shows you exactly how much you earned today, this month, and this year.</p>
+      </div>
+      <div class="value-card">
+        <span class="icon">📱</span>
+        <h3>Patients Stay Informed</h3>
+        <p>Your token is called? WhatsApp message sent automatically. Just billed? Invoice shared in seconds. Patient experience improves without any extra effort from your staff.</p>
+      </div>
+      <div class="value-card">
+        <span class="icon">🔒</span>
+        <h3>Every Staff Member in Their Lane</h3>
+        <p>The pharmacist sees only pharmacy. The receptionist sees only the desk. Doctors see what they need. Nobody has access to what they shouldn't. No configuration needed.</p>
+      </div>
+      <div class="value-card">
+        <span class="icon">📊</span>
+        <h3>Real Revenue Visibility</h3>
+        <p>Hospital billing and pharmacy billing are tracked separately. Filter by today, this month, or this quarter. Know where your revenue comes from — and where it doesn't.</p>
+      </div>
+      <div class="value-card">
+        <span class="icon">🌐</span>
+        <h3>Your Hospital Online, 24/7</h3>
+        <p>A professional multi-specialty website with appointment booking, patient portal, doctor profiles, and a blog — all managed from the same admin panel, no developer needed.</p>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Token Queue Flow -->
-<div class="section section-dark">
-  <div class="container">
-    <h2 class="section-title" style="text-align:center;">Smart Patient Token Queue</h2>
-    <p class="section-sub" style="text-align:center;">5-stage flow with WhatsApp notification at each step</p>
-    <div class="queue-flow">
-      <div class="queue-step">
-        <div class="step-badge badge-wait">WAITING</div>
-        <h4>Token Issued</h4>
-        <p>Reception issues token. Patient gets slip with number.</p>
-      </div>
-      <div class="queue-step">
-        <div class="step-badge badge-call">CALLED</div>
-        <h4>Call Next</h4>
-        <p>Token called. WhatsApp sent to patient automatically.</p>
-      </div>
-      <div class="queue-step">
-        <div class="step-badge badge-start">SERVING</div>
-        <h4>Start Consultation</h4>
-        <p>Doctor/staff clicks Start — consultation begins.</p>
-      </div>
-      <div class="queue-step">
-        <div class="step-badge badge-done">DONE</div>
-        <h4>Done → Next</h4>
-        <p>Mark complete. Next patient auto-called.</p>
-      </div>
-      <div class="queue-step">
-        <div class="step-badge badge-skip">SKIP</div>
-        <h4>Skip / No Show</h4>
-        <p>Patient absent — skip or mark no-show. Next called.</p>
-      </div>
-    </div>
-    <div style="margin-top:24px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:16px; font-size:0.82rem; color:#94a3b8;">
-      <strong style="color:#fff;">TV Display:</strong> Full-screen waiting room monitor shows current token in real-time with audio chime. Patients can also check their queue position from their phone at <code style="color:#93c5fd;">/queue</code>.
-    </div>
-  </div>
-</div>
-
-<!-- In-Patient Card -->
-<div class="section section-muted">
-  <div class="container">
-    <h2 class="section-title" style="text-align:center;">In-Patient Card — 14-Day Auto-Expiry</h2>
-    <p class="section-sub" style="text-align:center;">Issued at reception, printed in 85×54mm card format, shared via WhatsApp</p>
-    <div class="card-visual">
-      <div class="cv-header">
-        <div class="cv-title">Dhanvantari Hospital</div>
-        <div class="cv-sub">In-Patient Card</div>
-      </div>
-      <div class="cv-grid">
-        <div><span class="cv-label">Card No: </span><span class="cv-value">IPD-0042</span></div>
-        <div><span class="cv-label">Patient ID: </span><span class="cv-value">PAT-1009</span></div>
-        <div style="grid-column:1/-1;"><span class="cv-label">Name: </span><span class="cv-value">Ravi Kumar</span></div>
-        <div><span class="cv-label">Doctor: </span><span>Dr. Ayyapa</span></div>
-        <div><span class="cv-label">Ward: </span><span>General Ward</span></div>
-        <div><span class="cv-label">Room: </span><span>101</span></div>
-        <div style="grid-column:1/-1;"><span class="cv-label">Diagnosis: </span><span>Fracture — Left Femur</span></div>
-        <div><span class="cv-label">Admitted: </span><span>2026-04-05</span></div>
-      </div>
-      <div class="cv-expiry">
-        <span style="font-size:0.7rem;color:#64748b;">Valid until:</span>
-        <span class="cv-expiry-date">2026-04-19</span>
-      </div>
-    </div>
-    <p style="text-align:center; margin-top:16px; font-size:0.8rem; color:#64748b;">
-      <strong>Room Card (IPD-XXXX)</strong> — Admitted patients, no expiry, active until discharged &nbsp;|&nbsp;
-      <strong>Visit Card (OPD-XXXX)</strong> — 14-day expiry, auto-issues a queue token on creation
-    </p>
-  </div>
-</div>
-
-<!-- 4-Role System -->
+<!-- For Each Role -->
 <div class="section">
   <div class="container">
-    <h2 class="section-title" style="text-align:center;">4-Role Staff Access System</h2>
-    <p class="section-sub" style="text-align:center;">Single login page — each role sees only their panel</p>
+    <div class="centered">
+      <span class="section-label dark">Built for Every Member of Your Team</span>
+      <h2 class="section-title">One login. Four roles. Zero confusion.</h2>
+      <p class="section-sub">Every staff member logs in at the same page and sees only their own panel — purpose-built for how they actually work.</p>
+    </div>
     <div class="role-grid">
       <div class="role-card admin">
         <div class="role-badge">Admin</div>
         <h3>Hospital Administrator</h3>
+        <p class="role-desc">Full command over the entire system from a single dashboard.</p>
         <ul>
-          <li>All modules — full access</li>
-          <li>Create & manage staff accounts</li>
-          <li>Assign roles to staff</li>
-          <li>Delete/seed demo data</li>
-          <li>Blog, gallery, settings, analytics</li>
+          <li>Live revenue dashboard with period filters</li>
+          <li>Create and manage all staff accounts</li>
+          <li>Approve patient reviews before they go public</li>
+          <li>Manage blog posts, gallery, and careers page</li>
+          <li>Configure billing services and quick-add items</li>
+          <li>One-click backup and restore of all data</li>
+          <li>Seed demo data for training new staff</li>
         </ul>
       </div>
       <div class="role-card receptionist">
         <div class="role-badge">Receptionist</div>
-        <h3>Reception / Desk</h3>
+        <h3>Reception Desk</h3>
+        <p class="role-desc">Everything needed to run a busy front desk, without leaving one screen.</p>
         <ul>
-          <li>Token queue — call, start, skip, done</li>
-          <li>Room Card (IPD) & Visit Card (OPD)</li>
-          <li>Patients, appointments & enquiries inbox</li>
-          <li>Hospital invoice (INV-XXXX) creation</li>
-          <li>MR / visitor appointment scheduling</li>
-          <li>Festive wishes to all patients</li>
+          <li>Issue and manage the patient token queue</li>
+          <li>Create IPD Room Cards and OPD Visit Cards</li>
+          <li>Generate and print hospital invoices</li>
+          <li>Manage the unified enquiries inbox</li>
+          <li>Book MR and visitor appointments</li>
+          <li>Send festive wishes to all patients via WhatsApp</li>
+          <li>Request reviews via WhatsApp after billing</li>
         </ul>
       </div>
       <div class="role-card pharmacist">
         <div class="role-badge">Pharmacist</div>
-        <h3>Pharmacist</h3>
+        <h3>Pharmacy Team</h3>
+        <p class="role-desc">A complete pharmacy ERP — inventory, billing, and reports in one place.</p>
         <ul>
-          <li>Medicine catalog (brand, generic, batch, expiry)</li>
-          <li>Stock in / out with patient tracking</li>
-          <li>Pharmacy invoice (PHRM-XXXX) — medicine POS</li>
-          <li>Auto stock deduction on billing</li>
-          <li>Supplier management & expiry reports</li>
+          <li>Maintain full medicine catalog with expiry tracking</li>
+          <li>Record stock in, dispense out, and adjustments</li>
+          <li>Create pharmacy bills with auto stock deduction</li>
+          <li>Low stock and expiry alerts at a glance</li>
+          <li>Manage suppliers in Firestore</li>
+          <li>Run reports: stock status, expiry, dispensing log</li>
         </ul>
       </div>
       <div class="role-card doctor">
         <div class="role-badge">Doctor</div>
-        <h3>Doctor</h3>
+        <h3>Doctors</h3>
+        <p class="role-desc">See your queue, manage consultations, access patient records — nothing else to distract you.</p>
         <ul>
-          <li>Token queue — call, start, done</li>
-          <li>View next 3 waiting patients</li>
-          <li>Skip / No Show actions</li>
-          <li>Appointments management</li>
-          <li>Patient records access</li>
+          <li>Live queue view: waiting, called, serving counts</li>
+          <li>Call next, start, complete — all in one click</li>
+          <li>View upcoming patient list before they arrive</li>
+          <li>Access full patient record history</li>
+          <li>Skip or mark no-show without leaving the queue</li>
         </ul>
       </div>
     </div>
   </div>
 </div>
 
-<!-- WhatsApp Automation -->
+<!-- Patient Journey -->
 <div class="section section-dark">
   <div class="container">
-    <h2 class="section-title" style="text-align:center;">WhatsApp Automation (Twilio)</h2>
-    <p class="section-sub" style="text-align:center;">Automatic messages at every patient touchpoint</p>
-    <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-top:8px;">
-      <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:16px;">
-        <p style="font-size:0.85rem; font-weight:700; color:#fff; margin-bottom:6px;">📲 Token Called</p>
-        <p style="font-size:0.78rem; color:#94a3b8;">Auto-message sent when patient's token is called. Includes token number and hospital name.</p>
+    <div class="centered">
+      <span class="section-label">The Patient Journey</span>
+      <h2 class="section-title">From walk-in to follow-up — fully tracked</h2>
+      <p class="section-sub">The system follows every patient through their entire experience at your hospital. Nothing falls through the cracks.</p>
+    </div>
+    <div class="journey">
+      <div class="journey-step">
+        <div class="journey-num">1</div>
+        <div class="journey-body">
+          <h3>Patient Arrives — Token Issued in Seconds</h3>
+          <p>The receptionist enters the patient's phone number. If they've visited before, their name and record auto-fill instantly. A token is issued, a slip is printed, and the patient joins the digital queue — all in under 15 seconds.</p>
+          <span class="journey-tag">Token Queue System</span>
+        </div>
       </div>
-      <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:16px;">
-        <p style="font-size:0.85rem; font-weight:700; color:#fff; margin-bottom:6px;">🏥 Admission Card</p>
-        <p style="font-size:0.78rem; color:#94a3b8;">Card details sent to patient's phone when in-patient card is issued.</p>
+      <div class="journey-step">
+        <div class="journey-num">2</div>
+        <div class="journey-body">
+          <h3>Token Called — Patient Gets WhatsApp Notification</h3>
+          <p>When the patient's turn arrives, "Call Next" is clicked. Their token number and name appear on the full-screen TV display in the waiting room, a voice announcement plays, and a WhatsApp message is sent to their phone — automatically.</p>
+          <span class="journey-tag">TV Display + WhatsApp</span>
+        </div>
       </div>
-      <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:16px;">
-        <p style="font-size:0.85rem; font-weight:700; color:#fff; margin-bottom:6px;">⭐ Review Request</p>
-        <p style="font-size:0.78rem; color:#94a3b8;">After billing or discharge — review link sent to patient. Reviews appear on website after admin approval.</p>
+      <div class="journey-step">
+        <div class="journey-num">3</div>
+        <div class="journey-body">
+          <h3>Admitted? Card Issued and Sent to Their Phone</h3>
+          <p>If the patient is admitted, an IPD Room Card (IPD-XXXX) is created with their ward, room, bed, doctor, and diagnosis. If it's an OPD visit, an OPD Visit Card (OPD-XXXX) is issued with a 14-day validity. Both are printable in credit-card format and shareable via WhatsApp in one click.</p>
+          <span class="journey-tag">In-Patient Card System</span>
+        </div>
       </div>
-      <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:16px;">
-        <p style="font-size:0.85rem; font-weight:700; color:#fff; margin-bottom:6px;">🎉 Festive Wishes</p>
-        <p style="font-size:0.78rem; color:#94a3b8;">Bulk personalised WhatsApp to all patients for Diwali, Eid, New Year, and 8 more occasions.</p>
+      <div class="journey-step">
+        <div class="journey-num">4</div>
+        <div class="journey-body">
+          <h3>Treatment Done — Invoice Generated and Shared</h3>
+          <p>At billing, the receptionist selects pre-configured service items (consultation, lab, surgery, room charges) and adds any custom items. An auto-numbered invoice (INV-XXXX) is generated, printed on A4, and can be shared via WhatsApp to the patient's phone immediately.</p>
+          <span class="journey-tag">Hospital Billing</span>
+        </div>
       </div>
-      <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:16px;">
-        <p style="font-size:0.85rem; font-weight:700; color:#fff; margin-bottom:6px;">🤖 WhatsApp Bot</p>
-        <p style="font-size:0.78rem; color:#94a3b8;">Patients text APPOINTMENT, CARD, STATUS, or HELP — bot replies automatically with relevant info.</p>
+      <div class="journey-step">
+        <div class="journey-num">5</div>
+        <div class="journey-body">
+          <h3>Medicines Dispensed — Stock Auto-Updated</h3>
+          <p>The pharmacist searches for medicines by name, adds them to a pharmacy bill (PHRM-XXXX), and saves. Stock is automatically deducted — no manual stock update needed. If any medicine is running low, the dashboard shows an alert before it becomes a problem.</p>
+          <span class="journey-tag">Pharmacy ERP</span>
+        </div>
       </div>
-      <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:16px;">
-        <p style="font-size:0.85rem; font-weight:700; color:#fff; margin-bottom:6px;">📅 Appointment Reminders</p>
-        <p style="font-size:0.78rem; color:#94a3b8;">Reminders sent before appointments with date, time, and doctor name.</p>
+      <div class="journey-step">
+        <div class="journey-num">6</div>
+        <div class="journey-body">
+          <h3>Review Requested — Reputation Built Automatically</h3>
+          <p>After billing or discharge, the receptionist sends a review request via WhatsApp. The patient submits their rating and feedback. The admin approves it, and it appears on your public website — building your hospital's reputation with zero extra effort.</p>
+          <span class="journey-tag">Patient Reviews + Website</span>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Feature Table -->
+<!-- Feature Deep Dives -->
 <div class="section section-muted">
   <div class="container">
-    <h2 class="section-title" style="text-align:center;">Complete Feature List</h2>
-    <p class="section-sub" style="text-align:center;">Every feature built into the system</p>
-    <table class="feature-table">
-      <thead><tr><th>#</th><th>Feature</th><th>Who Uses It</th></tr></thead>
-      <tbody>
-        <tr class="cat-row"><td colspan="3">Hospital Website</td></tr>
-        <tr><td>1</td><td>8 Department pages with services and conditions</td><td>Public</td></tr>
-        <tr><td>2</td><td>15 Service pages with FAQs</td><td>Public</td></tr>
-        <tr><td>3</td><td>Doctor profiles (Dr. Ayyapa + specialists)</td><td>Public</td></tr>
-        <tr><td>4</td><td>Online appointment booking + email confirmation</td><td>Public</td></tr>
-        <tr><td>5</td><td>Patient portal (Google Sign-In, health profile, records)</td><td>Patients</td></tr>
-        <tr><td>6</td><td>Blog, gallery, reviews, FAQ, contact form</td><td>Public / Admin</td></tr>
+    <div class="centered" style="margin-bottom:56px;">
+      <span class="section-label dark">Feature Deep Dives</span>
+      <h2 class="section-title">The systems that run your hospital</h2>
+      <p class="section-sub">Four core engines working together — each powerful on its own, unstoppable as a whole.</p>
+    </div>
 
-        <tr class="cat-row"><td colspan="3">Token Queue System</td></tr>
-        <tr><td>7</td><td>Issue token (name, phone, purpose selection)</td><td>Receptionist / Admin</td></tr>
-        <tr><td>8</td><td>Call Next → WhatsApp auto-sent to patient</td><td>Receptionist / Doctor</td></tr>
-        <tr><td>9</td><td>Start Consultation button (Waiting → Called → Serving)</td><td>Doctor / Receptionist</td></tr>
-        <tr><td>10</td><td>Done → auto-call next patient</td><td>Doctor / Receptionist</td></tr>
-        <tr><td>11</td><td>Skip patient → auto-call next</td><td>Doctor / Receptionist</td></tr>
-        <tr><td>12</td><td>No Show marking</td><td>Doctor / Receptionist</td></tr>
-        <tr><td>13</td><td>Full-screen TV display — voice announcement of token number & patient name</td><td>Waiting Room</td></tr>
-        <tr><td>14</td><td>Patient queue position check (by phone/token)</td><td>Patients</td></tr>
-        <tr><td>15</td><td>Printable token slip (80mm thermal format)</td><td>Receptionist</td></tr>
+    <!-- Queue -->
+    <div class="feature-block">
+      <div class="feature-header">
+        <div class="feature-icon">🎫</div>
+        <div>
+          <h3>Smart Token Queue System</h3>
+          <p>Replace the paper register and shouting patients' names across a waiting room.</p>
+        </div>
+      </div>
+      <div class="feature-points">
+        <div class="feature-point">
+          <strong>Issue tokens by phone number</strong>
+          <span>Patient name auto-fills from records. No typing, no mistakes, no queues at the desk.</span>
+        </div>
+        <div class="feature-point">
+          <strong>5-stage workflow</strong>
+          <span>Waiting, Called, Serving, Completed, Skipped / No-Show — every state tracked and timestamped.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Full-screen TV display</strong>
+          <span>Mount a monitor in the waiting room. Current token updates in real time with a voice announcement of the patient's name.</span>
+        </div>
+        <div class="feature-point">
+          <strong>WhatsApp on every call</strong>
+          <span>When a token is called, the patient's phone gets a WhatsApp notification automatically — no staff action needed.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Printable token slips</strong>
+          <span>Thermal-ready slip with QR code, token number, and queue position — print from any browser.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Export queue as CSV</strong>
+          <span>Daily queue log available for download — for analysis, compliance, or internal reporting.</span>
+        </div>
+      </div>
+    </div>
 
-        <tr class="cat-row"><td colspan="3">Desk Application</td></tr>
-        <tr><td>16</td><td>Room Card (IPD-XXXX) — admitted in-patients, ward/room/bed, no expiry</td><td>Receptionist / Admin</td></tr>
-        <tr><td>17</td><td>Visit Card (OPD-XXXX) — 14-day expiry, auto-issues queue token</td><td>Receptionist</td></tr>
-        <tr><td>18</td><td>Print both card types (85×54mm) with hospital logo</td><td>Receptionist</td></tr>
-        <tr><td>19</td><td>Discharge / Close card — removes from active list</td><td>Receptionist</td></tr>
-        <tr><td>20</td><td>Hospital invoice (INV-XXXX) — consultation, surgery, room, lab, medicines</td><td>Receptionist / Admin</td></tr>
-        <tr><td>21</td><td>Invoice history — loads from Firestore, search, reprint with logo</td><td>Receptionist</td></tr>
-        <tr><td>22</td><td>Enquiries inbox — appointment requests + contact messages unified</td><td>Receptionist</td></tr>
-        <tr><td>23</td><td>MR / Visitor appointment scheduling (medical representatives)</td><td>Receptionist / Admin</td></tr>
-        <tr><td>24</td><td>Festive wishes — actual WhatsApp bulk send with progress bar (11 occasions)</td><td>Receptionist / Admin</td></tr>
-        <tr><td>25</td><td>Review request via WhatsApp after billing/discharge</td><td>Receptionist</td></tr>
+    <div class="divider" style="margin: 48px 0;"></div>
 
-        <tr class="cat-row"><td colspan="3">Pharmacy Inventory (ERP)</td></tr>
-        <tr><td>26</td><td>Medicine catalog (brand, generic, category, unit, pricing, batch, expiry)</td><td>Pharmacist / Admin</td></tr>
-        <tr><td>27</td><td>Stock management — purchase in, dispense out, movement log</td><td>Pharmacist</td></tr>
-        <tr><td>28</td><td>Pharmacy invoice (PHRM-XXXX) — medicine POS, auto stock deduction</td><td>Pharmacist</td></tr>
-        <tr><td>29</td><td>Pharmacy bill history — search, print with logo</td><td>Pharmacist</td></tr>
-        <tr><td>30</td><td>Supplier management (name, contact, GST)</td><td>Pharmacist / Admin</td></tr>
-        <tr><td>31</td><td>Low stock alerts + expiry tracking (30/60/90 day warnings)</td><td>Pharmacist / Admin</td></tr>
+    <!-- Pharmacy -->
+    <div class="feature-block">
+      <div class="feature-header">
+        <div class="feature-icon">💊</div>
+        <div>
+          <h3>Pharmacy ERP — Inventory, Billing, Reports</h3>
+          <p>A full pharmacy management system without the complexity or the cost of standalone software.</p>
+        </div>
+      </div>
+      <div class="feature-points">
+        <div class="feature-point">
+          <strong>Medicine catalog</strong>
+          <span>Brand name, generic name, category, unit, batch number, expiry date, reorder level — all searchable in real time.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Auto stock deduction</strong>
+          <span>When a pharmacy bill is saved, stock levels are deducted automatically. No manual updates, no discrepancies.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Expiry tracking</strong>
+          <span>Dashboard alerts show medicines expiring in 30, 60, or 90 days. Never dispense expired medicine again.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Supplier management</strong>
+          <span>Maintain a list of suppliers with contact details and GST numbers — linked to stock purchase entries.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Pharmacy billing (PHRM-XXXX)</strong>
+          <span>Search medicines, add quantities, generate a printed bill — all in under a minute. Integrated with patient records.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Dispensing log with date filter</strong>
+          <span>See every stock movement — what was dispensed, to whom, when, and by which batch — with date-range filtering.</span>
+        </div>
+      </div>
+    </div>
 
-        <tr class="cat-row"><td colspan="3">WhatsApp & Reviews</td></tr>
-        <tr><td>32</td><td>Token called notification (Twilio WhatsApp)</td><td>System</td></tr>
-        <tr><td>33</td><td>Admission card on WhatsApp</td><td>System</td></tr>
-        <tr><td>34</td><td>WhatsApp bot — APPOINTMENT, CARD, STATUS, HELP</td><td>Patients</td></tr>
-        <tr><td>35</td><td>Review submission via WhatsApp link (/reviews/submit)</td><td>Patients</td></tr>
-        <tr><td>36</td><td>Admin approves/rejects reviews before publishing</td><td>Admin</td></tr>
-        <tr><td>37</td><td>Star ratings shown on website</td><td>Public</td></tr>
+    <div class="divider" style="margin: 48px 0;"></div>
 
-        <tr class="cat-row"><td colspan="3">Access Control & System</td></tr>
-        <tr><td>38</td><td>4 roles: Admin, Receptionist, Pharmacist, Doctor — isolated panels</td><td>Admin</td></tr>
-        <tr><td>39</td><td>Single login page with role-based redirect</td><td>Staff</td></tr>
-        <tr><td>40</td><td>Create staff accounts from admin panel (no Firebase Console needed)</td><td>Admin</td></tr>
-        <tr><td>41</td><td>Patient portal — Google Sign-In, health profile, appointment history</td><td>Patients</td></tr>
-        <tr><td>42</td><td>TV voice announcement — speaks token number & patient name aloud</td><td>Waiting Room</td></tr>
-        <tr><td>43</td><td>Seed demo data & delete all data (admin settings)</td><td>Admin</td></tr>
-        <tr><td>44</td><td>Resend email for appointment confirmations (100/day free)</td><td>System</td></tr>
-        <tr><td>45</td><td>Branding configurable from environment variables</td><td>Developer</td></tr>
-        <tr><td>44</td><td>Mobile responsive — all pages work on phone</td><td>Everyone</td></tr>
-      </tbody>
-    </table>
+    <!-- Billing -->
+    <div class="feature-block">
+      <div class="feature-header">
+        <div class="feature-icon">🧾</div>
+        <div>
+          <h3>Hospital Billing — Invoicing that Works</h3>
+          <p>No more handwritten bills. Every invoice is numbered, stored, and retrievable in seconds.</p>
+        </div>
+      </div>
+      <div class="feature-points">
+        <div class="feature-point">
+          <strong>Auto-numbered invoices (INV-XXXX)</strong>
+          <span>Sequential, tamper-evident invoice numbers. No duplicates, no gaps, no confusion at the accounts table.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Quick-add service items</strong>
+          <span>Admin configures consultation fee, surgery, room charge, lab tests — receptionist adds them in one click.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Patient auto-fill</strong>
+          <span>Enter a phone number or PAT card ID — patient name, ID, and linked records fill automatically.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Print-ready A4 invoices</strong>
+          <span>Hospital logo, address, patient details, itemized charges, GST-ready — clean professional output every time.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Payment status tracking</strong>
+          <span>Mark invoices as Paid, Pending, or Partial. Invoice history is searchable by patient name, phone, or date.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Share via WhatsApp</strong>
+          <span>Send the invoice link to the patient's WhatsApp immediately after generation — no printing required.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider" style="margin: 48px 0;"></div>
+
+    <!-- Patient Records -->
+    <div class="feature-block">
+      <div class="feature-header">
+        <div class="feature-icon">🗂️</div>
+        <div>
+          <h3>Unified Patient Records</h3>
+          <p>Every patient's complete history — cards, bills, pharmacy, appointments — in one click.</p>
+        </div>
+      </div>
+      <div class="feature-points">
+        <div class="feature-point">
+          <strong>Unified patient view</strong>
+          <span>Click any patient to see their full record: 4 tabs — IPD/OPD Cards, Hospital Bills, Pharmacy Bills, Appointments.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Lifetime spend summary</strong>
+          <span>Total hospital spend and pharmacy spend shown at a glance. Know your most loyal patients.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Linked by phone number</strong>
+          <span>All records across all modules are linked to a single patient ID and phone. One source of truth, always.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Patient auto-created on card issue</strong>
+          <span>When a new card is issued, a patient record is created automatically. No duplicate data entry.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Search and export</strong>
+          <span>Search patients by name or phone. Export the full patient list as a CSV for reporting or backup.</span>
+        </div>
+        <div class="feature-point">
+          <strong>Admin-controlled deletion</strong>
+          <span>Only the admin can delete patient records — ensuring data is never accidentally removed by junior staff.</span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- Technology & Security -->
+<div class="section section-dark">
+  <div class="container">
+    <div class="centered">
+      <span class="section-label">Technology & Security</span>
+      <h2 class="section-title">Built on technology your hospital can trust</h2>
+      <p class="section-sub">The same infrastructure used by banks, government services, and Fortune 500 companies — now running your hospital.</p>
+    </div>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-name">Frontend</div>
+        <h4>Next.js 14</h4>
+        <p>The industry standard for production React applications. Fast, SEO-optimised, and built for scale. Your public website loads in under a second.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-name">Database & Auth</div>
+        <h4>Google Firebase</h4>
+        <p>Firestore stores all patient, billing, pharmacy, and queue data in real time. Firebase Auth handles login with bank-grade security and no passwords stored on our servers.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-name">Hosting</div>
+        <h4>Vercel</h4>
+        <p>Deployed globally on Vercel's edge network. Your system stays online even during peak hours, with 99.99% uptime and automatic SSL certificates.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-name">Messaging</div>
+        <h4>Twilio WhatsApp</h4>
+        <p>Official WhatsApp Business API via Twilio — the only way to send automated WhatsApp messages legally and reliably at scale.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-name">Email</div>
+        <h4>Resend</h4>
+        <p>Appointment confirmation emails sent via Resend — reliable delivery, professional branding, 100 free emails per day included.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-name">Access Control</div>
+        <h4>Firestore Security Rules</h4>
+        <p>Role-based access is enforced at the database level — not just in the UI. Even if someone guesses a URL, they cannot read or write data they're not allowed to.</p>
+      </div>
+    </div>
+    <div style="margin-top:36px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:24px 28px; font-size:0.88rem; color:rgba(255,255,255,0.7); line-height:1.8;">
+      <strong style="color:#fde68a; display:block; margin-bottom:8px;">Your data stays in India.</strong>
+      All Firestore data is stored in the <strong style="color:#fff;">asia-south1 (Mumbai)</strong> region — complying with data residency best practices for Indian healthcare providers. Backups are downloadable as JSON at any time from the admin panel.
+    </div>
+  </div>
+</div>
+
+<!-- Token Queue Visual -->
+<div class="section section-navy">
+  <div class="container">
+    <div class="centered" style="margin-bottom:0;">
+      <span class="section-label">Live Queue Flow</span>
+      <h2 class="section-title">5-stage patient flow — nothing gets lost</h2>
+    </div>
+    <div class="queue-flow" style="margin-top:36px; border:1px solid rgba(255,255,255,0.08); border-radius:10px; overflow:hidden;">
+      <div class="queue-step">
+        <div class="step-badge badge-wait">Waiting</div>
+        <h4>Token Issued</h4>
+        <p>Reception issues token. Slip printed. Patient waits.</p>
+      </div>
+      <div class="queue-step">
+        <div class="step-badge badge-call">Called</div>
+        <h4>Call Next</h4>
+        <p>TV display updates. WhatsApp sent. Voice announcement plays.</p>
+      </div>
+      <div class="queue-step">
+        <div class="step-badge badge-serve">Serving</div>
+        <h4>Consultation</h4>
+        <p>Doctor clicks Start. Timer begins. Patient is in consultation.</p>
+      </div>
+      <div class="queue-step">
+        <div class="step-badge badge-done">Completed</div>
+        <h4>Done</h4>
+        <p>Consultation complete. Next patient auto-called immediately.</p>
+      </div>
+      <div class="queue-step">
+        <div class="step-badge badge-skip">Skipped</div>
+        <h4>Skip / No-Show</h4>
+        <p>Patient absent. Skip or mark no-show. Queue moves forward.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Implementation -->
+<div class="section section-muted">
+  <div class="container">
+    <div class="centered">
+      <span class="section-label dark">Getting Started</span>
+      <h2 class="section-title">Live in days, not months</h2>
+      <p class="section-sub">No servers to set up. No long implementation projects. No disruption to your current operations.</p>
+    </div>
+    <div class="impl-steps">
+      <div class="impl-step">
+        <div class="step-num">1</div>
+        <h4>Discovery Call</h4>
+        <p>We review your workflow, confirm staff structure, and lock down the branding details.</p>
+      </div>
+      <div class="impl-step">
+        <div class="step-num">2</div>
+        <h4>Firebase Setup</h4>
+        <p>Firebase project created, Firestore configured, and all environment variables set — in under a day.</p>
+      </div>
+      <div class="impl-step">
+        <div class="step-num">3</div>
+        <h4>Branding & Data</h4>
+        <p>Hospital name, logo, departments, doctor profiles, and service items pre-filled before handover.</p>
+      </div>
+      <div class="impl-step">
+        <div class="step-num">4</div>
+        <h4>Staff Training</h4>
+        <p>2-hour walkthrough with your team — admin, receptionist, pharmacist, and doctor panels covered.</p>
+      </div>
+      <div class="impl-step">
+        <div class="step-num">5</div>
+        <h4>Go Live</h4>
+        <p>Deployed to Vercel. Custom domain configured. SSL active. Your system is live and ready to use.</p>
+      </div>
+      <div class="impl-step">
+        <div class="step-num">6</div>
+        <h4>Demo Data Available</h4>
+        <p>One-click "Load Demo Data" in settings — 20 patients with fully linked records for training and testing, cleared before go-live.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-banner">
+  <h2>Ready to see it in action?</h2>
+  <p>We'll walk you through a live demo of the complete system — queue, billing, pharmacy, and the admin dashboard — in under 30 minutes.</p>
+  <a href="#" class="cta-btn">Request a Demo</a>
+</div>
+
+<!-- Footer -->
 <div class="footer">
-  <p class="brand">Vwebstudio</p>
-  <p style="margin-top:6px;">Web Design & Development Studio</p>
-  <p style="margin-top:14px; font-size:0.72rem; color:rgba(255,255,255,0.3);">This brochure is confidential — prepared for Dhanvantari Hospital.</p>
+  <div class="brand">Vwebstudio</div>
+  <div class="tagline">Web Design &amp; Development Studio</div>
+  <div class="note">This brochure is confidential — prepared exclusively for Dhanvantari Hospital, Mysuru. &copy; 2026 Vwebstudio. All rights reserved.</div>
 </div>
 
 </body>
