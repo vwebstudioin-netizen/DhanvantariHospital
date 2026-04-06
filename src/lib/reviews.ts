@@ -29,8 +29,12 @@ const COL = "reviews";
 export async function submitReview(
   data: Omit<Review, "id" | "status" | "createdAt">
 ): Promise<string> {
+  // Strip undefined values — Firestore rejects them
+  const clean = Object.fromEntries(
+    Object.entries(data).filter(([, v]) => v !== undefined && v !== "")
+  );
   const ref = await addDoc(collection(db, COL), {
-    ...data,
+    ...clean,
     status: "pending",
     createdAt: Timestamp.now(),
   });
