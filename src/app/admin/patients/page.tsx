@@ -5,7 +5,8 @@ import {
   collection, getDocs, addDoc, orderBy, query, Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Plus, Search, RefreshCw, User, Phone, Mail } from "lucide-react";
+import Link from "next/link";
+import { Plus, Search, RefreshCw, User, Phone, Mail, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Patient {
@@ -160,25 +161,26 @@ export default function AdminPatients() {
                 <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Blood Group</th>
                 <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Source</th>
                 <th className="text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden sm:table-cell">Registered</th>
+                <th className="w-8" />
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={5} className="text-center py-10 text-muted-foreground">
+                <tr><td colSpan={6} className="text-center py-10 text-muted-foreground">
                   {search ? "No patients found." : "No patients yet. Add manually or patients register via the portal."}
                 </td></tr>
               ) : filtered.map((p) => (
-                <tr key={p.id} className="border-b border-border/50 hover:bg-muted/30">
+                <tr key={p.id} className="border-b border-border/50 hover:bg-muted/30 cursor-pointer group">
                   <td className="px-5 py-3">
-                    <div className="flex items-center gap-2">
+                    <Link href={`/admin/patients/${p.id}`} className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                         <User className="w-4 h-4 text-primary" />
                       </div>
                       <div>
-                        <p className="font-medium text-foreground">{p.name}</p>
+                        <p className="font-medium text-foreground group-hover:text-primary transition-colors">{p.name}</p>
                         {p.address && <p className="text-xs text-muted-foreground">{p.address}</p>}
                       </div>
-                    </div>
+                    </Link>
                   </td>
                   <td className="px-5 py-3 hidden sm:table-cell">
                     {p.phone && (
@@ -208,6 +210,9 @@ export default function AdminPatients() {
                   </td>
                   <td className="px-5 py-3 hidden sm:table-cell text-xs text-muted-foreground">
                     {p.createdAt?.toDate?.()?.toLocaleDateString("en-IN") || "—"}
+                  </td>
+                  <td className="px-3 py-3">
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
                   </td>
                 </tr>
               ))}
