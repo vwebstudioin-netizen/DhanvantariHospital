@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { usePatientLookup } from "@/hooks/usePatientLookup";
 import { Plus, Trash2, Printer, IndianRupee } from "lucide-react";
 import { createInvoice } from "@/lib/invoices";
 import { SITE_NAME, HOSPITAL_ADDRESS, CONTACT_PHONE, INVOICE_PAYMENT_METHODS } from "@/lib/constants";
@@ -109,6 +110,16 @@ export default function BillingPage() {
   const [createdInvoice, setCreatedInvoice] = useState<any>(null);
 
   const [patient, setPatient] = useState({ name: "", phone: "", patientId: "", doctorName: "" });
+  const { match: patientMatch, loading: lookingUp } = usePatientLookup(patient.phone, patient.patientId);
+  useEffect(() => {
+    if (!patientMatch) return;
+    setPatient(prev => ({
+      ...prev,
+      name: prev.name || patientMatch.name,
+      phone: prev.phone || patientMatch.phone,
+      doctorName: prev.doctorName || patientMatch.doctorName || "",
+    }));
+  }, [patientMatch]);
   const [items, setItems] = useState<InvoiceItem[]>([]);
   const [discount, setDiscount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<InvoicePaymentMethod>("cash");
@@ -248,6 +259,13 @@ export default function BillingPage() {
               />
             </div>
           ))}
+          {/* Auto-fill indicator */}
+          {lookingUp && patient.phone.replace(/\D/g,"").length === 10 && (
+            <p className="text-xs text-muted-foreground mt-1">Searching patient records…</p>
+          )}
+          {patientMatch && (
+            <p className="text-xs text-green-600 mt-1 font-medium">✓ Patient found: {patientMatch.name}{patientMatch.bloodGroup ? ` · ${patientMatch.bloodGroup}` : ""}</p>
+          )}
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePatientLookup } from "@/hooks/usePatientLookup";
 import { getMedicines } from "@/lib/medicines";
 import { dispense } from "@/lib/stock";
 import { collection, addDoc, getDocs, query, orderBy, Timestamp, runTransaction, doc } from "firebase/firestore";
@@ -92,6 +93,15 @@ export default function PharmacyBillingPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [search, setSearch] = useState("");
   const [patient, setPatient] = useState({ name: "", phone: "", doctorName: "" });
+  const { match: patientMatch, loading: lookingUp } = usePatientLookup(patient.phone);
+  useEffect(() => {
+    if (!patientMatch) return;
+    setPatient(prev => ({
+      ...prev,
+      name: prev.name || patientMatch.name,
+      phone: prev.phone || patientMatch.phone,
+    }));
+  }, [patientMatch]);
   const [discount, setDiscount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<typeof PAYMENT_METHODS[number]>("Cash");
   const [saving, setSaving] = useState(false);
@@ -337,6 +347,12 @@ export default function PharmacyBillingPage() {
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
             ))}
+            {lookingUp && patient.phone.replace(/\D/g,"").length === 10 && (
+              <p className="text-xs text-muted-foreground mt-1">Searching patient records…</p>
+            )}
+            {patientMatch && (
+              <p className="text-xs text-green-600 mt-1 font-medium">✓ Patient found: {patientMatch.name}{patientMatch.bloodGroup ? ` · ${patientMatch.bloodGroup}` : ""}</p>
+            )}
           </div>
 
           <div className="bg-card border border-border rounded-xl p-4 space-y-3">

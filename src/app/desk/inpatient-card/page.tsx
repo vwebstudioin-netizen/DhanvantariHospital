@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePatientLookup } from "@/hooks/usePatientLookup";
 import { format, differenceInDays, addDays } from "date-fns";
 import { Plus, Printer, Phone, XCircle, Search, BedDouble, CalendarCheck } from "lucide-react";
 import { createInPatientCard, getActiveCards, dischargePatient } from "@/lib/inpatient";
@@ -171,6 +172,19 @@ export default function InPatientCardPage() {
     admissionDate: format(new Date(), "yyyy-MM-dd"),
   });
 
+  const { match: roomMatch, loading: roomLooking } = usePatientLookup(roomForm.patientPhone);
+  const { match: visitMatch, loading: visitLooking } = usePatientLookup(visitForm.patientPhone);
+
+  useEffect(() => {
+    if (!roomMatch) return;
+    setRoomForm(prev => ({ ...prev, patientName: prev.patientName || roomMatch.name }));
+  }, [roomMatch]);
+
+  useEffect(() => {
+    if (!visitMatch) return;
+    setVisitForm(prev => ({ ...prev, patientName: prev.patientName || visitMatch.name }));
+  }, [visitMatch]);
+
   useEffect(() => { loadCards(); }, []);
 
   async function loadCards() {
@@ -327,6 +341,12 @@ export default function InPatientCardPage() {
                       className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f]" />
                   </div>
                 ))}
+                {roomLooking && roomForm.patientPhone.replace(/\D/g,"").length === 10 && (
+                  <p className="text-xs text-muted-foreground col-span-full mt-1">Searching…</p>
+                )}
+                {roomMatch && (
+                  <p className="text-xs text-green-600 font-medium col-span-full mt-1">✓ {roomMatch.name}{roomMatch.bloodGroup ? ` · ${roomMatch.bloodGroup}` : ""}</p>
+                )}
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">Ward *</label>
                   <select value={roomForm.ward} onChange={(e) => setRoomForm({ ...roomForm, ward: e.target.value })}
@@ -357,6 +377,12 @@ export default function InPatientCardPage() {
                       className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500" />
                   </div>
                 ))}
+                {visitLooking && visitForm.patientPhone.replace(/\D/g,"").length === 10 && (
+                  <p className="text-xs text-muted-foreground col-span-full mt-1">Searching…</p>
+                )}
+                {visitMatch && (
+                  <p className="text-xs text-green-600 font-medium col-span-full mt-1">✓ {visitMatch.name}{visitMatch.bloodGroup ? ` · ${visitMatch.bloodGroup}` : ""}</p>
+                )}
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">Visit Date *</label>
                   <input type="date" value={visitForm.admissionDate} onChange={(e) => setVisitForm({ ...visitForm, admissionDate: e.target.value })}

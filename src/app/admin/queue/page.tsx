@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { usePatientLookup } from "@/hooks/usePatientLookup";
 import { useQueue } from "@/hooks/useQueue";
 import TokenSlip from "@/components/shared/TokenSlip";
 import {
@@ -26,6 +27,13 @@ export default function QueuePage() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [cardId, setCardId] = useState("");
+  const { match: patientMatch, loading: lookingUp } = usePatientLookup(phone, cardId);
+  useEffect(() => {
+    if (!patientMatch) return;
+    if (!name)  setName(patientMatch.name);
+    if (!phone && patientMatch.phone) setPhone(patientMatch.phone);
+  }, [patientMatch]);
   const [purpose, setPurpose] = useState(PURPOSES[0]);
   const [issuing, setIssuing] = useState(false);
   const [lastIssued, setLastIssued] = useState<{ displayNumber: string; patientName: string } | null>(null);
@@ -120,6 +128,23 @@ export default function QueuePage() {
           </h2>
           <div className="space-y-3">
             <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                Card ID <span className="font-normal text-muted-foreground/60">(PAT-XXXX · auto-fills)</span>
+              </label>
+              <div className="relative">
+                <Ticket className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <input value={cardId} onChange={(e) => setCardId(e.target.value.toUpperCase())}
+                  placeholder="PAT-0001 (optional)"
+                  className="w-full rounded-lg border border-border bg-background py-2 pl-10 pr-3 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+              </div>
+              {lookingUp && /^PAT-\d+$/i.test(cardId) && (
+                <p className="text-xs text-muted-foreground mt-1">Looking up card…</p>
+              )}
+              {patientMatch && cardId && (
+                <p className="text-xs text-green-600 font-medium mt-1">✓ {patientMatch.name} · {patientMatch.phone}</p>
+              )}
+            </div>
+            <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Patient Name</label>
               <div className="relative">
                 <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -134,6 +159,12 @@ export default function QueuePage() {
                 <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="9876543210" type="tel"
                   className="w-full rounded-lg border border-border bg-background py-2 pl-10 pr-3 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
               </div>
+              {lookingUp && phone.replace(/\D/g,"").length === 10 && (
+                <p className="text-xs text-muted-foreground mt-1">Searching…</p>
+              )}
+              {patientMatch && (
+                <p className="text-xs text-green-600 font-medium mt-1">✓ Found: {patientMatch.name}</p>
+              )}
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Purpose</label>
