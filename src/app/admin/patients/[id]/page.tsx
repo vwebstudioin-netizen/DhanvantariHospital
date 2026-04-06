@@ -75,6 +75,7 @@ export default function PatientDetail() {
   const [appts, setAppts]         = useState<Appointment[]>([]);
   const [loading, setLoading]     = useState(true);
   const [tab, setTab]             = useState("cards");
+  const [debugInfo, setDebugInfo] = useState("");
 
   const handleDelete = async () => {
     if (!patient) return;
@@ -123,7 +124,17 @@ export default function PatientDetail() {
         if (apptRes.status === "fulfilled")
           setAppts(filterByPhone(apptRes.value.docs.map(d => ({ id: d.id, ...d.data() }))).sort(byDate) as Appointment[]);
 
-        // Log any failures to console for debugging
+        // Show debug info on page
+        const rawCounts = [
+          cardRes.status === "fulfilled"  ? cardRes.value.size  : "ERR",
+          invRes.status === "fulfilled"   ? invRes.value.size   : "ERR",
+          pharmaRes.status === "fulfilled"? pharmaRes.value.size: "ERR",
+          apptRes.status === "fulfilled"  ? apptRes.value.size  : "ERR",
+        ];
+        setDebugInfo(
+          `Phone used for filter: "${phone}" | Raw collection sizes — Cards: ${rawCounts[0]}, Invoices: ${rawCounts[1]}, Pharmacy: ${rawCounts[2]}, Appts: ${rawCounts[3]}`
+        );
+
         [cardRes, invRes, pharmaRes, apptRes].forEach((r, i) => {
           if (r.status === "rejected")
             console.warn(`Patient detail query [${i}] failed:`, r.reason?.message);
@@ -239,6 +250,13 @@ export default function PatientDetail() {
           ))}
         </div>
       </div>
+
+      {/* Debug bar (admin only — helps diagnose data issues) */}
+      {isAdmin && debugInfo && (
+        <div className="bg-slate-800 text-slate-200 text-xs font-mono px-4 py-2 rounded-lg">
+          {debugInfo}
+        </div>
+      )}
 
       {/* No phone warning */}
       {!patient.phone && (
