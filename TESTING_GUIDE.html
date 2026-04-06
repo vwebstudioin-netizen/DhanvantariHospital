@@ -234,7 +234,8 @@
       <li><a href="#backup">12. Backup, Restore &amp; CSV Exports</a></li>
       <li><a href="#public">13. Public Website &amp; Appointment Booking</a></li>
       <li><a href="#content">14. Blog, Gallery &amp; Reviews</a></li>
-      <li><a href="#golive">15. Final Go-Live Checklist</a></li>
+      <li><a href="#careers">15. Careers Portal &amp; Document Exports</a></li>
+      <li><a href="#golive">16. Final Go-Live Checklist</a></li>
     </ol>
   </div>
 
@@ -1001,10 +1002,118 @@
     </div>
   </div>
 
-  <!-- 15. Go-Live Checklist -->
-  <div class="test-section" id="golive">
+  <!-- 15. Careers Portal & Document Exports -->
+  <div class="test-section" id="careers">
     <div class="section-header">
       <div class="section-num">15</div>
+      <h2>Careers Portal &amp; Document Exports</h2>
+    </div>
+
+    <div class="test-block">
+      <div class="test-block-header"><h3>Careers Page — Public Job Listings</h3><span class="url-tag">/careers</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Go to <code>/careers</code> as a public (unauthenticated) visitor. Verify job listings load from Firestore.
+          <div class="expected">Active job openings appear with title, department, and an "Apply Now" button. If no listings exist in Firestore, fallback roles are displayed so the page is never empty.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Click <strong>"Apply Now"</strong> on any listed job. In the modal, fill in: Applicant Name, Phone Number, and an optional Cover Note. Click <strong>"Submit Application"</strong>.
+          <div class="expected">Success screen or toast displayed. Application saved to Firestore with status <code>New</code> and a timestamp.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Scroll to the bottom of the <code>/careers</code> page — locate the <strong>General Application</strong> option for unlisted roles. Fill in name, phone, and a note. Submit.
+          <div class="expected">General application saved to Firestore. Success confirmation displayed. Application appears in admin panel under the position "General Application".</div>
+        </div></div>
+      </div>
+      <div class="tip">To test with a live job listing: log in as admin, go to <code>/admin/careers</code> (or the careers management section in admin settings), add a job with title, department, and description, then re-visit <code>/careers</code> as a public visitor.</div>
+    </div>
+
+    <div class="test-block">
+      <div class="test-block-header"><h3>Admin — Job Applications Dashboard</h3><span class="url-tag">/admin/applications</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          As admin, go to <code>/admin/applications</code>. Verify the application submitted in the previous step appears in the list.
+          <div class="expected">Application visible with applicant name, position applied for, department, phone, submission date, cover note, and current status badge: <strong>New</strong> (default).</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Use the filter tabs at the top of the page — click <strong>New</strong>, <strong>Shortlisted</strong>, <strong>Reviewed</strong>, <strong>Rejected</strong> tabs in turn.
+          <div class="expected">Each tab filters the list to show only applications in that status. The <strong>All</strong> tab shows every application regardless of status.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          On the test application, click <strong>"Shortlist"</strong> (green button).
+          <div class="expected">Application status updates to <code>Shortlisted</code> in real time. Badge colour changes to green.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Click <strong>"Review"</strong> (amber button) on the same application.
+          <div class="expected">Status changes to <code>Reviewed</code>. Badge updates to amber.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Click <strong>"Reject"</strong> (red button) on a different test application.
+          <div class="expected">Status changes to <code>Rejected</code>. Badge updates to red. Application moves to the Rejected tab.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Click the applicant's phone number displayed in the list.
+          <div class="expected">Device opens the phone dialer (or a <code>tel:</code> link is triggered). The correct number is pre-filled, ready to call.</div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="test-block">
+      <div class="test-block-header"><h3>Token Queue — PDF Log Export</h3><span class="url-tag">/desk/queue</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Ensure at least 5 tokens have been issued and processed (mix of Completed, Skipped, No-Show statuses). Go to <code>/desk/queue</code>.
+          <div class="expected">Queue page loaded with today's token list visible.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Click the <strong>"PDF Log"</strong> button on the queue page.
+          <div class="expected">A new browser window opens with a print-ready A4 daily token report. The report shows a summary header (hospital name, date, total tokens issued, completed count) and a full token table below.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Verify the token table in the PDF view contains: token number, patient name, phone number, purpose, time issued, and status.
+          <div class="expected">Each row displays all required fields. Status column is colour-coded — Completed (green), Skipped (amber), No-Show (red), Waiting (grey).</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Verify the browser print dialog is triggered automatically when the PDF Log window opens.
+          <div class="expected">Browser print dialog appears on its own within 1–2 seconds of the window loading — no manual Ctrl+P needed. Selecting "Save as PDF" in the dialog saves a clean A4 document.</div>
+        </div></div>
+      </div>
+      <div class="note">The PDF Log is a print-only page — it has no sidebar, no navigation, and no interactive elements. It is designed to print cleanly on A4 paper or save directly to PDF.</div>
+    </div>
+
+    <div class="test-block">
+      <div class="test-block-header"><h3>IPD Card — Discharge Summary Print</h3><span class="url-tag">/desk/inpatient-card</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Go to <code>/desk/inpatient-card</code> → click the <strong>Room Cards</strong> tab. Locate an active IPD (Room) card with a patient who has diagnosis and doctor details filled in.
+          <div class="expected">Room card visible with patient name, card number, doctor, ward, room, and admission date.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Click the <strong>"Summary"</strong> button on the active IPD card.
+          <div class="expected">A new window opens with a print-ready A4 discharge summary document. Verify it contains: hospital name and header, patient name, card number (IPD-XXXX), patient ID (PAT-XXXX), phone number, admission date, discharge date, total days stayed, ward, room, bed number, treating doctor, diagnosis, and clinical notes field.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Verify that signature blocks are present at the bottom of the discharge summary.
+          <div class="expected">Two signature blocks visible: one labelled "Patient / Attender Signature" and one labelled "Doctor Signature" — each with a line and space for name and date.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Verify the print dialog triggers automatically when the summary window opens.
+          <div class="expected">Browser print dialog appears within 1–2 seconds. No manual action needed.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Switch to the <strong>Visit Cards</strong> (OPD) tab. Verify the "Summary" button does <strong>not</strong> appear on OPD visit cards.
+          <div class="expected">OPD cards show Print and Close Card buttons only — no Summary button. Discharge summary is exclusively an IPD feature.</div>
+        </div></div>
+      </div>
+      <div class="tip">If no active Room cards exist, create one first via the Room Cards tab → "New Card" — fill all fields including ward, room, bed, doctor, and diagnosis before testing the Summary button.</div>
+    </div>
+
+  </div>
+
+  <!-- 16. Go-Live Checklist -->
+  <div class="test-section" id="golive">
+    <div class="section-header">
+      <div class="section-num">16</div>
       <h2>Final Go-Live Checklist</h2>
     </div>
     <div class="test-block">
