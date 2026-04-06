@@ -1,120 +1,132 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import PageHero from "@/components/layout/PageHero";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, ArrowRight, User } from "lucide-react";
+import { Calendar, ArrowRight, User, BookOpen } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Blog",
-  description: "Health tips, medical news, and wellness articles from Dhanvantari Hospital's team of specialists.",
-};
-
-const demoPosts = [
-  {
-    slug: "heart-health-tips-winter",
-    title: "5 Heart Health Tips for Winter",
-    excerpt: "Cold weather can put extra stress on your heart. Learn how to protect your cardiovascular health during the winter months.",
-    author: "Dr. Michael Rodriguez",
-    date: "2024-11-20",
-    readTime: "5 min",
-    category: "Cardiology",
-    image: "/images/blog/heart-health.jpg",
-  },
-  {
-    slug: "childhood-vaccination-guide",
-    title: "A Parent's Guide to Childhood Vaccinations",
-    excerpt: "Everything you need to know about recommended vaccinations for children from birth through adolescence.",
-    author: "Dr. Emily Johnson",
-    date: "2024-11-15",
-    readTime: "7 min",
-    category: "Pediatrics",
-    image: "/images/blog/vaccinations.jpg",
-  },
-  {
-    slug: "managing-back-pain",
-    title: "Managing Chronic Back Pain: Non-Surgical Options",
-    excerpt: "Explore conservative treatment approaches for chronic back pain, including physical therapy and lifestyle modifications.",
-    author: "Dr. James Park",
-    date: "2024-11-10",
-    readTime: "6 min",
-    category: "Orthopedics",
-    image: "/images/blog/back-pain.jpg",
-  },
-  {
-    slug: "skin-care-seasonal-changes",
-    title: "How Seasonal Changes Affect Your Skin",
-    excerpt: "Dermatologist-approved tips for adapting your skincare routine as the seasons change.",
-    author: "Dr. Aisha Patel",
-    date: "2024-11-05",
-    readTime: "4 min",
-    category: "Dermatology",
-    image: "/images/blog/skincare.jpg",
-  },
-  {
-    slug: "mental-health-workplace",
-    title: "Prioritizing Mental Health in the Workplace",
-    excerpt: "Practical strategies for maintaining mental wellness and managing stress in your professional life.",
-    author: "Dr. David Williams",
-    date: "2024-10-28",
-    readTime: "6 min",
-    category: "Mental Health",
-    image: "/images/blog/mental-health.jpg",
-  },
-  {
-    slug: "prenatal-care-essentials",
-    title: "Essential Prenatal Care: What to Expect",
-    excerpt: "A comprehensive guide to prenatal visits, screenings, and what expecting mothers should know.",
-    author: "Dr. Lisa Martinez",
-    date: "2024-10-20",
-    readTime: "8 min",
-    category: "Women's Health",
-    image: "/images/blog/prenatal.jpg",
-  },
-];
+interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  author: string;
+  category: string;
+  createdAt: any;
+  status: string;
+}
 
 export default function BlogPage() {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState("All");
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const snap = await getDocs(
+          query(collection(db, "blogPosts"), where("status", "==", "published"), orderBy("createdAt", "desc"))
+        );
+        setPosts(snap.docs.map(d => ({ id: d.id, ...d.data() } as BlogPost)));
+      } catch {
+        // fallback: fetch all and filter client-side (avoids composite index)
+        try {
+          const snap = await getDocs(collection(db, "blogPosts"));
+          const all = snap.docs.map(d => ({ id: d.id, ...d.data() } as BlogPost));
+          setPosts(all.filter(p => p.status === "published")
+            .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0)));
+        } catch { /* silent */ }
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  const categories = ["All", ...Array.from(new Set(posts.map(p => p.category).filter(Boolean)))];
+  const filtered = activeCategory === "All" ? posts : posts.filter(p => p.category === activeCategory);
+
   return (
-    <>
+    <div>
       <PageHero
-        title="Health Blog"
-        subtitle="Expert health insights, tips, and news from our team of specialists."
-        breadcrumbs={[{ label: "Blog" }]}
+        title="Health & Wellness Blog"
+        subtitle="Expert insights, medical tips, and wellness articles from our specialists"
       />
 
-      <section className="px-4 py-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {demoPosts.map((post) => (
-              <Link
-                key={post.slug}
-                href={`/blog/${post.slug}`}
-                className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary/30 hover:shadow-lg"
+      <div className="container mx-auto px-4 py-12">
+        {/* Category filter */}
+        {!loading && categories.length > 1 && (
+          <div className="flex flex-wrap gap-2 mb-8">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  activeCategory === cat
+                    ? "bg-primary text-white"
+                    : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                }`}
               >
-                <div className="h-48 bg-muted" />
-                <div className="flex flex-1 flex-col p-6">
-                  <Badge variant="secondary" className="mb-3 w-fit text-xs">
+                {cat}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {loading ? (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="rounded-xl border border-border bg-card p-6 animate-pulse h-48" />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-20">
+            <BookOpen className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-muted-foreground">No articles published yet</h3>
+            <p className="text-sm text-muted-foreground mt-1">Check back soon for health tips and medical articles.</p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filtered.map(post => (
+              <Link
+                key={post.id}
+                href={`/blog/${post.slug}`}
+                className="group bg-card border border-border rounded-xl p-6 hover:border-primary hover:shadow-md transition-all flex flex-col"
+              >
+                {post.category && (
+                  <span className="inline-block px-2.5 py-0.5 bg-primary/10 text-primary text-xs font-semibold rounded-full mb-3 w-fit">
                     {post.category}
-                  </Badge>
-                  <h3 className="mb-2 text-lg font-semibold text-foreground group-hover:text-primary line-clamp-2">
-                    {post.title}
-                  </h3>
-                  <p className="mb-4 text-sm text-muted-foreground line-clamp-3">
-                    {post.excerpt}
-                  </p>
-                  <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <User className="h-3 w-3" /> {post.author}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> {post.readTime}
-                    </span>
+                  </span>
+                )}
+                <h2 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors mb-2 line-clamp-2">
+                  {post.title}
+                </h2>
+                {post.excerpt && (
+                  <p className="text-sm text-muted-foreground line-clamp-3 flex-1">{post.excerpt}</p>
+                )}
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    {post.author && (
+                      <span className="flex items-center gap-1">
+                        <User className="w-3 h-3" />{post.author}
+                      </span>
+                    )}
+                    {post.createdAt && (
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {post.createdAt?.toDate?.()?.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) ?? "—"}
+                      </span>
+                    )}
                   </div>
+                  <ArrowRight className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </Link>
             ))}
           </div>
-        </div>
-      </section>
-    </>
+        )}
+      </div>
+    </div>
   );
 }

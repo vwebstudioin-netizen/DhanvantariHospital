@@ -74,8 +74,12 @@ function SubmitForm() {
     try {
       await submitReview({ patientName: name || "Anonymous", patientPhone: phone || undefined, department: department || undefined, rating, comment: comment.trim(), ref: ref || undefined });
       setSubmitted(true);
-    } catch {
-      toast.error("Something went wrong. Please try again.");
+    } catch (err: any) {
+      console.error("Review submission error:", err);
+      const msg = err?.code === "permission-denied"
+        ? "Permission denied — please try again or contact support."
+        : err?.message || "Something went wrong. Please try again.";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
