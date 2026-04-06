@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { usePatientLookup } from "@/hooks/usePatientLookup";
 import { format, differenceInDays, addDays } from "date-fns";
-import { Plus, Printer, Phone, XCircle, Search, BedDouble, CalendarCheck } from "lucide-react";
+import { Plus, Printer, Phone, XCircle, Search, BedDouble, CalendarCheck, Download } from "lucide-react";
+import { exportToCsv } from "@/lib/exportCsv";
 import { createInPatientCard, getActiveCards, dischargePatient } from "@/lib/inpatient";
 import { issueToken } from "@/lib/queue";
 import { SITE_NAME, CONTACT_PHONE, INPATIENT_WARDS } from "@/lib/constants";
@@ -281,8 +282,44 @@ export default function InPatientCardPage() {
       c.patientId.toLowerCase().includes(search.toLowerCase())
     );
 
-  const roomCount = cards.filter((c) => c.type === "room").length;
-  const visitCount = cards.filter((c) => c.type === "visit").length;
+  const roomCards = cards.filter((c) => c.type === "room");
+  const visitCards = cards.filter((c) => c.type === "visit");
+  const roomCount = roomCards.length;
+  const visitCount = visitCards.length;
+
+  const handleExportRoomCards = () => {
+    exportToCsv(`room-cards-${new Date().toISOString().slice(0,10)}.csv`,
+      roomCards.map(c => ({
+        "Card #": c.cardNumber,
+        "Patient ID": c.patientId,
+        "Patient Name": c.patientName,
+        "Phone": c.patientPhone || "",
+        "Doctor": c.doctorName,
+        "Ward": c.ward || "",
+        "Room": c.roomNumber || "",
+        "Bed": c.bedNumber || "",
+        "Diagnosis": c.diagnosis,
+        "Admission Date": c.admissionDate,
+        "Status": c.isActive ? "Active" : "Discharged",
+      }))
+    );
+  };
+
+  const handleExportVisitCards = () => {
+    exportToCsv(`visit-cards-${new Date().toISOString().slice(0,10)}.csv`,
+      visitCards.map(c => ({
+        "Card #": c.cardNumber,
+        "Patient ID": c.patientId,
+        "Patient Name": c.patientName,
+        "Phone": c.patientPhone || "",
+        "Doctor": c.doctorName,
+        "Diagnosis": c.diagnosis,
+        "Admission Date": c.admissionDate,
+        "Expiry Date": c.expiryDate || "",
+        "Status": c.isActive ? "Active" : "Expired",
+      }))
+    );
+  };
 
   return (
     <div className="space-y-5">
@@ -309,7 +346,7 @@ export default function InPatientCardPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1">
+      <div className="flex items-center gap-1">
         <button onClick={() => { setActiveTab("room"); setShowForm(false); }}
           className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "room" ? "bg-[#1e3a5f] text-white" : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"}`}>
           <BedDouble className="w-4 h-4" /> Room Cards ({roomCount})
@@ -317,6 +354,11 @@ export default function InPatientCardPage() {
         <button onClick={() => { setActiveTab("visit"); setShowForm(false); }}
           className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "visit" ? "bg-green-600 text-white" : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"}`}>
           <CalendarCheck className="w-4 h-4" /> Visit Cards ({visitCount})
+        </button>
+        <button
+          onClick={activeTab === "room" ? handleExportRoomCards : handleExportVisitCards}
+          className="flex items-center gap-1.5 border border-border text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-muted ml-auto">
+          <Download className="w-3.5 h-3.5" /> Export CSV
         </button>
       </div>
 

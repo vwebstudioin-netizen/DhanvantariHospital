@@ -7,8 +7,9 @@ import {
 import { db } from "@/lib/firebase";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Plus, Search, RefreshCw, User, Phone, Mail, ChevronRight } from "lucide-react";
+import { Plus, Search, RefreshCw, User, Phone, Mail, ChevronRight, Download } from "lucide-react";
 import toast from "react-hot-toast";
+import { exportToCsv } from "@/lib/exportCsv";
 
 interface Patient {
   id: string;
@@ -20,6 +21,7 @@ interface Patient {
   address?: string;
   emergencyContact?: string;
   source?: "portal" | "manual" | "seed";
+  visitCount?: number;
   createdAt: any;
   lastLoginAt?: any;
 }
@@ -80,6 +82,21 @@ export default function AdminPatients() {
     p.email?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const handleExport = () => {
+    exportToCsv(`patients-${new Date().toISOString().slice(0,10)}.csv`,
+      filtered.map(p => ({
+        Name: p.name,
+        Phone: p.phone || "",
+        Email: p.email || "",
+        "Blood Group": p.bloodGroup || "",
+        Address: p.address || "",
+        Source: p.source || "",
+        "Visit Count": p.visitCount ?? 0,
+        Registered: p.createdAt?.toDate?.()?.toLocaleDateString("en-IN") || "",
+      }))
+    );
+  };
+
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
@@ -92,6 +109,10 @@ export default function AdminPatients() {
         <div className="flex gap-2">
           <button onClick={load} className="p-2 text-muted-foreground hover:text-foreground border border-border rounded-lg hover:bg-muted">
             <RefreshCw className="w-4 h-4" />
+          </button>
+          <button onClick={handleExport} disabled={filtered.length === 0}
+            className="flex items-center gap-2 border border-border text-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-muted disabled:opacity-40">
+            <Download className="w-4 h-4" /> Export CSV
           </button>
           <button onClick={() => setShowForm(!showForm)}
             className="flex items-center gap-2 bg-[#1e3a5f] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#152d4a]">
