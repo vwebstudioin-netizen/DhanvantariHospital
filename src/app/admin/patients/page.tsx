@@ -5,8 +5,7 @@ import {
   collection, getDocs, addDoc, deleteDoc, doc, orderBy, query, Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Plus, Search, RefreshCw, User, Phone, Mail, ChevronRight, Download, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { exportToCsv } from "@/lib/exportCsv";
@@ -31,6 +30,7 @@ const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 
 export default function AdminPatients() {
   const pathname = usePathname();
+  const router = useRouter();
   const { isAdmin } = useAuthContext();
   const basePath = pathname.startsWith("/desk") ? "/desk/patients"
     : pathname.startsWith("/doctor") ? "/doctor/patients"
@@ -208,9 +208,11 @@ export default function AdminPatients() {
                   {search ? "No patients found." : "No patients yet. Add manually or patients register via the portal."}
                 </td></tr>
               ) : filtered.map((p) => (
-                <tr key={p.id} className="border-b border-border/50 hover:bg-muted/30 cursor-pointer group">
+                <tr key={p.id}
+                  onClick={() => router.push(`${basePath}/${p.id}`)}
+                  className="border-b border-border/50 hover:bg-muted/30 cursor-pointer group">
                   <td className="px-5 py-3">
-                    <Link href={`${basePath}/${p.id}`} className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                         <User className="w-4 h-4 text-primary" />
                       </div>
@@ -218,7 +220,7 @@ export default function AdminPatients() {
                         <p className="font-medium text-foreground group-hover:text-primary transition-colors">{p.name}</p>
                         {p.address && <p className="text-xs text-muted-foreground">{p.address}</p>}
                       </div>
-                    </Link>
+                    </div>
                   </td>
                   <td className="px-5 py-3 hidden sm:table-cell">
                     {p.phone && (
@@ -253,7 +255,7 @@ export default function AdminPatients() {
                     <div className="flex items-center gap-1 justify-end">
                       {isAdmin && (
                         <button
-                          onClick={(e) => { e.preventDefault(); handleDelete(p.id, p.name); }}
+                          onClick={(e) => { e.stopPropagation(); handleDelete(p.id, p.name); }}
                           className="p-1 text-muted-foreground/40 hover:text-red-500 hover:bg-red-50 rounded transition-colors opacity-0 group-hover:opacity-100"
                           title="Delete patient"
                         >
