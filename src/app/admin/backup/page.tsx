@@ -17,6 +17,7 @@ const BACKUP_COLLECTIONS = [
   "pharmacyBills", "medicines", "pharmacySuppliers",
   "reviews", "contactMessages", "wishCampaigns",
   "blogPosts", "gallery",
+  "jobOpenings", "jobApplications",
 ];
 
 const LAST_BACKUP_KEY = "dh_last_backup";

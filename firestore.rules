@@ -195,8 +195,13 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    match /jobOpenings/{jobId} {
+      allow read: if resource.data.isActive == true || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
     match /jobApplications/{appId} {
-      allow create: if true;
+      allow create: if true;   // Anyone can apply from public careers page
       allow read, update, delete: if isAdmin();
     }
 

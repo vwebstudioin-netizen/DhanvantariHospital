@@ -21,7 +21,8 @@ const RESET_COLLECTIONS = [
   "patients", "appointments", "reviews",
   "inpatientCards", "invoices", "pharmacyBills",
   "wishCampaigns", "stockMovements", "contactMessages", "newsletters",
-  "billingServices",
+  "billingServices", "jobApplications",
+  // jobOpenings is NOT reset — admin-created job listings should persist
 ];
 
 async function deleteCollection(colName: string) {
