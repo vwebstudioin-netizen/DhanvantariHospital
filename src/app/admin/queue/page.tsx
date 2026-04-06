@@ -6,8 +6,10 @@ import { useQueue } from "@/hooks/useQueue";
 import TokenSlip from "@/components/shared/TokenSlip";
 import {
   Ticket, Phone, User, Plus, ChevronRight,
-  Check, SkipForward, UserX, Printer, Stethoscope, Play,
+  Check, SkipForward, UserX, Printer, Stethoscope, Play, FileText,
 } from "lucide-react";
+import { SITE_NAME, CONTACT_PHONE, HOSPITAL_ADDRESS } from "@/lib/constants";
+import { format } from "date-fns";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import toast from "react-hot-toast";
@@ -94,6 +96,60 @@ export default function QueuePage() {
     );
   }
 
+  const handleExportPDF = () => {
+    const today = format(new Date(), "dd MMM yyyy");
+    const rows = [...tokens].sort((a, b) => a.tokenNumber - b.tokenNumber).map(t => `
+      <tr>
+        <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:700;color:#1e3a5f;">${t.displayNumber}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;">${t.patientName}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;">${t.patientPhone || "—"}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;">${t.purpose || "—"}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;">${t.issuedAt?.toDate?.()?.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}) ?? "—"}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;">
+          <span style="padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;background:${
+            t.status==="completed"?"#dcfce7":t.status==="serving"?"#dbeafe":t.status==="skipped"?"#fff7ed":t.status==="no-show"?"#fee2e2":"#f1f5f9"
+          };color:${
+            t.status==="completed"?"#16a34a":t.status==="serving"?"#1d4ed8":t.status==="skipped"?"#c2410c":t.status==="no-show"?"#dc2626":"#64748b"
+          };">${t.status}</span>
+        </td>
+      </tr>`).join("");
+
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Token Log — ${today}</title>
+    <style>body{font-family:Arial,sans-serif;margin:0;padding:24px;color:#1e293b;}@media print{body{padding:0}}</style>
+    </head><body>
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1e3a5f;padding-bottom:12px;margin-bottom:20px;">
+      <div>
+        <div style="font-size:20px;font-weight:900;color:#1e3a5f;text-transform:uppercase;">${SITE_NAME}</div>
+        ${HOSPITAL_ADDRESS ? `<div style="font-size:11px;color:#64748b;">${HOSPITAL_ADDRESS}</div>` : ""}
+        ${CONTACT_PHONE ? `<div style="font-size:11px;color:#64748b;">Ph: ${CONTACT_PHONE}</div>` : ""}
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:16px;font-weight:700;color:#1e3a5f;">DAILY TOKEN LOG</div>
+        <div style="font-size:12px;color:#64748b;">Date: ${today}</div>
+        <div style="font-size:11px;color:#64748b;">Total tokens: ${tokens.length} · Completed: ${tokens.filter(t=>t.status==="completed").length}</div>
+      </div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead><tr style="background:#1e3a5f;color:#fff;">
+        <th style="padding:10px 12px;text-align:left;">Token #</th>
+        <th style="padding:10px 12px;text-align:left;">Patient Name</th>
+        <th style="padding:10px 12px;text-align:left;">Phone</th>
+        <th style="padding:10px 12px;text-align:left;">Purpose</th>
+        <th style="padding:10px 12px;text-align:left;">Time</th>
+        <th style="padding:10px 12px;text-align:left;">Status</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="margin-top:24px;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:12px;">
+      Generated on ${new Date().toLocaleString("en-IN")} · ${SITE_NAME}
+    </div>
+    <script>window.onload=()=>{window.print();}</script>
+    </body></html>`;
+
+    const w = window.open("", "_blank", "width=900,height=700");
+    if (w) { w.document.write(html); w.document.close(); }
+  };
+
   // Status badge color
   const statusColor = (s: string) => ({
     waiting: "bg-blue-100 text-blue-700",
@@ -113,10 +169,16 @@ export default function QueuePage() {
             Waiting: {waitingTokens.length} · Active: {activeToken ? 1 : 0} · Done: {completedTokens.length}
           </p>
         </div>
-        <Link href={doctorViewHref}
-          className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-[#152d4a]">
-          <Stethoscope className="h-4 w-4" /> Doctor View
-        </Link>
+        <div className="flex items-center gap-2">
+          <button onClick={handleExportPDF} disabled={tokens.length === 0}
+            className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-muted disabled:opacity-40 transition-colors">
+            <FileText className="h-4 w-4" /> PDF Log
+          </button>
+          <Link href={doctorViewHref}
+            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-[#152d4a]">
+            <Stethoscope className="h-4 w-4" /> Doctor View
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

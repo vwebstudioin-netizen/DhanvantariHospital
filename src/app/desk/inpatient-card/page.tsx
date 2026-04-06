@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { usePatientLookup } from "@/hooks/usePatientLookup";
 import { format, differenceInDays, addDays } from "date-fns";
-import { Plus, Printer, Phone, XCircle, Search, BedDouble, CalendarCheck, Download } from "lucide-react";
+import { Plus, Printer, Phone, XCircle, Search, BedDouble, CalendarCheck, Download, FileText } from "lucide-react";
+import { HOSPITAL_ADDRESS } from "@/lib/constants";
 import { exportToCsv } from "@/lib/exportCsv";
 import { createInPatientCard, getActiveCards, dischargePatient } from "@/lib/inpatient";
 import { issueToken } from "@/lib/queue";
@@ -91,12 +92,13 @@ function ExpiryBadge({ expiryDate }: { expiryDate: string }) {
 }
 
 // ── Card List Item ───────────────────────────────────────────────────────────
-function CardItem({ card, onPrint, onDischarge, onWhatsApp, onReview }: {
+function CardItem({ card, onPrint, onDischarge, onWhatsApp, onReview, onDischargeSummary }: {
   card: InPatientCard;
   onPrint: () => void;
   onDischarge: () => void;
   onWhatsApp: () => void;
   onReview: () => void;
+  onDischargeSummary: () => void;
 }) {
   const isRoom = card.type === "room";
   return (
@@ -131,6 +133,11 @@ function CardItem({ card, onPrint, onDischarge, onWhatsApp, onReview }: {
           <button onClick={onPrint} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50">
             <Printer className="w-3.5 h-3.5" /> Print
           </button>
+          {isRoom && (
+            <button onClick={onDischargeSummary} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-50">
+              <FileText className="w-3.5 h-3.5" /> Summary
+            </button>
+          )}
           {card.patientPhone && (
             <>
               <button onClick={onWhatsApp} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 border border-green-200 rounded-lg hover:bg-green-50">
@@ -247,6 +254,81 @@ export default function InPatientCardPage() {
       loadCards();
     } catch { toast.error("Failed to create card"); }
     finally { setSaving(false); }
+  };
+
+  const handleDischargeSummary = (card: InPatientCard) => {
+    const admitDate  = card.admissionDate || "—";
+    const dischargeDate = format(new Date(), "dd-MM-yyyy");
+    const stayDays   = card.admissionDate
+      ? differenceInDays(new Date(), new Date(card.admissionDate)) + 1
+      : "—";
+
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Discharge Summary — ${card.patientName}</title>
+    <style>
+      body{font-family:Arial,sans-serif;margin:0;padding:28px 36px;color:#1e293b;font-size:13px;}
+      h1{font-size:20px;font-weight:900;color:#1e3a5f;text-transform:uppercase;letter-spacing:1px;margin:0;}
+      .sub{font-size:11px;color:#64748b;margin:2px 0;}
+      .header{display:flex;justify-content:space-between;border-bottom:3px solid #1e3a5f;padding-bottom:12px;margin-bottom:20px;}
+      .title-box{text-align:right;}
+      .title{font-size:18px;font-weight:900;color:#1e3a5f;border:2px solid #1e3a5f;padding:4px 14px;display:inline-block;}
+      table{width:100%;border-collapse:collapse;margin-bottom:16px;}
+      td{padding:7px 10px;border:1px solid #e2e8f0;vertical-align:top;}
+      td:first-child{font-weight:700;background:#f8fafc;width:35%;color:#1e3a5f;}
+      .section{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0.5px;color:#1e3a5f;margin:18px 0 6px;border-bottom:1.5px solid #1e3a5f;padding-bottom:4px;}
+      .sig{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px;}
+      .sig-box{border-top:1.5px solid #1e293b;padding-top:8px;font-size:11px;color:#64748b;}
+      .note{background:#fefce8;border:1px solid #fcd34d;border-radius:6px;padding:10px 14px;font-size:11px;color:#92400e;margin-top:16px;}
+      @media print{body{padding:0}}
+    </style></head><body>
+    <div class="header">
+      <div>
+        <h1>${SITE_NAME}</h1>
+        ${HOSPITAL_ADDRESS ? `<div class="sub">${HOSPITAL_ADDRESS}</div>` : ""}
+        ${CONTACT_PHONE ? `<div class="sub">Ph: ${CONTACT_PHONE}</div>` : ""}
+      </div>
+      <div class="title-box"><div class="title">DISCHARGE SUMMARY</div></div>
+    </div>
+
+    <div class="section">Patient Information</div>
+    <table>
+      <tr><td>Patient Name</td><td><strong>${card.patientName}</strong></td></tr>
+      <tr><td>Card Number</td><td>${card.cardNumber}</td></tr>
+      <tr><td>Patient ID</td><td>${card.patientId}</td></tr>
+      ${card.patientPhone ? `<tr><td>Phone</td><td>${card.patientPhone}</td></tr>` : ""}
+    </table>
+
+    <div class="section">Admission Details</div>
+    <table>
+      <tr><td>Admission Date</td><td>${admitDate}</td></tr>
+      <tr><td>Discharge Date</td><td><strong>${dischargeDate}</strong></td></tr>
+      <tr><td>Total Stay</td><td>${stayDays} day(s)</td></tr>
+      <tr><td>Ward</td><td>${card.ward || "—"}</td></tr>
+      <tr><td>Room / Bed</td><td>${card.roomNumber ? `Room ${card.roomNumber}${card.bedNumber ? `, Bed ${card.bedNumber}` : ""}` : "—"}</td></tr>
+      <tr><td>Treating Doctor</td><td><strong>${card.doctorName}</strong></td></tr>
+    </table>
+
+    <div class="section">Clinical Information</div>
+    <table>
+      <tr><td>Diagnosis</td><td>${card.diagnosis}</td></tr>
+      <tr><td>Notes / Treatment</td><td>${card.notes || "As per doctor's advice"}</td></tr>
+      <tr><td>Condition at Discharge</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+    </table>
+
+    <div class="note">⚠ Follow-up: Please visit again as advised by the doctor. Bring this discharge summary for all future visits. For emergencies, contact the hospital immediately.</div>
+
+    <div class="sig">
+      <div class="sig-box"><strong>Patient / Attender Signature</strong><br><br><br>Name: ______________________<br>Date: ${dischargeDate}</div>
+      <div class="sig-box"><strong>Doctor's Signature</strong><br><br><br>Dr. ${card.doctorName}<br>Date: ${dischargeDate}</div>
+    </div>
+
+    <div style="margin-top:20px;font-size:10px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px;text-align:center;">
+      Issued by ${SITE_NAME} · ${new Date().toLocaleString("en-IN")} · This is a computer generated document
+    </div>
+    <script>window.onload=()=>window.print();</script>
+    </body></html>`;
+
+    const w = window.open("", "_blank", "width=800,height=700");
+    if (w) { w.document.write(html); w.document.close(); }
   };
 
   const handleDischarge = async (card: InPatientCard) => {
@@ -477,6 +559,7 @@ export default function InPatientCardPage() {
               onDischarge={() => handleDischarge(card)}
               onWhatsApp={() => sendCardWhatsApp(card).then(() => toast.success("WhatsApp sent!"))}
               onReview={() => handleReview(card)}
+              onDischargeSummary={() => handleDischargeSummary(card)}
             />
           ))}
         </div>
