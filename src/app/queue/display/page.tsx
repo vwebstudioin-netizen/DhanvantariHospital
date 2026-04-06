@@ -17,6 +17,15 @@ export default function QueueDisplayPage() {
   const { waitingTokens, activeToken, loading } = useQueue();
   const prevServingRef = useRef<string | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
+
+  // Load voices — browsers require voiceschanged event (getVoices() returns [] on first call)
+  useEffect(() => {
+    const loadVoices = () => { voicesRef.current = window.speechSynthesis?.getVoices() ?? []; };
+    loadVoices();
+    window.speechSynthesis?.addEventListener("voiceschanged", loadVoices);
+    return () => window.speechSynthesis?.removeEventListener("voiceschanged", loadVoices);
+  }, []);
 
   // Speak the token announcement using Web Speech API
   const announce = useCallback((token: { displayNumber: string; patientName: string }) => {
@@ -28,7 +37,7 @@ export default function QueueDisplayPage() {
     const teluguText  = `టోకెన్ నంబర్ ${num}. ${token.patientName}, దయచేసి కౌంటర్‌కు రండి. టోకెన్ నంబర్ ${num}.`;
     const englishText = `Token number ${num}. ${token.patientName}, please come to the counter. Token number ${num}.`;
 
-    const voices = window.speechSynthesis.getVoices();
+    const voices = voicesRef.current;
 
     // Try Telugu voice first
     const teluguVoice = voices.find(v => v.lang.startsWith("te") || v.lang.includes("tel"));
@@ -58,7 +67,7 @@ export default function QueueDisplayPage() {
   const enableSound = useCallback(() => {
     setSoundEnabled(true);
     // Test announcement in Telugu
-    const voices = window.speechSynthesis.getVoices();
+    const voices = voicesRef.current;
     const teluguVoice = voices.find(v => v.lang.startsWith("te") || v.lang.includes("tel"));
     const test = new SpeechSynthesisUtterance(
       teluguVoice ? "శబ్దం ప్రారంభించబడింది. టోకెన్ ప్రకటనలకు సిద్ధంగా ఉంది." : "Sound enabled. Ready to announce tokens."
