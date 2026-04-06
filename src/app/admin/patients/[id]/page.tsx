@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
-  doc, getDoc, deleteDoc, collection, getDocs, query, where,
+  doc, getDoc, deleteDoc, collection, getDocs,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuthContext } from "@/providers/AuthProvider";
@@ -99,25 +99,29 @@ export default function PatientDetail() {
         const phone = pat.phone?.trim();
         if (!phone) { setLoading(false); return; }
 
-        // 2. Parallel queries — use allSettled so one failure doesn't blank all tabs
+        // 2. Fetch each collection fully then filter by phone client-side
+        //    (avoids Firestore index requirements entirely)
         const byDate = (a: any, b: any) =>
           (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0);
 
+        const filterByPhone = (docs: any[]) =>
+          docs.filter(d => d.patientPhone?.trim() === phone);
+
         const [cardRes, invRes, pharmaRes, apptRes] = await Promise.allSettled([
-          getDocs(query(collection(db, "inpatientCards"), where("patientPhone", "==", phone))),
-          getDocs(query(collection(db, "invoices"),       where("patientPhone", "==", phone))),
-          getDocs(query(collection(db, "pharmacyBills"),  where("patientPhone", "==", phone))),
-          getDocs(query(collection(db, "appointments"),   where("patientPhone", "==", phone))),
+          getDocs(collection(db, "inpatientCards")),
+          getDocs(collection(db, "invoices")),
+          getDocs(collection(db, "pharmacyBills")),
+          getDocs(collection(db, "appointments")),
         ]);
 
         if (cardRes.status === "fulfilled")
-          setCards(cardRes.value.docs.map(d => ({ id: d.id, ...d.data() } as Card)).sort(byDate));
+          setCards(filterByPhone(cardRes.value.docs.map(d => ({ id: d.id, ...d.data() }))).sort(byDate) as Card[]);
         if (invRes.status === "fulfilled")
-          setInvoices(invRes.value.docs.map(d => ({ id: d.id, ...d.data() } as Invoice)).sort(byDate));
+          setInvoices(filterByPhone(invRes.value.docs.map(d => ({ id: d.id, ...d.data() }))).sort(byDate) as Invoice[]);
         if (pharmaRes.status === "fulfilled")
-          setPharma(pharmaRes.value.docs.map(d => ({ id: d.id, ...d.data() } as PharmaBill)).sort(byDate));
+          setPharma(filterByPhone(pharmaRes.value.docs.map(d => ({ id: d.id, ...d.data() }))).sort(byDate) as PharmaBill[]);
         if (apptRes.status === "fulfilled")
-          setAppts(apptRes.value.docs.map(d => ({ id: d.id, ...d.data() } as Appointment)).sort(byDate));
+          setAppts(filterByPhone(apptRes.value.docs.map(d => ({ id: d.id, ...d.data() }))).sort(byDate) as Appointment[]);
 
         // Log any failures to console for debugging
         [cardRes, invRes, pharmaRes, apptRes].forEach((r, i) => {
