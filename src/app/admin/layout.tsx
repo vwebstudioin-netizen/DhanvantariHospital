@@ -11,7 +11,7 @@ import {
   LayoutDashboard, Calendar, Users, FileText, MessageSquare,
   Star, Settings, Image, BarChart3, Shield,
   Ticket, Pill, LogOut, HardDrive,
-  CreditCard, Receipt, Stethoscope,
+  CreditCard, Receipt, Stethoscope, Briefcase, ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +27,8 @@ const ADMIN_CORE_LINKS = [
   { label: "Gallery",      href: "/admin/gallery",      icon: Image },
   { label: "Analytics",    href: "/admin/analytics",    icon: BarChart3 },
   { label: "Billing Items", href: "/admin/billing-services", icon: Receipt },
+  { label: "Careers",      href: "/admin/careers",      icon: Briefcase },
+  { label: "Applications", href: "/admin/applications", icon: ClipboardList },
   { label: "Roles",        href: "/admin/roles",        icon: Shield },
   { label: "Backup",       href: "/admin/backup",       icon: HardDrive },
   { label: "Settings",     href: "/admin/settings",     icon: Settings },

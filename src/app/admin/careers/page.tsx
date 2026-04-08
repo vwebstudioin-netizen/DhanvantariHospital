@@ -1,72 +1,117 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  collection, getDocs, addDoc, updateDoc, deleteDoc,
+  doc, orderBy, query, Timestamp,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Pencil, Trash2, Search, Briefcase, Users, MapPin, IndianRupee } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Briefcase, MapPin, IndianRupee, RefreshCw } from "lucide-react";
+import toast from "react-hot-toast";
 
-interface CareerListing {
+interface JobOpening {
   id: string;
   title: string;
   department: string;
   location: string;
   type: string;
   salary: string;
-  posted: string;
-  applications: number;
-  status: "open" | "closed";
   description: string;
+  isActive: boolean;
+  createdAt?: any;
 }
 
-const initialCareers: CareerListing[] = [
-  { id: "1", title: "Registered Nurse", department: "Nursing", location: "Main Campus", type: "Full-time", salary: "₹5,00,000 – ₹7,00,000", posted: "2025-01-10", applications: 24, status: "open", description: "Experienced RN for our family medicine department." },
-  { id: "2", title: "Front Desk Receptionist", department: "Administration", location: "Downtown Clinic", type: "Full-time", salary: "₹3,00,000 – ₹4,00,000", posted: "2025-01-20", applications: 42, status: "open", description: "Greet patients and manage appointment scheduling." },
-  { id: "3", title: "Lab Technician", department: "Laboratory", location: "Main Campus", type: "Full-time", salary: "₹4,50,000 – ₹6,00,000", posted: "2025-02-01", applications: 15, status: "open", description: "Perform clinical laboratory tests and maintain equipment." },
-  { id: "4", title: "Dental Hygienist", department: "Dental", location: "West Side Center", type: "Part-time", salary: "₹3,50,000 – ₹4,50,000", posted: "2024-12-15", applications: 8, status: "closed", description: "Provide dental cleaning and patient education." },
-];
+const EMPTY_FORM: Omit<JobOpening, "id" | "createdAt"> = {
+  title: "", department: "", location: "Tanuku, AP",
+  type: "Full-time", salary: "", description: "", isActive: true,
+};
 
 export default function AdminCareersPage() {
-  const [careers, setCareers] = useState<CareerListing[]>(initialCareers);
-  const [search, setSearch] = useState("");
-  const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState<Partial<CareerListing>>({});
+  const [jobs, setJobs]       = useState<JobOpening[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving]   = useState(false);
+  const [search, setSearch]   = useState("");
+  const [editId, setEditId]   = useState<string | null>(null);
+  const [form, setForm]       = useState<Omit<JobOpening, "id" | "createdAt">>(EMPTY_FORM);
 
-  const filtered = careers.filter((c) =>
-    c.title.toLowerCase().includes(search.toLowerCase()) ||
-    c.department.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => { load(); }, []);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const snap = await getDocs(query(collection(db, "jobOpenings"), orderBy("createdAt", "desc")));
+      setJobs(snap.docs.map(d => ({ id: d.id, ...d.data() } as JobOpening)));
+    } catch {
+      toast.error("Failed to load job openings");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   function openNew() {
     setEditId("new");
-    setForm({ title: "", department: "", location: "", type: "Full-time", salary: "", posted: new Date().toISOString().split("T")[0], applications: 0, status: "open", description: "" });
+    setForm(EMPTY_FORM);
   }
 
-  function openEdit(c: CareerListing) {
-    setEditId(c.id);
-    setForm(c);
+  function openEdit(job: JobOpening) {
+    setEditId(job.id);
+    setForm({ title: job.title, department: job.department, location: job.location, type: job.type, salary: job.salary, description: job.description, isActive: job.isActive });
   }
 
-  function save() {
-    if (!form.title || !form.department) return;
-    if (editId === "new") {
-      setCareers((prev) => [...prev, { ...form, id: Date.now().toString() } as CareerListing]);
-    } else {
-      setCareers((prev) => prev.map((c) => (c.id === editId ? { ...c, ...form } : c)));
+  async function save() {
+    if (!form.title.trim() || !form.department.trim()) {
+      toast.error("Title and department are required");
+      return;
     }
-    setEditId(null);
-    setForm({});
+    setSaving(true);
+    try {
+      if (editId === "new") {
+        const ref = await addDoc(collection(db, "jobOpenings"), { ...form, createdAt: Timestamp.now() });
+        setJobs(prev => [{ id: ref.id, ...form, createdAt: Timestamp.now() }, ...prev]);
+        toast.success("Job posted successfully");
+      } else if (editId) {
+        await updateDoc(doc(db, "jobOpenings", editId), { ...form });
+        setJobs(prev => prev.map(j => j.id === editId ? { ...j, ...form } : j));
+        toast.success("Job updated");
+      }
+      setEditId(null);
+      setForm(EMPTY_FORM);
+    } catch {
+      toast.error("Save failed");
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function remove(id: string) {
-    setCareers((prev) => prev.filter((c) => c.id !== id));
+  async function remove(id: string) {
+    if (!confirm("Delete this job posting?")) return;
+    try {
+      await deleteDoc(doc(db, "jobOpenings", id));
+      setJobs(prev => prev.filter(j => j.id !== id));
+      toast.success("Job deleted");
+    } catch {
+      toast.error("Delete failed");
+    }
   }
 
-  function toggleStatus(id: string) {
-    setCareers((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status: c.status === "open" ? "closed" : "open" } : c))
-    );
+  async function toggleActive(job: JobOpening) {
+    try {
+      await updateDoc(doc(db, "jobOpenings", job.id), { isActive: !job.isActive });
+      setJobs(prev => prev.map(j => j.id === job.id ? { ...j, isActive: !j.isActive } : j));
+    } catch {
+      toast.error("Update failed");
+    }
   }
+
+  const filtered = jobs.filter(j =>
+    j.title.toLowerCase().includes(search.toLowerCase()) ||
+    j.department.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const openCount = jobs.filter(j => j.isActive).length;
 
   return (
     <div className="space-y-6">
@@ -74,12 +119,17 @@ export default function AdminCareersPage() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Manage Careers</h1>
           <p className="text-sm text-muted-foreground">
-            {careers.filter((c) => c.status === "open").length} open positions &middot; {careers.reduce((a, c) => a + c.applications, 0)} total applications
+            {openCount} open {openCount === 1 ? "position" : "positions"} · {jobs.length} total
           </p>
         </div>
-        <Button onClick={openNew}>
-          <Plus className="mr-2 h-4 w-4" /> Post New Job
-        </Button>
+        <div className="flex gap-2">
+          <button onClick={load} className="p-2 text-muted-foreground hover:text-foreground border border-border rounded-lg hover:bg-muted" title="Refresh">
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          </button>
+          <Button onClick={openNew}>
+            <Plus className="mr-2 h-4 w-4" /> Post New Job
+          </Button>
+        </div>
       </div>
 
       <div className="relative">
@@ -87,28 +137,29 @@ export default function AdminCareersPage() {
         <Input placeholder="Search positions..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
       </div>
 
+      {/* Form */}
       {editId && (
         <div className="rounded-xl border border-primary/30 bg-primary/5 p-6">
           <h2 className="mb-4 font-semibold text-foreground">{editId === "new" ? "Post New Job" : "Edit Job Listing"}</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label>Job Title</Label>
-              <Input value={form.title || ""} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} />
+              <Label>Job Title *</Label>
+              <Input value={form.title} onChange={(e) => setForm(p => ({ ...p, title: e.target.value }))} placeholder="e.g. Staff Nurse" />
             </div>
             <div>
-              <Label>Department</Label>
-              <Input value={form.department || ""} onChange={(e) => setForm((p) => ({ ...p, department: e.target.value }))} />
+              <Label>Department *</Label>
+              <Input value={form.department} onChange={(e) => setForm(p => ({ ...p, department: e.target.value }))} placeholder="e.g. Nursing" />
             </div>
             <div>
               <Label>Location</Label>
-              <Input value={form.location || ""} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} />
+              <Input value={form.location} onChange={(e) => setForm(p => ({ ...p, location: e.target.value }))} />
             </div>
             <div>
               <Label>Type</Label>
               <select
                 className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                value={form.type || "Full-time"}
-                onChange={(e) => setForm((p) => ({ ...p, type: e.target.value }))}
+                value={form.type}
+                onChange={(e) => setForm(p => ({ ...p, type: e.target.value }))}
               >
                 <option>Full-time</option>
                 <option>Part-time</option>
@@ -118,90 +169,98 @@ export default function AdminCareersPage() {
             </div>
             <div>
               <Label>Salary Range</Label>
-              <Input value={form.salary || ""} onChange={(e) => setForm((p) => ({ ...p, salary: e.target.value }))} placeholder="e.g. ₹5,00,000 – ₹7,00,000" />
+              <Input value={form.salary} onChange={(e) => setForm(p => ({ ...p, salary: e.target.value }))} placeholder="e.g. ₹5,00,000 – ₹7,00,000" />
             </div>
             <div>
               <Label>Status</Label>
               <select
                 className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                value={form.status || "open"}
-                onChange={(e) => setForm((p) => ({ ...p, status: e.target.value as "open" | "closed" }))}
+                value={form.isActive ? "open" : "closed"}
+                onChange={(e) => setForm(p => ({ ...p, isActive: e.target.value === "open" }))}
               >
-                <option value="open">Open</option>
-                <option value="closed">Closed</option>
+                <option value="open">Open (visible on website)</option>
+                <option value="closed">Closed (hidden from website)</option>
               </select>
             </div>
             <div className="sm:col-span-2">
               <Label>Description</Label>
-              <Input value={form.description || ""} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} />
+              <textarea
+                value={form.description}
+                onChange={(e) => setForm(p => ({ ...p, description: e.target.value }))}
+                rows={3}
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+                placeholder="Role summary, responsibilities, qualifications…"
+              />
             </div>
           </div>
           <div className="mt-4 flex gap-2">
-            <Button onClick={save}>Save</Button>
-            <Button variant="outline" onClick={() => setEditId(null)}>Cancel</Button>
+            <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save"}</Button>
+            <Button variant="outline" onClick={() => { setEditId(null); setForm(EMPTY_FORM); }}>Cancel</Button>
           </div>
         </div>
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-xl border border-border">
-        <table className="w-full text-sm">
-          <thead className="border-b border-border bg-muted/50">
-            <tr>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Position</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Location</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Type</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Salary</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Apps</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
-              <th className="px-4 py-3 text-right font-medium text-muted-foreground">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((c) => (
-              <tr key={c.id} className="border-b border-border last:border-0">
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-primary" />
-                    <div>
-                      <p className="font-medium text-foreground">{c.title}</p>
-                      <p className="text-xs text-muted-foreground">{c.department}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-muted-foreground">
-                  <div className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {c.location}</div>
-                </td>
-                <td className="px-4 py-3 text-muted-foreground">{c.type}</td>
-                <td className="px-4 py-3 text-muted-foreground">
-                  <div className="flex items-center gap-1"><IndianRupee className="h-3 w-3" /> {c.salary}</div>
-                </td>
-                <td className="px-4 py-3 text-muted-foreground">
-                  <div className="flex items-center gap-1"><Users className="h-3 w-3" /> {c.applications}</div>
-                </td>
-                <td className="px-4 py-3">
-                  <button onClick={() => toggleStatus(c.id)}>
-                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${c.status === "open" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
-                      {c.status}
-                    </span>
-                  </button>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <button onClick={() => openEdit(c)} className="rounded p-1 hover:bg-muted"><Pencil className="h-4 w-4" /></button>
-                    <button onClick={() => remove(c.id)} className="rounded p-1 hover:bg-red-50 text-red-500"><Trash2 className="h-4 w-4" /></button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {filtered.length === 0 && (
+      {loading ? (
+        <div className="space-y-3">{[1, 2, 3].map(i => <div key={i} className="h-16 rounded-xl border border-border bg-card animate-pulse" />)}</div>
+      ) : (
+        <div className="overflow-x-auto rounded-xl border border-border">
+          <table className="w-full text-sm">
+            <thead className="border-b border-border bg-muted/50">
               <tr>
-                <td colSpan={7} className="py-8 text-center text-muted-foreground">No positions found.</td>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Position</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Location</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Type</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Salary</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
+                <th className="px-4 py-3 text-right font-medium text-muted-foreground">Actions</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {filtered.map((job) => (
+                <tr key={job.id} className="border-b border-border last:border-0">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Briefcase className="h-4 w-4 text-primary shrink-0" />
+                      <div>
+                        <p className="font-medium text-foreground">{job.title}</p>
+                        <p className="text-xs text-muted-foreground">{job.department}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    <div className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {job.location}</div>
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">{job.type}</td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {job.salary ? <div className="flex items-center gap-1"><IndianRupee className="h-3 w-3" /> {job.salary}</div> : <span className="text-muted-foreground/50">—</span>}
+                  </td>
+                  <td className="px-4 py-3">
+                    <button onClick={() => toggleActive(job)}>
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${job.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                        {job.isActive ? "Open" : "Closed"}
+                      </span>
+                    </button>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <button onClick={() => openEdit(job)} className="rounded p-1 hover:bg-muted"><Pencil className="h-4 w-4" /></button>
+                      <button onClick={() => remove(job.id)} className="rounded p-1 hover:bg-red-50 text-red-500"><Trash2 className="h-4 w-4" /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-muted-foreground">
+                    {jobs.length === 0 ? "No job postings yet. Click 'Post New Job' to add one." : "No positions match your search."}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

@@ -46,6 +46,7 @@ export const NAV_LINKS = [
     ],
   },
   { label: "Blog", href: "/blog" },
+  { label: "Careers", href: "/careers" },
   { label: "Contact", href: "/contact" },
 ] as const;
 
@@ -67,6 +68,7 @@ export const FOOTER_LINKS = {
   company: [
     { label: "Gallery", href: "/gallery" },
     { label: "Blog", href: "/blog" },
+    { label: "Careers", href: "/careers" },
     { label: "Contact", href: "/contact" },
   ],
 };

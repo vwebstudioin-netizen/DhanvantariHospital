@@ -51,7 +51,7 @@ export default function Footer() {
                 <Mail className="h-4 w-4 text-primary" /> {CONTACT_EMAIL}
               </p>
               <p className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-primary" /> Springfield, IL — 3 Locations
+                <MapPin className="h-4 w-4 text-primary" /> Tanuku, Andhra Pradesh
               </p>
             </div>
             {/* Social */}
