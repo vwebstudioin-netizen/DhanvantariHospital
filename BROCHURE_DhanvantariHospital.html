@@ -731,6 +731,117 @@
   </div>
 </div>
 
+<!-- Complete Feature List -->
+<div class="section section-muted">
+  <div class="container">
+    <div class="centered">
+      <span class="section-label dark">Complete Feature List</span>
+      <h2 class="section-title">Everything included — at a glance</h2>
+      <p class="section-sub">Every feature across all 8 modules, in one place. This is the full scope of what goes live at Dhanvantari Hospital on deployment day.</p>
+    </div>
+
+    <style>
+      .feat-table { width:100%; border-collapse:collapse; margin-top:40px; margin-bottom:48px; font-size:0.86rem; }
+      .feat-table .mod-row td { background:#1e3a5f; color:#fde68a; font-weight:700; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; padding:10px 16px; }
+      .feat-table tbody tr td { padding:11px 16px; border-bottom:1px solid #e2e8f0; vertical-align:top; color:#374151; }
+      .feat-table tbody tr:nth-child(even) td { background:#fff; }
+      .feat-table tbody tr:nth-child(odd) td { background:#f8fafc; }
+      .feat-table tbody tr.mod-row:nth-child(odd) td,
+      .feat-table tbody tr.mod-row:nth-child(even) td { background:#1e3a5f; }
+      .feat-table td:first-child { font-weight:700; color:#1e3a5f; width:240px; white-space:nowrap; }
+      .feat-table .mod-row td:first-child { color:#fde68a; white-space:normal; }
+      @media(max-width:600px){ .feat-table td:first-child { white-space:normal; width:auto; } }
+    </style>
+
+    <table class="feat-table">
+      <tbody>
+
+        <!-- MODULE 1 -->
+        <tr class="mod-row"><td colspan="2">Module 1 — Public Website + Patient Portal</td></tr>
+        <tr><td>Multi-specialty website</td><td>Home, About, Doctors, Departments (8), Services (15+), Gallery, Blog, FAQ, Reviews, Contact — all SEO-optimised with auto sitemap</td></tr>
+        <tr><td>Online appointment booking</td><td>Patients select department → service → doctor → date & time → fill details — email confirmation lands in their inbox in seconds</td></tr>
+        <tr><td>Patient portal</td><td>Google Sign-In — patients view appointments, messages, reviews, and notifications from a dedicated login</td></tr>
+        <tr><td>Public careers page</td><td>Live job listings at /careers — "Apply Now" modal collects name, phone, and note and writes to Firestore; admin sees it instantly in Applications tab</td></tr>
+        <tr><td>Queue status page</td><td>Patients enter their token number at /queue to check their position and estimated wait without calling reception</td></tr>
+        <tr><td>Doctor profiles</td><td>Individual pages per doctor — qualifications, specialities, conditions treated, and availability</td></tr>
+        <tr><td>Department pages</td><td>8 department pages with dedicated service listings and specialist details</td></tr>
+        <tr><td>Dark mode</td><td>Full light/dark mode — toggleable on every page, remembers user preference</td></tr>
+
+        <!-- MODULE 2 -->
+        <tr class="mod-row"><td colspan="2">Module 2 — Token Queue + TV Display + WhatsApp + Voice</td></tr>
+        <tr><td>Token issuance</td><td>Receptionist enters phone number → patient name auto-fills from records → token issued and slip printed in under 10 seconds</td></tr>
+        <tr><td>5-stage live queue</td><td>Waiting → Called → Serving → Done → Skipped — status syncs across every screen in real time (Firestore)</td></tr>
+        <tr><td>Full-screen TV display</td><td>Waiting room screen shows current and upcoming tokens with colour-coded status — no setup beyond opening the URL</td></tr>
+        <tr><td>Doctor call panel</td><td>One click calls the next patient — TV display updates and WhatsApp message fires simultaneously</td></tr>
+        <tr><td>WhatsApp notification</td><td>Patient receives a WhatsApp message the moment their token is called — no more shouting across the waiting room</td></tr>
+        <tr><td>Telugu voice announcement</td><td>Audio voice announces the patient name in Telugu on the waiting room TV when their token is called</td></tr>
+        <tr><td>No-show & skip handling</td><td>Doctor can mark patients as skipped or no-show without leaving the consultation panel — queue adjusts automatically</td></tr>
+        <tr><td>End-of-day PDF log</td><td>One click exports a print-ready A4 PDF of every token for the day — patient name, time, status — for accountability and records</td></tr>
+
+        <!-- MODULE 3 -->
+        <tr class="mod-row"><td colspan="2">Module 3 — Desk App (Patient Cards + Hospital Billing)</td></tr>
+        <tr><td>OPD patient cards</td><td>Full patient history linked to phone number — every past visit, every invoice, every note in one profile</td></tr>
+        <tr><td>IPD room cards</td><td>Ward, bed, room number, doctor, diagnosis, and admission date — all digital; printed as credit-card-sized slip for patient</td></tr>
+        <tr><td>Admission WhatsApp card</td><td>Room card details sent to patient and family on WhatsApp at the moment of admission</td></tr>
+        <tr><td>Hospital invoicing</td><td>Numbered invoices (INV-XXXX) with configurable line items — print A4 or share to patient WhatsApp in one click</td></tr>
+        <tr><td>Invoice history</td><td>Full billing log per patient and across the hospital — searchable and filterable</td></tr>
+        <tr><td>Discharge summary (IPD)</td><td>One-click A4 discharge document — admission & discharge dates, stay duration, diagnosis, treating doctor, and signature blocks for both parties</td></tr>
+        <tr><td>Enquiries inbox</td><td>All contact form submissions and appointment requests from the public website land in a single inbox at the desk</td></tr>
+        <tr><td>Review request</td><td>WhatsApp link sent automatically to patient after billing or discharge — they click, rate, write; admin approves and it appears on the website</td></tr>
+
+        <!-- MODULE 4 -->
+        <tr class="mod-row"><td colspan="2">Module 4 — Pharmacy ERP</td></tr>
+        <tr><td>Medicine catalog</td><td>Full database of medicines with name, category, unit, price, and reorder level</td></tr>
+        <tr><td>Auto stock deduction</td><td>Every dispensed medicine is deducted from inventory the moment the bill is saved — no manual stock entry</td></tr>
+        <tr><td>Low-stock alerts</td><td>Dashboard flags any medicine that has fallen below its reorder level — no surprise stockouts</td></tr>
+        <tr><td>Expiry alerts</td><td>Medicines expiring in 30, 60, or 90 days are flagged on the dashboard every morning — catch expired stock before it reaches patients</td></tr>
+        <tr><td>Pharmacy billing</td><td>Numbered invoices (PHRM-XXXX) — search medicine, add quantity, save — print or WhatsApp share in under a minute</td></tr>
+        <tr><td>Supplier records</td><td>Supplier name, contact, and details stored digitally and linked to every purchase entry</td></tr>
+        <tr><td>Dispensing reports</td><td>Full stock movement history with CSV export — useful for monthly audits and purchase planning</td></tr>
+
+        <!-- MODULE 5 -->
+        <tr class="mod-row"><td colspan="2">Module 5 — Patient Records + Admin Dashboard</td></tr>
+        <tr><td>Unified patient records</td><td>Every visit, every invoice, every medicine dispensed — one patient profile accessible from admin, desk, and doctor panels</td></tr>
+        <tr><td>Revenue dashboard</td><td>Hospital billing + pharmacy billing — visible the moment admin logs in, with one-click filter for today / this month / this quarter / this year</td></tr>
+        <tr><td>Staff management</td><td>Create staff accounts and assign roles (Admin / Receptionist / Pharmacist / Doctor) — no developer involvement</td></tr>
+        <tr><td>Content management</td><td>Blog posts, gallery photos, doctor profiles, department details, services, reviews — all editable from the admin panel without touching code</td></tr>
+        <tr><td>Billing service config</td><td>Pre-configure all hospital billing items and rates so reception only selects from a list — no freehand entry errors</td></tr>
+        <tr><td>Careers management</td><td>Post, edit, and close job openings from the Careers tab — jobs appear live on the public /careers page immediately; close with one click when filled</td></tr>
+        <tr><td>Applications inbox</td><td>All job applications arrive with applicant name, phone, cover note, and date — one-click status updates: New → Reviewed → Shortlisted → Rejected</td></tr>
+        <tr><td>Analytics</td><td>Queue activity, appointment volume, patient visit trends — visible from the admin dashboard</td></tr>
+
+        <!-- MODULE 6 -->
+        <tr class="mod-row"><td colspan="2">Module 6 — WhatsApp (Twilio) + Email (Resend)</td></tr>
+        <tr><td>Token call alert</td><td>Automatic WhatsApp when patient token is called — they receive the message on their phone at the exact moment the doctor calls them</td></tr>
+        <tr><td>Admission card on WhatsApp</td><td>Full room and admission details sent to patient and next-of-kin at the moment of IPD admission</td></tr>
+        <tr><td>Invoice on WhatsApp</td><td>Hospital and pharmacy invoices shareable via WhatsApp in one click — patient gets a digital copy instantly</td></tr>
+        <tr><td>Review request</td><td>Automatic WhatsApp message with a direct review link after billing or discharge</td></tr>
+        <tr><td>Appointment email</td><td>Online appointment booking triggers a confirmation email via Resend — sent within seconds of booking</td></tr>
+        <tr><td>Festive bulk blast</td><td>Pre-built WhatsApp messages for 11 occasions — Diwali, Eid, New Year, Holi, Doctor's Day, and more — send to all patients in one click</td></tr>
+        <tr><td>Campaign history</td><td>Log of all past bulk messages with send date and template used</td></tr>
+
+        <!-- MODULE 7 -->
+        <tr class="mod-row"><td colspan="2">Module 7 — Data Tools</td></tr>
+        <tr><td>Full data backup</td><td>Export all 12 Firestore collections as a single JSON file — downloadable from the admin panel anytime</td></tr>
+        <tr><td>Restore from backup</td><td>Upload any prior backup file to restore the hospital's data — no developer needed</td></tr>
+        <tr><td>Seed demo data</td><td>Load 20 fully linked demo patients for staff training and practice before go-live</td></tr>
+        <tr><td>CSV exports</td><td>Patient lists, token logs, billing history, pharmacy dispensing records — exportable across all modules</td></tr>
+        <tr><td>30-day backup reminder</td><td>Admin panel surfaces a reminder if no backup has been taken in the last 30 days</td></tr>
+
+        <!-- MODULE 8 -->
+        <tr class="mod-row"><td colspan="2">Module 8 — Deployment, Domain Setup &amp; Staff Training</td></tr>
+        <tr><td>Vercel deployment</td><td>Global edge network — 99.99% uptime, SSL auto-renewed, zero-downtime updates</td></tr>
+        <tr><td>Domain &amp; DNS</td><td>Custom domain pointed, DNS configured, HTTPS active before go-live</td></tr>
+        <tr><td>Firebase setup</td><td>Firestore + Auth configured in asia-south1 (Mumbai) — all patient data stays in India</td></tr>
+        <tr><td>Content pre-fill</td><td>All 8 departments, 15+ service pages, doctor profiles, and billing items pre-loaded from content you provide — system arrives ready to use</td></tr>
+        <tr><td>Staff training</td><td>2-hour hands-on walkthrough — each role shown their own panel, demo data pre-loaded so staff can practice before going live</td></tr>
+        <tr><td>Go-live verification</td><td>Queue tested, billing verified, WhatsApp integration confirmed, and domain live before handover — you see it working before we leave</td></tr>
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
 <!-- CTA -->
 <div class="cta-banner">
   <h2>Let's show you thirty minutes that will change how you think about your hospital.</h2>
