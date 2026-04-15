@@ -10,7 +10,7 @@ const features = [
   },
   {
     icon: Users,
-    title: "30+ Specialists",
+    title: "Expert Specialists",
     description: "Access board-certified physicians across 10 medical departments, all under one network.",
   },
   {

@@ -40,7 +40,7 @@ export default function AboutPage() {
               </p>
               <p className="mt-4 text-muted-foreground leading-relaxed">
                 Founded in 2010, we have grown from a single practice to a multi-location
-                healthcare network with over 30 specialists across 10 medical departments.
+                healthcare network with specialist doctors across 10 medical departments.
                 Our growth reflects our unwavering commitment to clinical excellence and
                 patient satisfaction.
               </p>
@@ -61,8 +61,8 @@ export default function AboutPage() {
                     <p className="text-xs text-muted-foreground">Years of Service</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-primary">30+</p>
-                    <p className="text-xs text-muted-foreground">Specialists</p>
+                    <p className="text-2xl font-bold text-primary">10</p>
+                    <p className="text-xs text-muted-foreground">Specialities</p>
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-primary">10</p>

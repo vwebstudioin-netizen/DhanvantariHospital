@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Phone, Mail, Clock, MapPin, Search, Menu, X, ChevronDown, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AnnouncementBar from "./AnnouncementBar";
-import { SITE_NAME, NAV_LINKS, CONTACT_PHONE, CONTACT_EMAIL } from "@/lib/constants";
+import { SITE_NAME, NAV_LINKS, CONTACT_PHONE, CONTACT_PHONE2, CONTACT_PHONE3, CONTACT_EMAIL } from "@/lib/constants";
 import ThemeToggle from "./ThemeToggle";
 import { cn } from "@/lib/utils";
 
@@ -31,7 +31,7 @@ export default function Header() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-xs text-muted-foreground">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
-              <Phone className="h-3 w-3" /> {CONTACT_PHONE}
+              <Phone className="h-3 w-3" /> {CONTACT_PHONE} / {CONTACT_PHONE2} / {CONTACT_PHONE3}
             </span>
             <span className="flex items-center gap-1">
               <Mail className="h-3 w-3" /> {CONTACT_EMAIL}

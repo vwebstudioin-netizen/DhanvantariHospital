@@ -8,7 +8,7 @@ export const locations: LocationData[] = [
     city: "Tanuku",
     state: "Andhra Pradesh",
     zipCode: "534211",
-    phone: process.env.NEXT_PUBLIC_HOSPITAL_PHONE || "",
+    phone: `${process.env.NEXT_PUBLIC_HOSPITAL_PHONE || "08819293445"} / ${process.env.NEXT_PUBLIC_HOSPITAL_PHONE2 || "7799381456"} / ${process.env.NEXT_PUBLIC_HOSPITAL_PHONE3 || "7799791456"}`,
     fax: "",
     email: process.env.NEXT_PUBLIC_HOSPITAL_EMAIL || "info@dhanvantarihospital.com",
     coordinates: { lat: 16.7626, lng: 81.6825 }, // Tanuku, West Godavari, AP

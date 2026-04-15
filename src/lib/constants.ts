@@ -7,9 +7,15 @@ export const SITE_DESCRIPTION =
 export const CONTACT_EMAIL =
   process.env.NEXT_PUBLIC_HOSPITAL_EMAIL || "info@dhanvantarihospital.com";
 export const CONTACT_PHONE =
-  process.env.NEXT_PUBLIC_HOSPITAL_PHONE || "";
+  process.env.NEXT_PUBLIC_HOSPITAL_PHONE || "08819293445";
+export const CONTACT_PHONE2 =
+  process.env.NEXT_PUBLIC_HOSPITAL_PHONE2 || "7799381456";
+export const CONTACT_PHONE3 =
+  process.env.NEXT_PUBLIC_HOSPITAL_PHONE3 || "7799791456";
+// Formatted display string e.g. used in headers/footers
+export const CONTACT_PHONES_DISPLAY = `${CONTACT_PHONE} / ${CONTACT_PHONE2} / ${CONTACT_PHONE3}`;
 export const EMERGENCY_PHONE =
-  process.env.NEXT_PUBLIC_HOSPITAL_PHONE || "";
+  process.env.NEXT_PUBLIC_HOSPITAL_PHONE || "08819293445";
 export const HOSPITAL_ADDRESS =
   process.env.NEXT_PUBLIC_HOSPITAL_ADDRESS || "";
 export const HOSPITAL_WHATSAPP =

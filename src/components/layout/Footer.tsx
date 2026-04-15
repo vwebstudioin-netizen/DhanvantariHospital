@@ -13,6 +13,8 @@ import {
 import {
   SITE_NAME,
   CONTACT_PHONE,
+  CONTACT_PHONE2,
+  CONTACT_PHONE3,
   CONTACT_EMAIL,
   FOOTER_LINKS,
   SOCIAL_LINKS,
@@ -45,7 +47,8 @@ export default function Footer() {
             </p>
             <div className="mt-4 space-y-2 text-sm text-muted-foreground">
               <p className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-primary" /> {CONTACT_PHONE}
+                <Phone className="h-4 w-4 text-primary shrink-0" />
+                <span>{CONTACT_PHONE} / {CONTACT_PHONE2} / {CONTACT_PHONE3}</span>
               </p>
               <p className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-primary" /> {CONTACT_EMAIL}
