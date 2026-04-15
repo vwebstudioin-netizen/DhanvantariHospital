@@ -3,9 +3,8 @@ import { buildWaLink } from "@/lib/whatsapp";
 
 /**
  * POST /api/whatsapp/send
- *
- * No longer sends via Twilio. Returns a wa.me link with a pre-filled message.
- * The client opens the link so the user taps Send themselves.
+ * Builds and returns a wa.me link with a pre-filled message.
+ * The client opens the link so the user taps Send themselves — no server-side sending.
  */
 export async function POST(req: NextRequest) {
   try {

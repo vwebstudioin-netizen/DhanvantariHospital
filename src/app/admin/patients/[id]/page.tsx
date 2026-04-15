@@ -9,9 +9,10 @@ import { db } from "@/lib/firebase";
 import { useAuthContext } from "@/providers/AuthProvider";
 import {
   ArrowLeft, User, Phone, Mail, Droplets, Calendar, CreditCard,
-  Receipt, Pill, FileText, Activity, IndianRupee, Stethoscope, Trash2,
+  Receipt, Pill, FileText, Activity, IndianRupee, Stethoscope, Trash2, MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { buildInvoiceLink } from "@/lib/whatsapp";
 import toast from "react-hot-toast";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -346,6 +347,7 @@ export default function PatientDetail() {
                     <Th>Amount</Th>
                     <Th>Payment</Th>
                     <Th>Date</Th>
+                    <Th>Share</Th>
                   </tr>
                 </thead>
                 <tbody>
@@ -364,6 +366,19 @@ export default function PatientDetail() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs text-muted-foreground">{fmt(inv.createdAt)}</td>
+                      <td className="px-4 py-3">
+                        {patient?.phone && (
+                          <a
+                            href={buildInvoiceLink(patient.phone, patient.name, inv.invoiceNumber, (inv.total ?? 0).toLocaleString("en-IN"))}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Send invoice summary via WhatsApp"
+                            className="inline-flex items-center gap-1 text-xs text-[#25D366] hover:underline font-medium"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+                          </a>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -386,6 +401,7 @@ export default function PatientDetail() {
                     <Th>Amount</Th>
                     <Th>Payment</Th>
                     <Th>Date</Th>
+                    <Th>Share</Th>
                   </tr>
                 </thead>
                 <tbody>
@@ -404,6 +420,19 @@ export default function PatientDetail() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs text-muted-foreground">{fmt(b.createdAt)}</td>
+                      <td className="px-4 py-3">
+                        {patient?.phone && (
+                          <a
+                            href={buildInvoiceLink(patient.phone, patient.name, b.billNumber, (b.total ?? 0).toLocaleString("en-IN"))}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Send pharmacy bill summary via WhatsApp"
+                            className="inline-flex items-center gap-1 text-xs text-[#25D366] hover:underline font-medium"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+                          </a>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

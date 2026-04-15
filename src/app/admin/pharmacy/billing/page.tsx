@@ -7,7 +7,8 @@ import { dispense } from "@/lib/stock";
 import { collection, addDoc, getDocs, query, orderBy, Timestamp, runTransaction, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { SITE_NAME, HOSPITAL_ADDRESS, CONTACT_PHONE } from "@/lib/constants";
-import { Plus, Trash2, Printer, Search, IndianRupee } from "lucide-react";
+import { Plus, Trash2, Printer, Search, IndianRupee, MessageCircle } from "lucide-react";
+import { buildPharmacyBillLink } from "@/lib/whatsapp";
 import type { Medicine } from "@/types/medicine";
 import toast from "react-hot-toast";
 
@@ -232,11 +233,27 @@ export default function PharmacyBillingPage() {
             </tbody>
           </table>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           <button onClick={() => handlePrint(createdBill)}
             className="flex items-center gap-2 bg-[#1e3a5f] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#152d4a]">
             <Printer className="w-4 h-4" /> Print Bill
           </button>
+          {createdBill.phone && (
+            <a
+            href={buildPharmacyBillLink(
+                createdBill.phone,
+                createdBill.name,
+                createdBill.billNumber,
+                createdBill.total,
+                createdBill.items
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-[#25D366] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#1ebe5d]"
+            >
+              <MessageCircle className="w-4 h-4" /> WhatsApp
+            </a>
+          )}
           <button onClick={() => { setCreatedBill(null); setCart([]); setPatient({ name: "", phone: "", doctorName: "" }); setDiscount(0); }}
             className="px-5 py-2 rounded-lg text-sm font-medium text-muted-foreground border border-border hover:bg-muted">
             New Bill

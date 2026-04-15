@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SITE_NAME, CONTACT_PHONE, HOSPITAL_ADDRESS } from "@/lib/constants";
 
 /**
- * WhatsApp webhook — kept for future use but Twilio is not active.
- * WhatsApp messages are now sent via wa.me links (no server-side sending).
+ * WhatsApp webhook stub — kept for routing compatibility.
+ * Messages are sent via wa.me links opened in the browser (no server-side sending).
  */
 export async function POST(req: NextRequest) {
-  // No Twilio — just acknowledge the request
+  // Stub — acknowledge any incoming request
   return new NextResponse("<?xml version='1.0' encoding='UTF-8'?><Response></Response>", {
     status: 200,
     headers: { "Content-Type": "text/xml" },
@@ -14,5 +13,5 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  return NextResponse.json({ status: "WhatsApp webhook endpoint — wa.me mode active" });
+  return NextResponse.json({ status: "WhatsApp endpoint active — wa.me mode" });
 }

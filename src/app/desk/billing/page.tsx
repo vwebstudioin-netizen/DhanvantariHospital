@@ -2,15 +2,14 @@
 
 import { useState, useRef, useEffect } from "react";
 import { usePatientLookup } from "@/hooks/usePatientLookup";
-import { Plus, Trash2, Printer, IndianRupee } from "lucide-react";
+import { Plus, Trash2, Printer, IndianRupee, MessageCircle } from "lucide-react";
 import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { createInvoice } from "@/lib/invoices";
 import { SITE_NAME, HOSPITAL_ADDRESS, CONTACT_PHONE, INVOICE_PAYMENT_METHODS } from "@/lib/constants";
 import type { InvoiceItem, InvoiceItemType, InvoicePaymentMethod } from "@/types/invoice";
 import toast from "react-hot-toast";
-
-const ITEM_TYPES: InvoiceItemType[] = ["consultation", "procedure", "medicine", "room", "lab", "other"];
+import { buildInvoiceLink } from "@/lib/whatsapp";
 
 function InvoicePrint({ data }: { data: any }) {
   return (
@@ -114,30 +113,37 @@ export default function BillingPage() {
   const [items, setItems] = useState<InvoiceItem[]>([]);
   const [discount, setDiscount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<InvoicePaymentMethod>("cash");
-  const [newItem, setNewItem] = useState({ name: "", type: "consultation" as InvoiceItemType, quantity: 1, unitPrice: 0 });
-  const [quickItems, setQuickItems] = useState<{ name: string; type: InvoiceItemType; price: number }[]>([]);
+  const [selectedServiceId, setSelectedServiceId] = useState("");
+  const [addQty, setAddQty] = useState(1);
+  const [quickItems, setQuickItems] = useState<{ id: string; name: string; type: InvoiceItemType; price: number }[]>([]);
 
-  // Load admin-configured quick items from Firestore
+  // Load admin-configured billing services from Firestore
   useEffect(() => {
     getDocs(query(collection(db, "billingServices"), where("isActive", "==", true), orderBy("createdAt", "asc")))
       .then(snap => setQuickItems(snap.docs.map(d => {
         const data = d.data();
-        return { name: data.name, type: data.type as InvoiceItemType, price: data.price };
+        return { id: d.id, name: data.name, type: data.type as InvoiceItemType, price: data.price };
       })))
-      .catch(() => {}); // silent — billing still works without quick items
+      .catch(() => {});
   }, []);
+
+  const selectedService = quickItems.find(q => q.id === selectedServiceId) ?? null;
 
   const subtotal = items.reduce((s, i) => s + i.total, 0);
   const total = Math.max(0, subtotal - discount);
 
   const addItem = () => {
-    if (!newItem.name || newItem.unitPrice <= 0) { toast.error("Enter item name and price"); return; }
-    setItems([...items, { ...newItem, total: newItem.quantity * newItem.unitPrice }]);
-    setNewItem({ name: "", type: "consultation", quantity: 1, unitPrice: 0 });
-  };
-
-  const addQuickItem = (qi: { name: string; type: InvoiceItemType; price: number }) => {
-    setItems([...items, { name: qi.name, type: qi.type, quantity: 1, unitPrice: qi.price, total: qi.price }]);
+    if (!selectedService) { toast.error("Select a service to add"); return; }
+    if (addQty < 1) { toast.error("Quantity must be at least 1"); return; }
+    setItems([...items, {
+      name: selectedService.name,
+      type: selectedService.type,
+      quantity: addQty,
+      unitPrice: selectedService.price,
+      total: addQty * selectedService.price,
+    }]);
+    setSelectedServiceId("");
+    setAddQty(1);
   };
 
   const handleSave = async () => {
@@ -206,23 +212,20 @@ export default function BillingPage() {
             <Printer className="w-4 h-4" /> Print Invoice
           </button>
           {createdInvoice.patientPhone && (
-            <button
-              onClick={async () => {
-                const res = await fetch("/api/whatsapp/send", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    phone: createdInvoice.patientPhone,
-                    message: `Thank you for visiting Dhanvantari Hospital! We'd love your feedback ⭐\n\nRate your visit: ${window.location.origin}/reviews/submit?ref=${createdInvoice.invoiceNumber}&name=${encodeURIComponent(createdInvoice.patientName)}`,
-                  }),
-                });
-                if (res.ok) toast.success("Review request sent via WhatsApp!");
-                else toast.error("Failed to send WhatsApp");
-              }}
-              className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+            <a
+              href={buildInvoiceLink(
+                createdInvoice.patientPhone,
+                createdInvoice.patientName,
+                createdInvoice.invoiceNumber,
+                createdInvoice.total,
+                createdInvoice.items.map((i: InvoiceItem) => ({ name: i.name, amount: i.total }))
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-[#25D366] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#1ebe5d]"
             >
-              ⭐ Request Review via WhatsApp
-            </button>
+              <MessageCircle className="w-4 h-4" /> WhatsApp Invoice
+            </a>
           )}
           <button onClick={() => { setCreatedInvoice(null); setPatient({ name: "", phone: "", patientId: "", doctorName: "" }); setItems([]); setDiscount(0); }} className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 border border-slate-200 hover:bg-slate-50">
             New Invoice
@@ -266,64 +269,51 @@ export default function BillingPage() {
         </div>
       </div>
 
-      {/* Quick add items */}
-      {quickItems.length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-100 p-5">
-          <h3 className="font-semibold text-slate-700 mb-3 text-sm uppercase tracking-wider">Quick Add</h3>
-          <div className="flex flex-wrap gap-2">
-            {quickItems.map((qi) => (
-              <button
-                key={qi.name}
-                onClick={() => addQuickItem(qi)}
-                className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-[#1e3a5f] hover:text-white hover:border-[#1e3a5f] transition-colors"
-              >
-                {qi.name} — ₹{qi.price}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Add custom item */}
+      {/* Add item from billing services */}
       <div className="bg-white rounded-xl border border-slate-100 p-5">
         <h3 className="font-semibold text-slate-700 mb-3 text-sm uppercase tracking-wider">Add Item</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="sm:col-span-2">
-            <input
-              value={newItem.name}
-              onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-              placeholder="Item description"
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f]"
-            />
+        {quickItems.length === 0 ? (
+          <p className="text-sm text-slate-400">No billing services configured. Add services in Admin → Billing Services.</p>
+        ) : (
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-48">
+              <label className="block text-xs font-medium text-slate-500 mb-1">Service / Item</label>
+              <select
+                value={selectedServiceId}
+                onChange={(e) => setSelectedServiceId(e.target.value)}
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f]"
+              >
+                <option value="">— Select service —</option>
+                {quickItems.map((qi) => (
+                  <option key={qi.id} value={qi.id}>
+                    {qi.name} — ₹{qi.price} ({qi.type})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="w-24">
+              <label className="block text-xs font-medium text-slate-500 mb-1">Qty</label>
+              <input
+                type="number"
+                min={1}
+                value={addQty}
+                onChange={(e) => setAddQty(Math.max(1, +e.target.value))}
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f]"
+              />
+            </div>
+            {selectedService && (
+              <div className="text-sm text-slate-500 pb-2">
+                = ₹{(selectedService.price * addQty).toFixed(2)}
+              </div>
+            )}
+            <button
+              onClick={addItem}
+              className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200"
+            >
+              <Plus className="w-4 h-4" /> Add
+            </button>
           </div>
-          <select
-            value={newItem.type}
-            onChange={(e) => setNewItem({ ...newItem, type: e.target.value as InvoiceItemType })}
-            className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f]"
-          >
-            {ITEM_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-          </select>
-          <div className="flex gap-2">
-            <input
-              type="number"
-              value={newItem.quantity}
-              onChange={(e) => setNewItem({ ...newItem, quantity: +e.target.value })}
-              min={1}
-              placeholder="Qty"
-              className="w-16 border border-slate-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f]"
-            />
-            <input
-              type="number"
-              value={newItem.unitPrice || ""}
-              onChange={(e) => setNewItem({ ...newItem, unitPrice: +e.target.value })}
-              placeholder="Price"
-              className="flex-1 border border-slate-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f]"
-            />
-          </div>
-        </div>
-        <button onClick={addItem} className="mt-3 flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200">
-          <Plus className="w-4 h-4" /> Add Item
-        </button>
+        )}
       </div>
 
       {/* Items list */}

@@ -66,8 +66,7 @@ export default function QueuePage() {
   const handleCallNext = async () => {
     const served = await callNext();
     if (served?.patientPhone && served?.displayNumber) {
-      // Open WhatsApp with a pre-filled "your token is called" message.
-      // Staff/receptionist just taps Send — no Twilio / server needed.
+      // Open WhatsApp in browser with pre-filled message — user just taps Send
       const link = buildTokenCalledLink(served.patientPhone, served.displayNumber);
       window.open(link, "_blank", "noopener,noreferrer");
     }

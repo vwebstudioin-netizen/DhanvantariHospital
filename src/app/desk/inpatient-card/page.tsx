@@ -11,20 +11,19 @@ import { issueToken } from "@/lib/queue";
 import { SITE_NAME, CONTACT_PHONE, INPATIENT_WARDS } from "@/lib/constants";
 import type { InPatientCard, CardType } from "@/types/inpatient";
 import toast from "react-hot-toast";
+import { buildAdmissionCardLink, buildReviewRequestLink } from "@/lib/whatsapp";
 
 // ── Whatsapp helper ──────────────────────────────────────────────────────────
-async function sendCardWhatsApp(card: InPatientCard) {
-  let message = "";
-  if (card.type === "room") {
-    message = `Hello ${card.patientName},\n\n${SITE_NAME} — Admission Details:\n\n🏥 Card No: *${card.cardNumber}*\n🛏 Ward: ${card.ward}, Room: ${card.roomNumber}${card.bedNumber ? `, Bed: ${card.bedNumber}` : ""}\n📅 Admitted: ${card.admissionDate}\n\nGet well soon! For assistance: ${CONTACT_PHONE}`;
-  } else {
-    message = `Hello ${card.patientName},\n\n${SITE_NAME} — Visit Card:\n\n📋 Card No: *${card.cardNumber}*\n📅 Valid until: ${card.expiryDate}\n\nPlease carry this card for follow-up visits. Ph: ${CONTACT_PHONE}`;
-  }
-  await fetch("/api/whatsapp/send", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone: card.patientPhone, message }),
-  });
+function sendCardWhatsApp(card: InPatientCard) {
+  if (!card.patientPhone) return;
+  const link = buildAdmissionCardLink(
+    card.patientPhone,
+    card.patientName,
+    card.cardNumber,
+    card.ward || (card.type === "visit" ? "OPD" : ""),
+    card.roomNumber || ""
+  );
+  window.open(link, "_blank", "noopener,noreferrer");
 }
 
 // ── Printable Room Card ──────────────────────────────────────────────────────
@@ -240,7 +239,7 @@ export default function InPatientCardPage() {
           const expiryDate = format(addDays(new Date(form.admissionDate), 14), "yyyy-MM-dd");
           tmpCard.expiryDate = expiryDate;
         }
-        await sendCardWhatsApp(tmpCard as InPatientCard).catch(() => {});
+        sendCardWhatsApp(tmpCard as InPatientCard);
       }
 
       const successMsg = activeTab === "visit" && tokenNumber
@@ -344,16 +343,10 @@ export default function InPatientCardPage() {
     setTimeout(() => { window.print(); setPrintCard(null); }, 300);
   };
 
-  const handleReview = async (card: InPatientCard) => {
-    const res = await fetch("/api/whatsapp/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        phone: card.patientPhone,
-        message: `Thank you for visiting ${SITE_NAME}! We hope you are well.\n\n⭐ Please share your experience:\n${window.location.origin}/reviews/submit?ref=${card.cardNumber}&name=${encodeURIComponent(card.patientName)}`,
-      }),
-    });
-    if (res.ok) toast.success("Review request sent!"); else toast.error("Failed to send");
+  const handleReview = (card: InPatientCard) => {
+    if (!card.patientPhone) return;
+    const link = buildReviewRequestLink(card.patientPhone, card.patientName, card.cardNumber);
+    window.open(link, "_blank", "noopener,noreferrer");
   };
 
   const filteredCards = cards
@@ -557,7 +550,7 @@ export default function InPatientCardPage() {
             <CardItem key={card.id} card={card}
               onPrint={() => handlePrint(card)}
               onDischarge={() => handleDischarge(card)}
-              onWhatsApp={() => sendCardWhatsApp(card).then(() => toast.success("WhatsApp sent!"))}
+              onWhatsApp={() => sendCardWhatsApp(card)}
               onReview={() => handleReview(card)}
               onDischargeSummary={() => handleDischargeSummary(card)}
             />
