@@ -19,7 +19,9 @@ export const EMERGENCY_PHONE =
 export const HOSPITAL_ADDRESS =
   process.env.NEXT_PUBLIC_HOSPITAL_ADDRESS || "D.No.34-1-5, Dodipeta Vari Thota Vedhi, Beside CPI Office, Tanuku, West Godavari, Andhra Pradesh 534211";
 export const HOSPITAL_WHATSAPP =
-  process.env.NEXT_PUBLIC_HOSPITAL_WHATSAPP || "";
+  process.env.NEXT_PUBLIC_HOSPITAL_WHATSAPP || "917799381456";
+export const HOSPITAL_WHATSAPP2 =
+  process.env.NEXT_PUBLIC_HOSPITAL_WHATSAPP2 || "917799791456";
 
 export const NAV_LINKS = [
   { label: "Home", href: "/" },
