@@ -11,7 +11,7 @@ import { doctors, getDoctorsByDepartment } from "@/data/doctors";
 import { useDoctors } from "@/hooks/useDoctors";
 import { getSlotsForDate, formatTime12, getDaySchedule, formatDayScheduleSummary } from "@/lib/scheduleUtils";
 import { WEEK_DAYS } from "@/types/doctor";
-import { CheckCircle, ArrowLeft, ArrowRight, Calendar, MapPin, Clock, AlertCircle } from "lucide-react";
+import { CheckCircle, ArrowLeft, ArrowRight, Calendar, MapPin, Clock, Phone, AlertCircle } from "lucide-react";
 
 interface BookingState {
   locationSlug: string;
@@ -220,20 +220,46 @@ export default function BookingPage() {
             {step === 0 && (
               <div className="space-y-4">
                 <h2 className="text-lg font-bold text-foreground">Select a Location</h2>
-                <div className="grid gap-4 sm:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-2">
                   {locations.map((loc) => (
                     <button
                       key={loc.slug}
                       onClick={() => setState({ ...state, locationSlug: loc.slug })}
-                      className={`rounded-lg border p-4 text-left transition ${
+                      className={`rounded-xl border-2 p-5 text-left transition-all hover:shadow-md ${
                         state.locationSlug === loc.slug
                           ? "border-primary bg-primary/5"
-                          : "border-border hover:border-primary/30"
+                          : "border-border hover:border-primary/40"
                       }`}
                     >
-                      <MapPin className="mb-2 h-5 w-5 text-primary" />
-                      <p className="font-semibold text-foreground text-sm">{loc.name.replace("Dhanvantari Hospital — ", "")}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">{loc.address}</p>
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <div>
+                          <p className="font-bold text-foreground text-sm">{loc.name}</p>
+                          <span className="inline-block mt-1 text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-medium">
+                            🚨 24/7 Emergency
+                          </span>
+                        </div>
+                        {state.locationSlug === loc.slug && (
+                          <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center shrink-0 mt-0.5">
+                            <CheckCircle className="h-3.5 w-3.5 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <p className="flex items-start gap-2 text-xs text-muted-foreground">
+                          <MapPin className="h-3.5 w-3.5 shrink-0 text-primary mt-0.5" />
+                          {loc.address}
+                        </p>
+                        {loc.phone && (
+                          <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Phone className="h-3.5 w-3.5 shrink-0 text-primary" />
+                            {loc.phone}
+                          </p>
+                        )}
+                        <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Clock className="h-3.5 w-3.5 shrink-0 text-primary" />
+                          Open 24 Hours — Emergency Always Available
+                        </p>
+                      </div>
                     </button>
                   ))}
                 </div>

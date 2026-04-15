@@ -11,7 +11,7 @@ import {
   LayoutDashboard, Calendar, Users, FileText, MessageSquare,
   Star, Settings, Image, BarChart3, Shield,
   Ticket, Pill, LogOut, HardDrive,
-  CreditCard, Receipt, Stethoscope, Briefcase, ClipboardList,
+  CreditCard, Receipt, Stethoscope, Briefcase, ClipboardList, UserRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +21,7 @@ const ADMIN_CORE_LINKS = [
   { label: "Token Queue",  href: "/admin/queue",        icon: Ticket },
   { label: "Appointments", href: "/admin/appointments", icon: Calendar },
   { label: "Patients",     href: "/admin/patients",     icon: Users },
+  { label: "Doctors",      href: "/admin/doctors",      icon: UserRound },
   { label: "Blog",         href: "/admin/blog",         icon: FileText },
   { label: "Messages",     href: "/admin/messages",     icon: MessageSquare },
   { label: "Reviews",      href: "/admin/reviews",      icon: Star },
