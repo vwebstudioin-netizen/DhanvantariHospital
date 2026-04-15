@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { usePatientLookup } from "@/hooks/usePatientLookup";
 import { Plus, Trash2, Printer, IndianRupee, MessageCircle } from "lucide-react";
-import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { createInvoice } from "@/lib/invoices";
 import { SITE_NAME, HOSPITAL_ADDRESS, CONTACT_PHONE, INVOICE_PAYMENT_METHODS } from "@/lib/constants";
@@ -117,14 +117,17 @@ export default function BillingPage() {
   const [addQty, setAddQty] = useState(1);
   const [quickItems, setQuickItems] = useState<{ id: string; name: string; type: InvoiceItemType; price: number }[]>([]);
 
-  // Load admin-configured billing services from Firestore
+  // Load admin-configured billing services from Firestore (fetch all, filter client-side to avoid composite index requirement)
   useEffect(() => {
-    getDocs(query(collection(db, "billingServices"), where("isActive", "==", true), orderBy("createdAt", "asc")))
-      .then(snap => setQuickItems(snap.docs.map(d => {
-        const data = d.data();
-        return { id: d.id, name: data.name, type: data.type as InvoiceItemType, price: data.price };
-      })))
-      .catch(() => {});
+    getDocs(collection(db, "billingServices"))
+      .then(snap => {
+        const all = snap.docs.map(d => {
+          const data = d.data();
+          return { id: d.id, name: data.name, type: data.type as InvoiceItemType, price: data.price, isActive: data.isActive !== false };
+        });
+        setQuickItems(all.filter(s => s.isActive).sort((a, b) => a.name.localeCompare(b.name)));
+      })
+      .catch((err) => { console.error("Failed to load billing services:", err); });
   }, []);
 
   const selectedService = quickItems.find(q => q.id === selectedServiceId) ?? null;
