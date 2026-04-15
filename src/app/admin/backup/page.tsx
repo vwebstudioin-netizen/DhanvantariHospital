@@ -13,10 +13,19 @@ import toast from "react-hot-toast";
 
 // Collections included in backup
 const BACKUP_COLLECTIONS = [
-  "patients", "appointments", "inpatientCards", "invoices",
-  "pharmacyBills", "medicines", "pharmacySuppliers",
-  "reviews", "contactMessages", "wishCampaigns",
+  // Patients & clinical
+  "patients", "appointments", "inpatientCards",
+  // Billing
+  "invoices", "pharmacyBills", "billingServices", "counters",
+  // Pharmacy
+  "medicines", "stockMovements", "suppliers",
+  // Doctors
+  "doctors",
+  // CRM / communications
+  "reviews", "contactMessages", "wishCampaigns", "newsletters",
+  // Content
   "blogPosts", "gallery",
+  // HR
   "jobOpenings", "jobApplications",
 ];
 
