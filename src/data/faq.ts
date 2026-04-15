@@ -24,7 +24,7 @@ export const faqs: FAQItem[] = [
   },
   {
     question: "What specialties are available at Dhanvantari Hospital?",
-    answer: "We offer General Medicine, General Surgery, Gynecology, Pediatrics, Orthopedics, Neurology, Cardiology, and Critical Care with a dedicated Emergency Critical Care Unit.",
+    answer: "We offer General Medicine, General Surgery, Gynecology, Orthopedics, Neurology, Cardiology, Pulmonology, Urology, Nephrology, and Critical Care with a dedicated Emergency Critical Care Unit.",
     category: "General",
   },
 
@@ -79,8 +79,8 @@ export const faqs: FAQItem[] = [
     category: "Services",
   },
   {
-    question: "Is pediatric care available for newborns?",
-    answer: "Yes, we have a neonatal care unit for newborns requiring special attention. Our pediatricians provide complete care for children from birth through adolescence.",
+    question: "Do you have respiratory and lung disease specialists?",
+    answer: "Yes, our Pulmonology department provides expert care for asthma, COPD, tuberculosis, pleural effusion, pneumonia, and other respiratory conditions. Spirometry and nebulization services are available.",
     category: "Services",
   },
 

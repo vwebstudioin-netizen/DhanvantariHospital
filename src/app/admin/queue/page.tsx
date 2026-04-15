@@ -9,6 +9,7 @@ import {
   Check, SkipForward, UserX, Printer, Stethoscope, Play, FileText,
 } from "lucide-react";
 import { SITE_NAME, CONTACT_PHONE, HOSPITAL_ADDRESS } from "@/lib/constants";
+import { buildTokenCalledLink } from "@/lib/whatsapp";
 import { format } from "date-fns";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -16,7 +17,7 @@ import toast from "react-hot-toast";
 
 const PURPOSES = [
   "General Consultation", "Emergency / Accident", "Surgery Review",
-  "Gynecology", "Pediatrics / Child", "Orthopedics",
+  "Gynecology", "Pulmonology", "Urology", "Nephrology", "Orthopedics",
   "Neurology", "Cardiology", "Critical Care", "Follow-up", "Lab / Tests", "Other",
 ];
 
@@ -65,16 +66,10 @@ export default function QueuePage() {
   const handleCallNext = async () => {
     const served = await callNext();
     if (served?.patientPhone && served?.displayNumber) {
-      try {
-        await fetch("/api/whatsapp/send", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            phone: served.patientPhone,
-            message: `Your token *#${served.displayNumber}* has been called at ${process.env.NEXT_PUBLIC_HOSPITAL_NAME || "the hospital"}. Please come to the consultation room. Thank you!`,
-          }),
-        });
-      } catch { /* WhatsApp failure should not block queue */ }
+      // Open WhatsApp with a pre-filled "your token is called" message.
+      // Staff/receptionist just taps Send — no Twilio / server needed.
+      const link = buildTokenCalledLink(served.patientPhone, served.displayNumber);
+      window.open(link, "_blank", "noopener,noreferrer");
     }
   };
 

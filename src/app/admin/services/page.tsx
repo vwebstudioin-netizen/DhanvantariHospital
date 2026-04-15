@@ -17,12 +17,12 @@ interface Service {
 }
 
 const initialServices: Service[] = [
-  { id: "1", name: "General Checkup", department: "Family Medicine", description: "Comprehensive annual wellness examination", duration: "30 min", price: "₹1,500", isActive: true },
-  { id: "2", name: "Pediatric Vaccination", department: "Pediatrics", description: "Routine childhood immunizations per schedule", duration: "15 min", price: "₹800", isActive: true },
-  { id: "3", name: "Dental Cleaning", department: "Dental", description: "Professional dental prophylaxis and examination", duration: "45 min", price: "₹2,000", isActive: true },
-  { id: "4", name: "Eye Exam", department: "Ophthalmology", description: "Comprehensive visual acuity and health screening", duration: "30 min", price: "₹1,200", isActive: true },
-  { id: "5", name: "X-Ray", department: "Radiology", description: "Digital X-ray imaging for diagnostic purposes", duration: "20 min", price: "₹1,000", isActive: false },
-  { id: "6", name: "Blood Panel", department: "Laboratory", description: "Complete blood count and metabolic panel", duration: "10 min", price: "₹900", isActive: true },
+  { id: "1", name: "General Consultation", department: "General Medicine", description: "Expert diagnosis and treatment for adult illnesses", duration: "20 min", price: "₹500", isActive: true },
+  { id: "2", name: "Asthma & COPD Treatment", department: "Pulmonology", description: "Spirometry, nebulization and lung disease management", duration: "30 min", price: "₹700", isActive: true },
+  { id: "3", name: "Kidney Stone Treatment", department: "Urology", description: "Evaluation and treatment of urinary stones", duration: "40 min", price: "₹800", isActive: true },
+  { id: "4", name: "CKD Care", department: "Nephrology", description: "Chronic kidney disease monitoring and management", duration: "30 min", price: "₹700", isActive: true },
+  { id: "5", name: "Fracture Treatment", department: "Orthopedics", description: "Emergency and elective fracture management", duration: "60 min", price: "₹1,000", isActive: true },
+  { id: "6", name: "Cardiac Consultation", department: "Cardiology", description: "ECG, echocardiography, and heart disease management", duration: "30 min", price: "₹800", isActive: true },
 ];
 
 export default function AdminServicesPage() {

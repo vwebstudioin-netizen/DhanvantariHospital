@@ -298,6 +298,7 @@ export interface DoctorData {
   conditionsTreated: string[];
   proceduresPerformed: string[];
   image: string;
+  weeklySchedule?: import("@/types/doctor").WeeklySchedule;
 }
 
 export interface InsuranceData {

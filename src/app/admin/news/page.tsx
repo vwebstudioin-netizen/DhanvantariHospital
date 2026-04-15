@@ -19,9 +19,9 @@ interface NewsItem {
 
 const initialNews: NewsItem[] = [
   { id: "1", title: "Dhanvantari Hospital Launches New Telehealth Platform", excerpt: "Patients can now access virtual consultations from the comfort of home.", category: "Technology", author: "Admin", date: "2025-01-15", status: "published", views: 1240 },
-  { id: "2", title: "Free Health Screening Camp — March 2025", excerpt: "Annual community health screening event at our Main Campus location.", category: "Events", author: "Dr. Priya Sharma", date: "2025-02-01", status: "published", views: 890 },
-  { id: "3", title: "New Pediatric Wing Opening", excerpt: "Expanded pediatric facilities with state-of-the-art equipment.", category: "Announcements", author: "Admin", date: "2025-02-10", status: "draft", views: 0 },
-  { id: "4", title: "Flu Season Preparedness Guide", excerpt: "Tips and vaccination information for the upcoming flu season.", category: "Health Tips", author: "Dr. Arjun Patel", date: "2025-01-28", status: "published", views: 2130 },
+  { id: "2", title: "Free Health Screening Camp — March 2025", excerpt: "Annual community health screening event at our Main Campus location.", category: "Events", author: "Admin", date: "2025-02-01", status: "published", views: 890 },
+  { id: "3", title: "New Pulmonology & Nephrology Units Now Open", excerpt: "Expanded respiratory and kidney care facilities with specialist doctors.", category: "Announcements", author: "Admin", date: "2025-02-10", status: "published", views: 640 },
+  { id: "4", title: "Kidney Stone Awareness Month", excerpt: "Tips on prevention, early symptoms, and when to seek urgent care.", category: "Health Tips", author: "Admin", date: "2025-01-28", status: "published", views: 2130 },
 ];
 
 export default function AdminNewsPage() {

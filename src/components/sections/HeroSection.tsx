@@ -33,7 +33,7 @@ export default function HeroSection() {
             </h1>
 
             <p className="max-w-lg text-lg text-white/70 leading-relaxed">
-              Dhanvantari Hospital — advanced multi-specialty care in Mysuru. Emergency, Surgery, Gynecology, Pediatrics, Orthopedics, Neurology, Cardiology and more under one roof.
+              Dhanvantari Hospital — advanced multi-specialty care in Mysuru. Emergency, Surgery, Gynecology, Pulmonology, Urology, Nephrology, Orthopedics, Neurology, Cardiology and more under one roof.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row">

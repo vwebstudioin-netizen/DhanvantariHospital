@@ -94,20 +94,84 @@ export const services: ServiceData[] = [
     ],
   },
 
-  // Pediatrics
+  // Pulmonology
   {
-    slug: "child-health-vaccination",
-    title: "Child Health & Vaccination",
-    shortDescription: "Complete pediatric care, immunization, and growth monitoring for infants and children.",
-    description: "Our pediatric department provides comprehensive child health services including newborn care, vaccination as per national immunization schedule, growth and development monitoring, nutritional guidance, and treatment of all childhood illnesses.",
-    icon: "Baby",
-    image: "/images/services/pediatrics.jpg",
-    departmentSlug: "pediatrics",
-    duration: 20,
-    features: ["Newborn care & screening", "Vaccination (NIS schedule)", "Growth & development tracking", "Childhood illness treatment", "Nutritional counselling", "School health assessment"],
+    slug: "asthma-copd-treatment",
+    title: "Asthma & COPD Treatment",
+    shortDescription: "Diagnosis and management of asthma, COPD, and other chronic respiratory conditions.",
+    description: "Our pulmonology department provides comprehensive care for all respiratory conditions. We offer spirometry, nebulization therapy, inhaler education, and structured management programs for chronic lung diseases including asthma and COPD.",
+    icon: "Wind",
+    image: "/images/services/asthma-copd.jpg",
+    departmentSlug: "pulmonology",
+    duration: 30,
+    features: ["Spirometry (lung function test)", "Nebulization therapy", "Inhaler technique training", "Asthma action plans", "COPD management", "Chest physiotherapy"],
     faq: [
-      { question: "What vaccines does your hospital provide?", answer: "We follow the National Immunization Schedule including BCG, OPV, DPT, Hepatitis B, MMR, and all recommended vaccines." },
-      { question: "Do you have a neonatal care unit?", answer: "Yes, we have a neonatal unit for care of newborns requiring special attention after birth." },
+      { question: "What is spirometry?", answer: "Spirometry is a simple breathing test that measures how much air you can inhale and exhale and how fast. It helps diagnose and monitor conditions like asthma and COPD." },
+      { question: "Can asthma be cured?", answer: "Asthma cannot be cured but can be very well controlled with proper medication, lifestyle changes, and regular monitoring. Most patients live a completely normal life." },
+    ],
+  },
+  {
+    slug: "pleural-chest-treatment",
+    title: "Pleural & Chest Conditions",
+    shortDescription: "Diagnosis and treatment of pleural effusion, pneumothorax, TB, and lung infections.",
+    description: "We manage a range of pleural and chest conditions including pleural effusion (fluid around the lung), pneumothorax (collapsed lung), tuberculosis, and lung infections. Procedures like pleural tapping and chest drain insertion are performed by experienced pulmonologists.",
+    icon: "Wind",
+    image: "/images/services/chest-treatment.jpg",
+    departmentSlug: "pulmonology",
+    duration: 45,
+    features: ["Pleural tapping (thoracocentesis)", "Chest drain insertion", "TB diagnosis & DOTS therapy", "Pneumonia management", "Bronchoscopy referral", "Pulmonary rehabilitation"],
+    faq: [
+      { question: "How is pleural effusion treated?", answer: "Small effusions may resolve on their own or with medication. Larger ones require thoracocentesis — a procedure to drain the excess fluid — which we perform at our hospital." },
+      { question: "Is TB treatment available here?", answer: "Yes, we diagnose TB and initiate DOTS (Directly Observed Treatment Short-course) as per national guidelines." },
+    ],
+  },
+
+  // Urology
+  {
+    slug: "kidney-stone-treatment",
+    title: "Kidney Stone Treatment",
+    shortDescription: "Complete evaluation and treatment of kidney and ureteric stones with medical and surgical options.",
+    description: "Our urology team provides complete management of urinary stones including diagnostic ultrasound and CT KUB, medical expulsion therapy, and surgical interventions such as ureteroscopy and PCNL when required. Emergency care for renal colic is available 24/7.",
+    icon: "Droplets",
+    image: "/images/services/kidney-stone.jpg",
+    departmentSlug: "urology",
+    duration: 40,
+    features: ["Ultrasound & CT KUB", "Medical expulsion therapy", "Ureteroscopy (URS)", "PCNL (percutaneous nephrolithotomy)", "Dietary & hydration advice", "Metabolic stone workup"],
+    faq: [
+      { question: "Can all kidney stones be treated without surgery?", answer: "Small stones (less than 5mm) often pass on their own with adequate hydration and medications. Larger stones may require ureteroscopy or PCNL depending on their size and location." },
+      { question: "Is emergency care available for kidney stone pain?", answer: "Yes, we provide 24/7 emergency care for severe renal colic including IV pain relief and urgent evaluation." },
+    ],
+  },
+  {
+    slug: "urological-conditions",
+    title: "Prostate & Urological Conditions",
+    shortDescription: "Diagnosis and treatment of prostate disorders, urinary incontinence, and bladder conditions.",
+    description: "We offer comprehensive urological care for men and women including management of benign prostatic hyperplasia (BPH), urinary tract infections, bladder conditions, and urinary incontinence. Both medical and surgical management options are available.",
+    icon: "Droplets",
+    image: "/images/services/urology.jpg",
+    departmentSlug: "urology",
+    duration: 30,
+    features: ["PSA testing & prostate evaluation", "BPH management (medical & surgical)", "Urinary flow studies (uroflowmetry)", "Bladder infection treatment", "Urinary incontinence care", "Cystoscopy"],
+    faq: [
+      { question: "What are signs of BPH (enlarged prostate)?", answer: "Common symptoms include frequent urination, weak urine stream, difficulty starting urination, and nighttime urination. We offer both medication and surgical options including TURP." },
+      { question: "Are UTI treatments available for women?", answer: "Yes, we treat urinary tract infections in both men and women with appropriate antibiotics and follow-up investigation to prevent recurrence." },
+    ],
+  },
+
+  // Nephrology
+  {
+    slug: "chronic-kidney-disease",
+    title: "Chronic Kidney Disease (CKD) Care",
+    shortDescription: "Comprehensive management of chronic kidney disease, renal failure, and dialysis support.",
+    description: "Our nephrology department provides expert care for all stages of chronic kidney disease — from early detection and slowing progression to preparation for dialysis or kidney transplant referral. We offer renal diet counselling, medication management, and regular monitoring.",
+    icon: "Activity",
+    image: "/images/services/ckd-care.jpg",
+    departmentSlug: "nephrology",
+    duration: 30,
+    features: ["CKD staging & monitoring (GFR, creatinine)", "Blood pressure & diabetes control", "Renal diet counselling", "Anaemia of CKD management", "Dialysis coordination", "Transplant evaluation referral"],
+    faq: [
+      { question: "Can CKD be reversed?", answer: "CKD cannot be fully reversed, but with proper management — blood pressure control, diabetes control, and renal-protective medications — progression can be significantly slowed." },
+      { question: "Do you provide dialysis?", answer: "We provide dialysis support and coordination for patients requiring hemodialysis. Please contact us to check current dialysis availability." },
     ],
   },
 

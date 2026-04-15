@@ -18,12 +18,16 @@ interface Department {
 }
 
 const initialDepartments: Department[] = [
-  { id: "1", name: "Family Medicine", head: "Dr. Priya Sharma", phone: "(555) 123-4001", email: "familymedicine@clinicarepro.com", staffCount: 8, description: "Comprehensive primary care for patients of all ages.", isActive: true },
-  { id: "2", name: "Pediatrics", head: "Dr. Arjun Patel", phone: "(555) 123-4002", email: "pediatrics@clinicarepro.com", staffCount: 5, description: "Specialized care for infants, children, and adolescents.", isActive: true },
-  { id: "3", name: "Dental", head: "Dr. Neha Gupta", phone: "(555) 123-4003", email: "dental@clinicarepro.com", staffCount: 6, description: "General and preventive dental care services.", isActive: true },
-  { id: "4", name: "Ophthalmology", head: "Dr. Raj Krishnan", phone: "(555) 123-4004", email: "eye@clinicarepro.com", staffCount: 3, description: "Eye examinations, vision correction, and ocular health.", isActive: true },
-  { id: "5", name: "Radiology", head: "Dr. Ananya Rao", phone: "(555) 123-4005", email: "radiology@clinicarepro.com", staffCount: 4, description: "Diagnostic imaging including X-ray, ultrasound, and CT.", isActive: true },
-  { id: "6", name: "Laboratory", head: "Dr. Suresh Iyer", phone: "(555) 123-4006", email: "lab@clinicarepro.com", staffCount: 7, description: "Clinical laboratory testing and pathology services.", isActive: false },
+  { id: "1", name: "General Medicine", head: "Dr. Ayyapa", phone: "", email: "medicine@dhanvantarihospital.com", staffCount: 8, description: "Comprehensive diagnosis and treatment of adult illnesses.", isActive: true },
+  { id: "2", name: "General Surgery", head: "Dr. Ayyapa", phone: "", email: "surgery@dhanvantarihospital.com", staffCount: 5, description: "Elective and emergency surgical care.", isActive: true },
+  { id: "3", name: "Gynecology", head: "Dr. Ayyapa", phone: "", email: "gynecology@dhanvantarihospital.com", staffCount: 6, description: "Complete women's health and maternity services.", isActive: true },
+  { id: "4", name: "Pulmonology", head: "Dr. Ayyapa", phone: "", email: "pulmonology@dhanvantarihospital.com", staffCount: 4, description: "Respiratory and lung disease diagnosis and management.", isActive: true },
+  { id: "5", name: "Urology", head: "Dr. Ayyapa", phone: "", email: "urology@dhanvantarihospital.com", staffCount: 4, description: "Urinary tract and male reproductive system care.", isActive: true },
+  { id: "6", name: "Nephrology", head: "Dr. Ayyapa", phone: "", email: "nephrology@dhanvantarihospital.com", staffCount: 4, description: "Kidney disease management and dialysis support.", isActive: true },
+  { id: "7", name: "Orthopedics", head: "Dr. Ayyapa", phone: "", email: "ortho@dhanvantarihospital.com", staffCount: 5, description: "Bone, joint, and musculoskeletal care.", isActive: true },
+  { id: "8", name: "Neurology", head: "Dr. Ayyapa", phone: "", email: "neurology@dhanvantarihospital.com", staffCount: 4, description: "Brain, spinal cord, and nervous system disorders.", isActive: true },
+  { id: "9", name: "Cardiology", head: "Dr. Ayyapa", phone: "", email: "cardiology@dhanvantarihospital.com", staffCount: 5, description: "Heart and cardiovascular disease care.", isActive: true },
+  { id: "10", name: "Critical Care & Emergency", head: "Dr. Ayyapa", phone: "", email: "emergency@dhanvantarihospital.com", staffCount: 10, description: "24/7 emergency and intensive care unit.", isActive: true },
 ];
 
 export default function AdminDepartmentsPage() {

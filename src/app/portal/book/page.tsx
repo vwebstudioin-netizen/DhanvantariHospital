@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { CalendarDays, User, Clock, MapPin, Stethoscope, CheckCircle, ArrowLeft, ArrowRight } from "lucide-react";
 
-const departments = ["Family Medicine", "Pediatrics", "Dental", "Ophthalmology", "Dermatology", "Orthopedics"];
+const departments = ["General Medicine", "General Surgery", "Gynecology", "Pulmonology", "Urology", "Nephrology", "Orthopedics", "Neurology", "Cardiology", "Critical Care"];
 const locations = ["Main Campus — 123 Health Blvd", "Downtown Clinic — 456 Central Ave", "West Side Center — 789 Wellness Dr"];
 const timeSlots = ["9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM"];
 

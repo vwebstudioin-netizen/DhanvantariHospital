@@ -2,7 +2,7 @@ export const SITE_NAME =
   process.env.NEXT_PUBLIC_HOSPITAL_NAME || "Dhanvantari Hospital";
 export const SITE_TAGLINE = "Emergency Treatment for Accident Cases Available";
 export const SITE_DESCRIPTION =
-  `${SITE_NAME} — Multi-specialty hospital offering General Medicine, Surgery, Gynecology, Pediatrics, Orthopedics, Neurology, Cardiology, Critical Care, and Emergency Treatment for Accident Cases. Book your appointment online.`;
+  `${SITE_NAME} — Multi-specialty hospital offering General Medicine, Surgery, Gynecology, Pulmonology, Urology, Nephrology, Orthopedics, Neurology, Cardiology, Critical Care, and Emergency Treatment for Accident Cases. Book your appointment online.`;
 
 export const CONTACT_EMAIL =
   process.env.NEXT_PUBLIC_HOSPITAL_EMAIL || "info@dhanvantarihospital.com";
@@ -98,7 +98,9 @@ export const BLOG_CATEGORIES = [
   "Emergency Care",
   "General Medicine",
   "Surgery",
-  "Child Health",
+  "Pulmonology",
+  "Urology",
+  "Nephrology",
   "Women's Health",
   "Cardiology",
   "Orthopedics",
@@ -139,7 +141,7 @@ export const INPATIENT_WARDS = [
   "ICU",
   "Private Room",
   "Semi-Private Room",
-  "Pediatric Ward",
+  "Nephrology Ward",
   "Maternity Ward",
 ] as const;
 

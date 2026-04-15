@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import PageHero from "@/components/layout/PageHero";
 import { Button } from "@/components/ui/button";
 import { BOOKING_STEPS } from "@/lib/constants";
@@ -8,7 +8,10 @@ import { locations } from "@/data/locations";
 import { departments } from "@/data/departments";
 import { services, getServicesByDepartment } from "@/data/services";
 import { doctors, getDoctorsByDepartment } from "@/data/doctors";
-import { CheckCircle, ArrowLeft, ArrowRight, Calendar, MapPin } from "lucide-react";
+import { useDoctors } from "@/hooks/useDoctors";
+import { getSlotsForDate, formatTime12, getDaySchedule, formatDayScheduleSummary } from "@/lib/scheduleUtils";
+import { WEEK_DAYS } from "@/types/doctor";
+import { CheckCircle, ArrowLeft, ArrowRight, Calendar, MapPin, Clock, AlertCircle } from "lucide-react";
 
 interface BookingState {
   locationSlug: string;
@@ -43,25 +46,47 @@ const initialState: BookingState = {
   insurance: { provider: "", memberId: "", groupNumber: "" },
 };
 
-const timeSlots = [
-  "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
-  "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM",
-];
-
 export default function BookingPage() {
   const [step, setStep] = useState(0);
   const [state, setState] = useState<BookingState>(initialState);
   const [submitted, setSubmitted] = useState(false);
 
+  // Fetch live doctors from Firestore (includes weeklySchedule)
+  const { doctors: liveDoctors, isLoading: doctorsLoading } = useDoctors();
+
   const filteredServices = state.departmentSlug
     ? getServicesByDepartment(state.departmentSlug)
     : services;
 
+  // Use live Firestore doctors (with weeklySchedule), fall back to static while loading
+  const allDoctors = liveDoctors.length > 0 ? liveDoctors : doctors;
+
   const filteredDoctors = state.departmentSlug
-    ? getDoctorsByDepartment(state.departmentSlug).filter(
-        (d) => !state.locationSlug || d.locationSlugs.includes(state.locationSlug)
+    ? allDoctors.filter(
+        (d) =>
+          d.departmentSlugs.includes(state.departmentSlug) &&
+          (!state.locationSlug || d.locationSlugs.includes(state.locationSlug))
       )
-    : doctors;
+    : allDoctors;
+
+  // Selected doctor object (from live data so weeklySchedule is available)
+  const selectedDoctor = state.doctorSlug
+    ? allDoctors.find((d) => d.slug === state.doctorSlug)
+    : null;
+
+  // Time slots derived from doctor's weeklySchedule for the chosen date
+  const availableTimeSlots = useMemo(() => {
+    if (!state.date || !selectedDoctor?.weeklySchedule) return [];
+    const dateObj = new Date(state.date + "T00:00:00");
+    return getSlotsForDate(selectedDoctor.weeklySchedule, dateObj);
+  }, [state.date, selectedDoctor]);
+
+  // Day schedule summary for selected doctor + date
+  const selectedDaySchedule = useMemo(() => {
+    if (!state.date || !selectedDoctor?.weeklySchedule) return null;
+    const dateObj = new Date(state.date + "T00:00:00");
+    return getDaySchedule(selectedDoctor.weeklySchedule, dateObj);
+  }, [state.date, selectedDoctor]);
 
   const canProceed = (): boolean => {
     switch (step) {
@@ -69,7 +94,7 @@ export default function BookingPage() {
       case 1: return !!state.departmentSlug;
       case 2: return !!state.serviceSlug;
       case 3: return !!state.doctorSlug;
-      case 4: return !!state.date && !!state.time;
+      case 4: return !!state.date && !!state.time && selectedDaySchedule !== null;
       case 5: return !!(state.patientInfo.firstName && state.patientInfo.lastName && state.patientInfo.email && state.patientInfo.phone);
       case 6: return true;
       case 7: return true;
@@ -138,7 +163,7 @@ export default function BookingPage() {
             <p className="mb-4 text-muted-foreground">A confirmation email will be sent to {state.patientInfo.email}.</p>
             <div className="mb-6 rounded-lg bg-muted/50 p-4 text-left text-sm">
               <p><strong>Location:</strong> {locations.find((l) => l.slug === state.locationSlug)?.name}</p>
-              <p><strong>Date:</strong> {state.date} at {state.time}</p>
+              <p><strong>Date:</strong> {state.date} at {formatTime12(state.time)}</p>
               <p><strong>Doctor:</strong> {doctors.find((d) => d.slug === state.doctorSlug)?.firstName} {doctors.find((d) => d.slug === state.doctorSlug)?.lastName}</p>
             </div>
             <Button onClick={() => { setSubmitted(false); setStep(0); setState(initialState); }}>
@@ -264,24 +289,42 @@ export default function BookingPage() {
             {step === 3 && (
               <div className="space-y-4">
                 <h2 className="text-lg font-bold text-foreground">Select a Physician</h2>
+                {doctorsLoading && (
+                  <p className="text-sm text-muted-foreground">Loading doctors…</p>
+                )}
                 <div className="grid gap-3 sm:grid-cols-2">
-                  {filteredDoctors.map((doc) => (
-                    <button
-                      key={doc.slug}
-                      onClick={() => setState({ ...state, doctorSlug: doc.slug })}
-                      className={`rounded-lg border p-4 text-left transition ${
-                        state.doctorSlug === doc.slug
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-primary/30"
-                      }`}
-                    >
-                      <p className="font-semibold text-foreground text-sm">
-                        {doc.title} {doc.firstName} {doc.lastName}
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground">{doc.specialty}</p>
-                    </button>
-                  ))}
-                  {filteredDoctors.length === 0 && (
+                  {filteredDoctors.map((doc) => {
+                    // Summarise availability: show which days are available
+                    const availDays = doc.weeklySchedule
+                      ? WEEK_DAYS
+                          .filter((d) => doc.weeklySchedule?.[d]?.available)
+                          .map((d) => d.slice(0, 3).charAt(0).toUpperCase() + d.slice(1, 3))
+                          .join(", ")
+                      : null;
+                    return (
+                      <button
+                        key={doc.slug}
+                        onClick={() => setState({ ...state, doctorSlug: doc.slug, date: "", time: "" })}
+                        className={`rounded-lg border p-4 text-left transition ${
+                          state.doctorSlug === doc.slug
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-primary/30"
+                        }`}
+                      >
+                        <p className="font-semibold text-foreground text-sm">
+                          {doc.title} {doc.firstName} {doc.lastName}
+                        </p>
+                        <p className="mt-0.5 text-xs text-primary">{doc.specialty}</p>
+                        {availDays && (
+                          <p className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
+                            <Clock className="h-3 w-3 shrink-0" />
+                            Available: {availDays}
+                          </p>
+                        )}
+                      </button>
+                    );
+                  })}
+                  {filteredDoctors.length === 0 && !doctorsLoading && (
                     <p className="col-span-2 text-sm text-muted-foreground">
                       No physicians available for the selected department and location.
                     </p>
@@ -294,34 +337,106 @@ export default function BookingPage() {
             {step === 4 && (
               <div className="space-y-6">
                 <h2 className="text-lg font-bold text-foreground">Select Date & Time</h2>
+
+                {/* Doctor schedule hint */}
+                {selectedDoctor && (
+                  <div className="rounded-lg border border-border bg-muted/30 p-3">
+                    <p className="text-sm font-semibold text-foreground mb-2 flex items-center gap-1.5">
+                      <Clock className="h-4 w-4 text-primary" />
+                      {selectedDoctor.title} {selectedDoctor.firstName} {selectedDoctor.lastName} — Weekly Hours
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1.5">
+                      {WEEK_DAYS.map((day) => {
+                        const ds = selectedDoctor.weeklySchedule?.[day] ?? null;
+                        return (
+                          <div key={day} className={`rounded-md border p-1.5 text-xs ${
+                            ds?.available ? "border-primary/30 bg-primary/5 text-foreground" : "border-border text-muted-foreground"
+                          }`}>
+                            <span className="font-semibold capitalize block">{day.slice(0, 3)}</span>
+                            {ds?.available
+                              ? <span>{ds.from}–{ds.to}</span>
+                              : <span>Closed</span>
+                            }
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Date picker */}
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-foreground">Date</label>
+                  <label className="mb-2 block text-sm font-medium text-foreground">Select Date</label>
                   <input
                     type="date"
                     value={state.date}
-                    onChange={(e) => setState({ ...state, date: e.target.value })}
+                    onChange={(e) => setState({ ...state, date: e.target.value, time: "" })}
                     min={new Date().toISOString().split("T")[0]}
                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
                   />
                 </div>
+
+                {/* Time slots */}
                 {state.date && (
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-foreground">Available Times</label>
-                    <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
-                      {timeSlots.map((t) => (
-                        <button
-                          key={t}
-                          onClick={() => setState({ ...state, time: t })}
-                          className={`rounded-lg border px-3 py-2 text-xs transition ${
-                            state.time === t
-                              ? "border-primary bg-primary text-white"
-                              : "border-border hover:border-primary/30"
-                          }`}
-                        >
-                          {t}
-                        </button>
-                      ))}
-                    </div>
+                    {/* No schedule / not available day */}
+                    {!selectedDoctor?.weeklySchedule ? (
+                      <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800 p-4 flex items-start gap-2">
+                        <AlertCircle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                        <p className="text-sm text-amber-800 dark:text-amber-200">
+                          Schedule information not available for this doctor. Please call{" "}
+                          <a href="tel:+918886611116" className="font-semibold underline">+91 88866 11116</a>{" "}
+                          to confirm availability.
+                        </p>
+                      </div>
+                    ) : selectedDaySchedule === null ? (
+                      <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 p-4 flex items-start gap-2">
+                        <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+                        <p className="text-sm text-red-800 dark:text-red-200">
+                          <strong>{selectedDoctor?.title} {selectedDoctor?.firstName} {selectedDoctor?.lastName}</strong> is{" "}
+                          <strong>not available</strong> on{" "}
+                          {new Date(state.date + "T00:00:00").toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}.
+                          Please choose a different date.
+                        </p>
+                      </div>
+                    ) : availableTimeSlots.length === 0 ? (
+                      <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800 p-4">
+                        <p className="text-sm text-amber-800 dark:text-amber-200">
+                          No slots available on this date. Please select another date or call{" "}
+                          <a href="tel:+918886611116" className="font-semibold underline">+91 88866 11116</a>.
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <label className="mb-2 block text-sm font-medium text-foreground">
+                          Available Times —{" "}
+                          <span className="font-normal text-muted-foreground">
+                            {formatDayScheduleSummary(selectedDaySchedule)}
+                          </span>
+                        </label>
+                        <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                          {availableTimeSlots.map((t) => (
+                            <button
+                              key={t}
+                              onClick={() => setState({ ...state, time: t })}
+                              className={`rounded-lg border px-2 py-2 text-xs transition ${
+                                state.time === t
+                                  ? "border-primary bg-primary text-white"
+                                  : "border-border hover:border-primary/50 hover:bg-primary/5"
+                              }`}
+                            >
+                              {formatTime12(t)}
+                            </button>
+                          ))}
+                        </div>
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          {availableTimeSlots.length} slot{availableTimeSlots.length !== 1 ? "s" : ""} available
+                          {selectedDaySchedule.slotDuration
+                            ? ` · ${selectedDaySchedule.slotDuration} min each`
+                            : ""}
+                        </p>
+                      </>
+                    )}
                   </div>
                 )}
               </div>

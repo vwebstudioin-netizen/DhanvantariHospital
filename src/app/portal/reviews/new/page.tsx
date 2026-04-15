@@ -9,7 +9,8 @@ import { useAuthContext } from "@/providers/AuthProvider";
 import toast from "react-hot-toast";
 
 const DEPARTMENTS = [
-  "General Medicine", "General Surgery", "Gynecology", "Pediatrics",
+  "General Medicine", "General Surgery", "Gynecology",
+  "Pulmonology", "Urology", "Nephrology",
   "Orthopedics", "Neurology", "Cardiology", "Critical Care / Emergency", "Other",
 ];
 

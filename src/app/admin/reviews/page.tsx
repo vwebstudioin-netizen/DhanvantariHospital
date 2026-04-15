@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, Trash2, Star } from "lucide-react";
+import { CheckCircle, XCircle, Trash2, Star, MessageCircle } from "lucide-react";
 import { getAllReviews, approveReview, rejectReview, deleteReview, type Review } from "@/lib/reviews";
+import { buildReviewRequestLink } from "@/lib/whatsapp";
 import toast from "react-hot-toast";
 
 function StarDisplay({ rating }: { rating: number }) {
@@ -78,7 +79,7 @@ export default function AdminReviews() {
       <div>
         <h1 className="text-2xl font-bold text-foreground">Patient Reviews</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Approve reviews to make them visible on the website. Patients submit reviews via WhatsApp link.
+          Approve reviews to make them visible on the website. Use the WhatsApp button to send a review request directly to the patient.
         </p>
       </div>
 
@@ -134,6 +135,18 @@ export default function AdminReviews() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 shrink-0">
+                  {/* Send review request via WhatsApp */}
+                  {review.patientPhone && (
+                    <a
+                      href={buildReviewRequestLink(review.patientPhone, review.patientName, review.ref)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Open WhatsApp with pre-filled review request — patient just taps Send"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+                    </a>
+                  )}
                   {review.status === "pending" && (
                     <>
                       <button onClick={() => handle("approve", review.id)}

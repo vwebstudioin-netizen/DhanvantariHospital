@@ -18,10 +18,7 @@ interface Location {
 }
 
 const initialLocations: Location[] = [
-  { id: "1", name: "Main Campus", address: "123 Health Blvd", city: "Mumbai, MH 400001", phone: "(555) 123-4567", hours: "Mon-Fri 8AM-6PM, Sat 9AM-1PM", services: "Full-service clinic, Lab, Pharmacy, Imaging", isActive: true },
-  { id: "2", name: "Downtown Clinic", address: "456 Central Ave", city: "Mumbai, MH 400002", phone: "(555) 234-5678", hours: "Mon-Fri 9AM-5PM", services: "Primary Care, Pediatrics, Dental", isActive: true },
-  { id: "3", name: "West Side Center", address: "789 Wellness Dr", city: "Mumbai, MH 400058", phone: "(555) 345-6789", hours: "Mon-Sat 8AM-8PM", services: "Urgent Care, Lab, Primary Care", isActive: true },
-  { id: "4", name: "North Branch", address: "321 Care Lane", city: "Thane, MH 400601", phone: "(555) 456-7890", hours: "Mon-Fri 9AM-6PM", services: "Primary Care, Ophthalmology", isActive: false },
+  { id: "1", name: "Dhanvantari Hospital", address: process.env.NEXT_PUBLIC_HOSPITAL_ADDRESS || "Tanuku", city: "Tanuku, AP 534211", phone: process.env.NEXT_PUBLIC_HOSPITAL_PHONE || "", hours: "24 Hours (Emergency Always Open)", services: "General Medicine, Surgery, Gynecology, Pulmonology, Urology, Nephrology, Orthopedics, Neurology, Cardiology, Critical Care", isActive: true },
 ];
 
 export default function AdminLocationsPage() {

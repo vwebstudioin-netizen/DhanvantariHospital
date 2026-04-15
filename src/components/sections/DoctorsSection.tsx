@@ -1,10 +1,14 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowRight, MapPin, Star, Video } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Video } from "lucide-react";
 import SectionHeader from "@/components/shared/SectionHeader";
 import { Badge } from "@/components/ui/badge";
-import { doctors } from "@/data/doctors";
+import { useDoctors } from "@/hooks/useDoctors";
 
 export default function DoctorsSection() {
+  const { doctors } = useDoctors();
   const featured = doctors.slice(0, 4);
 
   return (
@@ -24,12 +28,21 @@ export default function DoctorsSection() {
               className="group overflow-hidden rounded-xl border border-border bg-card transition-all hover:shadow-lg"
             >
               {/* Photo */}
-              <div className="relative aspect-[3/4] bg-gradient-to-br from-primary/10 to-primary/5">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-                    {doc.firstName[0]}{doc.lastName[0]}
+              <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5">
+                {doc.image ? (
+                  <Image
+                    src={doc.image}
+                    alt={`${doc.title} ${doc.firstName} ${doc.lastName}`}
+                    fill className="object-cover object-top"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
+                      {doc.firstName[0]}{doc.lastName[0] || ""}
+                    </div>
                   </div>
-                </div>
+                )}
                 {doc.offersTelehealth && (
                   <div className="absolute right-2 top-2">
                     <Badge variant="default" className="gap-1 text-xs">
@@ -45,13 +58,7 @@ export default function DoctorsSection() {
                   {doc.title} {doc.firstName} {doc.lastName}
                 </h3>
                 <p className="text-sm text-primary">{doc.specialty}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {doc.credentials}
-                </p>
-                <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                  <MapPin className="h-3 w-3" />
-                  {doc.locationSlugs.length} location{doc.locationSlugs.length > 1 ? "s" : ""}
-                </div>
+                <p className="mt-1 text-xs text-muted-foreground">{doc.credentials}</p>
                 {doc.acceptingNewPatients && (
                   <Badge variant="success" className="mt-2 text-xs">
                     Accepting New Patients

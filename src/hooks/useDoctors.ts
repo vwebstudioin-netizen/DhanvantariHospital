@@ -1,8 +1,23 @@
 "use client";
 
 import useSWR from "swr";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { doctors as staticDoctors } from "@/data/doctors";
 import type { DoctorData } from "@/types";
+
+// Fetch all doctors from Firestore; fall back to static data if empty / error
+async function fetchDoctors(): Promise<DoctorData[]> {
+  try {
+    const snap = await getDocs(query(collection(db, "doctors"), orderBy("slug")));
+    if (!snap.empty) {
+      return snap.docs.map((d) => ({ ...d.data() }) as DoctorData);
+    }
+  } catch {
+    // Firestore unavailable — use static
+  }
+  return staticDoctors;
+}
 
 export function useDoctors(filters?: {
   departmentSlug?: string;
@@ -15,9 +30,9 @@ export function useDoctors(filters?: {
   language?: string;
 }) {
   const { data, error, isLoading } = useSWR(
-    ["doctors", filters],
-    () => {
-      let result = [...staticDoctors];
+    ["doctors-firestore", filters],
+    async () => {
+      let result = await fetchDoctors();
 
       if (filters?.departmentSlug) {
         result = result.filter((d) =>

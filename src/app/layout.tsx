@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     apple: "/images/logo.jpg",
   },
   description:
-    "Dhanvantari Hospital — Emergency Treatment for Accident Cases Available. Multi-specialty care: General Medicine, Surgery, Gynecology, Pediatrics, Orthopedics, Neurology, Cardiology, Critical Care.",
+    "Dhanvantari Hospital — Emergency Treatment for Accident Cases Available. Multi-specialty care: General Medicine, Surgery, Gynecology, Pulmonology, Urology, Nephrology, Orthopedics, Neurology, Cardiology, Critical Care.",
   keywords: [
     "Dhanvantari Hospital",
     "emergency hospital",

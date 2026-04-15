@@ -156,7 +156,7 @@ export async function seedDemoData(): Promise<{ seeded: string[] }> {
     { inv: "INV-0007", pat: "Mohan Gowda",   ph: "9876543216", dr: "Dr. Ayyapa", items: [{ name:"ICU Room Charges",type:"room",quantity:2,unitPrice:3000,total:6000},{name:"Dextrose 5%",type:"medicine",quantity:4,unitPrice:80,total:320},{name:"Cardiac Monitor",type:"procedure",quantity:1,unitPrice:500,total:500}], sub:6820, disc:820, tot:6000, pm:"insurance", ps:"paid", daysAgo:2,hr:8 },
     { inv: "INV-0008", pat: "Rekha Iyer",    ph: "9876543217", dr: "Dr. Ayyapa", items: [{ name:"Consultation",type:"consultation",quantity:1,unitPrice:500,total:500},{name:"CBC Blood Test",type:"lab",quantity:1,unitPrice:400,total:400}], sub:900, disc:0, tot:900, pm:"cash", ps:"paid", daysAgo:0, hr:14 },
     { inv: "INV-0009", pat: "Arun Menon",    ph: "9876543218", dr: "Dr. Ayyapa", items: [{ name:"Consultation",type:"consultation",quantity:1,unitPrice:500,total:500},{name:"ECG",type:"procedure",quantity:1,unitPrice:300,total:300}], sub:800, disc:0, tot:800, pm:"upi", ps:"paid", daysAgo:0, hr:15 },
-    { inv: "INV-0010", pat: "Deepa Rao",     ph: "9876543219", dr: "Dr. Ayyapa", items: [{ name:"Pediatrics Consult",type:"consultation",quantity:1,unitPrice:600,total:600}], sub:600, disc:0, tot:600, pm:"pending", ps:"pending", daysAgo:0, hr:16 },
+    { inv: "INV-0010", pat: "Deepa Rao",     ph: "9876543219", dr: "Dr. Ayyapa", items: [{ name:"Nephrology Consult",type:"consultation",quantity:1,unitPrice:600,total:600}], sub:600, disc:0, tot:600, pm:"pending", ps:"pending", daysAgo:0, hr:16 },
   ];
   for (const inv of INVOICES) {
     await addDoc(collection(db, "invoices"), {
@@ -241,7 +241,7 @@ export async function seedDemoData(): Promise<{ seeded: string[] }> {
     { n:  7, name: "Suresh Reddy",   phone: "9876543212", purpose: "Diabetes Management",   status: "completed" },
     { n:  8, name: "Kavitha Nair",   phone: "9876543215", purpose: "General Consultation",  status: "completed" },
     { n:  9, name: "Arun Menon",     phone: "9876543218", purpose: "Cardiology",            status: "completed" },
-    { n: 10, name: "Deepa Rao",      phone: "9876543219", purpose: "Pediatrics / Child",    status: "completed" },
+    { n: 10, name: "Deepa Rao",      phone: "9876543219", purpose: "Nephrology",             status: "completed" },
     { n: 11, name: "Usha Kumari",    phone: "9876543227", purpose: "General Consultation",  status: "completed" },
     { n: 12, name: "Prakash Hegde",  phone: "9876543222", purpose: "Follow-up",             status: "completed" },
     { n: 13, name: "Ganesh Naik",    phone: "9876543224", purpose: "Orthopedics",           status: "skipped"   },
