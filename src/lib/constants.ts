@@ -17,7 +17,7 @@ export const CONTACT_PHONES_DISPLAY = `${CONTACT_PHONE} / ${CONTACT_PHONE2} / ${
 export const EMERGENCY_PHONE =
   process.env.NEXT_PUBLIC_HOSPITAL_PHONE || "08819293445";
 export const HOSPITAL_ADDRESS =
-  process.env.NEXT_PUBLIC_HOSPITAL_ADDRESS || "";
+  process.env.NEXT_PUBLIC_HOSPITAL_ADDRESS || "D.No.34-1-5, Dodipeta Vari Thota Vedhi, Beside CPI Office, Tanuku, West Godavari, Andhra Pradesh 534211";
 export const HOSPITAL_WHATSAPP =
   process.env.NEXT_PUBLIC_HOSPITAL_WHATSAPP || "";
 

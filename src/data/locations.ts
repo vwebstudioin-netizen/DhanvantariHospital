@@ -4,7 +4,7 @@ export const locations: LocationData[] = [
   {
     slug: "main",
     name: "Dhanvantari Hospital",
-    address: process.env.NEXT_PUBLIC_HOSPITAL_ADDRESS || "Tanuku",
+    address: process.env.NEXT_PUBLIC_HOSPITAL_ADDRESS || "D.No.34-1-5, Dodipeta Vari Thota Vedhi, Beside CPI Office, Tanuku, West Godavari, Andhra Pradesh 534211",
     city: "Tanuku",
     state: "Andhra Pradesh",
     zipCode: "534211",
