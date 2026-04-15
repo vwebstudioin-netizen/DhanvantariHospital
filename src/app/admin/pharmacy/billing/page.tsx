@@ -39,12 +39,12 @@ async function getNextBillNumber(): Promise<string> {
   return `PHRM-${String(num).padStart(4, "0")}`;
 }
 
-function buildPrintHTML(bill: any) {
+function buildPrintHTML(bill: any, origin: string) {
   return `
     <div style="font-family:Arial,sans-serif;max-width:210mm;margin:0 auto;padding:20mm;font-size:12px">
       <div style="display:flex;justify-content:space-between;border-bottom:2px solid #1e3a5f;padding-bottom:12px;margin-bottom:16px;align-items:center">
         <div style="display:flex;align-items:center;gap:10px">
-          <img src="${typeof window !== "undefined" ? window.location.origin : ""}/images/logo.jpg" style="width:44px;height:44px;border-radius:50%;object-fit:cover"/>
+          <img src="${origin}/images/logo.jpg" style="width:44px;height:44px;border-radius:50%;object-fit:cover"/>
           <div>
             <div style="font-size:18px;font-weight:900;color:#1e3a5f">${SITE_NAME}</div>
             <div style="font-size:10px;color:#64748b">${HOSPITAL_ADDRESS}</div>
@@ -183,11 +183,12 @@ export default function PharmacyBillingPage() {
   };
 
   const handlePrint = (bill: any) => {
+    const origin = window.location.origin;
     const w = window.open("", "_blank", "width=900,height=700");
     if (w) {
       w.document.write(`<!DOCTYPE html><html><head><title>Pharmacy Bill ${bill.billNumber}</title>
         <style>body{margin:0}@media print{body{margin:0}}</style>
-        </head><body>${buildPrintHTML(bill)}</body></html>`);
+        </head><body>${buildPrintHTML(bill, origin)}</body></html>`);
       w.document.close(); w.focus(); w.print(); w.close();
     }
   };
