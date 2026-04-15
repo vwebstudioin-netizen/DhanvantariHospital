@@ -141,6 +141,12 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    match /billingServices/{serviceId} {
+      allow read: if isStaff();          // All staff can read — needed for invoice dropdown
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     match /wishCampaigns/{campaignId} {
       allow read: if isDeskStaff();
       allow create: if isDeskStaff();
@@ -168,6 +174,12 @@ service cloud.firestore {
     // ── Pharmacy ──────────────────────────────────────────────────────
     match /medicines/{medicineId} {
       allow read: if isPharmacist() || isAdmin();
+      allow create, update: if isPharmacist() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /pharmacyBills/{billId} {
+      allow read: if isPharmacist() || isAdmin() || isDeskStaff();
       allow create, update: if isPharmacist() || isAdmin();
       allow delete: if isAdmin();
     }
