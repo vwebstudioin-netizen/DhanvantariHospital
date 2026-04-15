@@ -3,7 +3,7 @@ import { Award, Users, Stethoscope, Clock } from "lucide-react";
 const stats = [
   { icon: Users,       value: "10,000+", label: "Patients Served" },
   { icon: Award,       value: "8+",      label: "Specialists" },
-  { icon: Stethoscope, value: "8",       label: "Departments" },
+  { icon: Stethoscope, value: "10",      label: "Departments" },
   { icon: Clock,       value: "24/7",    label: "Emergency Care" },
 ];
 

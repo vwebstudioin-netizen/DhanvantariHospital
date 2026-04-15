@@ -57,20 +57,20 @@ export default function AboutPage() {
                 <p className="text-sm font-medium text-foreground">By the Numbers</p>
                 <div className="mt-3 grid grid-cols-2 gap-4 text-center">
                   <div>
-                    <p className="text-2xl font-bold text-primary">14+</p>
-                    <p className="text-xs text-muted-foreground">Years of Service</p>
+                    <p className="text-2xl font-bold text-primary">10,000+</p>
+                    <p className="text-xs text-muted-foreground">Patients Served</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-primary">10</p>
-                    <p className="text-xs text-muted-foreground">Specialities</p>
+                    <p className="text-2xl font-bold text-primary">8+</p>
+                    <p className="text-xs text-muted-foreground">Specialists</p>
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-primary">10</p>
                     <p className="text-xs text-muted-foreground">Departments</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-primary">3</p>
-                    <p className="text-xs text-muted-foreground">Locations</p>
+                    <p className="text-2xl font-bold text-primary">24/7</p>
+                    <p className="text-xs text-muted-foreground">Emergency Care</p>
                   </div>
                 </div>
               </div>
