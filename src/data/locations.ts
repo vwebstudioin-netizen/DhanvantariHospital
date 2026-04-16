@@ -11,7 +11,8 @@ export const locations: LocationData[] = [
     phone: `${process.env.NEXT_PUBLIC_HOSPITAL_PHONE || "08819293445"} / ${process.env.NEXT_PUBLIC_HOSPITAL_PHONE2 || "7799381456"} / ${process.env.NEXT_PUBLIC_HOSPITAL_PHONE3 || "7799791456"}`,
     fax: "",
     email: process.env.NEXT_PUBLIC_HOSPITAL_EMAIL || "info@dhanvantarihospital.com",
-    coordinates: { lat: 16.7626, lng: 81.6825 }, // Tanuku, West Godavari, AP
+    coordinates: { lat: 16.7701, lng: 81.6836 }, // Exact location — QM4J+3W2, Dodipeta Vari Thota Vedhi, Tanuku
+    mapEmbedUrl: process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL || "",
     hours: {
       monday: "24 Hours (Emergency Always Open)",
       tuesday: "24 Hours (Emergency Always Open)",

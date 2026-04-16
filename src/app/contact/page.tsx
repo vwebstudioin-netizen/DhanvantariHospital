@@ -76,6 +76,7 @@ export default function ContactPage() {
             <GoogleMap
               lat={locations[0].coordinates.lat}
               lng={locations[0].coordinates.lng}
+              embedUrl={locations[0].mapEmbedUrl}
               label={locations[0].name}
               height="420px"
             />

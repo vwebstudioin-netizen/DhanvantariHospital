@@ -273,6 +273,7 @@ export interface LocationData {
   fax?: string;
   email?: string;
   coordinates: { lat: number; lng: number };
+  mapEmbedUrl?: string;
   hours: Record<string, string>;
   departmentSlugs: string[];
   image: string;
