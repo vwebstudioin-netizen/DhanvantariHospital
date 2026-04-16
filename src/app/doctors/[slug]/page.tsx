@@ -150,7 +150,7 @@ export default async function DoctorDetailPage({ params }: Props) {
                   </Button>
                 </Link>
                 <p className="mt-3 text-center text-xs text-muted-foreground">
-                  Or call (555) 100-2000
+                  Or call 08819293445
                 </p>
               </div>
 
@@ -186,7 +186,7 @@ export default async function DoctorDetailPage({ params }: Props) {
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <p className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-primary" />
-                    (555) 100-2000
+                    08819293445
                   </p>
                 </div>
               </div>

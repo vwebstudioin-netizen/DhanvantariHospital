@@ -72,7 +72,7 @@ export default function ContactForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <Label htmlFor="phone">Phone</Label>
-          <Input id="phone" placeholder="(555) 000-0000" {...register("phone")} className="mt-1" />
+          <Input id="phone" placeholder="e.g. 9876543210" {...register("phone")} className="mt-1" />
         </div>
         <div>
           <Label htmlFor="locationId">Location</Label>

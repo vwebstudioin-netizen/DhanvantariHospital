@@ -39,11 +39,11 @@ export default function PrivacyPage() {
           </div>
           <div>
             <h2 className="mb-3 text-lg font-bold text-foreground">6. Your Rights</h2>
-            <p>You have the right to access, correct, or request deletion of your personal information. To exercise these rights, please contact our Privacy Officer at privacy@clinicarepro.com or call (555) 100-2000.</p>
+            <p>You have the right to access, correct, or request deletion of your personal information. To exercise these rights, please contact our Privacy Officer at info@dhanvantarihospital.com or call 08819293445.</p>
           </div>
           <div>
             <h2 className="mb-3 text-lg font-bold text-foreground">7. Contact Us</h2>
-            <p>If you have questions about this privacy policy, please contact our Privacy Officer at privacy@clinicarepro.com.</p>
+            <p>If you have questions about this privacy policy, please contact our Privacy Officer at info@dhanvantarihospital.com.</p>
           </div>
           <p className="text-sm italic">This is a template privacy policy for demonstration purposes. A production deployment should include a legally reviewed privacy policy.</p>
         </div>

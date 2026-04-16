@@ -398,8 +398,8 @@ export default function BillingPayPage() {
                   with the payment, please contact our billing department:
                 </p>
                 <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
-                  <li>📞 Call: +91 98765 43210</li>
-                  <li>✉️ Email: billing@clinicarepro.com</li>
+                  <li>📞 Call: 08819293445</li>
+                  <li>✉️ Email: info@dhanvantarihospital.com</li>
                   <li>🕘 Mon–Sat: 8:00 AM – 6:00 PM</li>
                 </ul>
               </Card>

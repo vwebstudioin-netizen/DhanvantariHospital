@@ -18,7 +18,7 @@ const paymentMethods = [
 const billingFAQs = [
   { q: "When will I receive my bill?", a: "You'll receive an itemized statement via email within 5–7 business days after your visit. You can also view statements in your patient portal." },
   { q: "What if I can't pay my full balance?", a: "We offer interest-free payment plans. Contact our billing department to set up a plan that works for your budget." },
-  { q: "How do I dispute a charge?", a: "Contact our billing department at billing@clinicarepro.com or call (555) 123-4567 ext. 3. We'll review and resolve billing inquiries within 10 business days." },
+  { q: "How do I dispute a charge?", a: "Contact our billing department at info@dhanvantarihospital.com or call 08819293445. We'll review and resolve billing inquiries within 10 business days." },
   { q: "Do you offer financial assistance?", a: "Yes, we offer a sliding-fee scale for qualifying patients based on household income. Ask our front desk or billing team for an application." },
   { q: "Does my insurance cover this visit?", a: "Coverage varies by plan. We recommend calling your insurer before your visit. Our team can also help verify coverage." },
 ];

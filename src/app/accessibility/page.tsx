@@ -40,7 +40,7 @@ export default function AccessibilityPage() {
           </div>
           <div>
             <h2 className="mb-3 text-lg font-bold text-foreground">Feedback</h2>
-            <p>If you encounter any accessibility barriers on our website or at our facilities, please contact us at accessibility@clinicarepro.com or call (555) 100-2000. We welcome your feedback and will make every effort to address your needs.</p>
+            <p>If you encounter any accessibility barriers on our website or at our facilities, please contact us at info@dhanvantarihospital.com or call 08819293445. We welcome your feedback and will make every effort to address your needs.</p>
           </div>
         </div>
       </section>
