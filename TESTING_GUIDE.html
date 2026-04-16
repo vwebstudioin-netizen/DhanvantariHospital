@@ -233,9 +233,10 @@
       <li><a href="#dashboard">11. Admin Dashboard &amp; Analytics</a></li>
       <li><a href="#backup">12. Backup, Restore &amp; CSV Exports</a></li>
       <li><a href="#public">13. Public Website &amp; Appointment Booking</a></li>
-      <li><a href="#content">14. Blog, Gallery &amp; Reviews</a></li>
-      <li><a href="#careers">15. Careers Portal &amp; Document Exports</a></li>
-      <li><a href="#golive">16. Final Go-Live Checklist</a></li>
+      <li><a href="#content">14. Blog, Gallery, Reviews &amp; News</a></li>
+      <li><a href="#careers">15. Careers Portal, Jobs &amp; Document Exports</a></li>
+      <li><a href="#newsletter">16. Newsletter &amp; Locations Management</a></li>
+      <li><a href="#golive">17. Final Go-Live Checklist</a></li>
     </ol>
   </div>
 
@@ -413,7 +414,7 @@
           <div class="expected">The sent campaign appears with occasion name, date, and recipient count.</div>
         </div></div>
       </div>
-      <div class="note">WhatsApp messages only send if Twilio is configured. Without Twilio, campaigns are saved to Firestore but no messages are dispatched. This is expected behaviour during testing.</div>
+      <div class="note">WhatsApp messages open via <code>wa.me</code> links in the browser — the message text is pre-filled. Bulk wishes campaigns are saved to Firestore and each patient's link is generated automatically. No server-side WhatsApp API is required.</div>
     </div>
   </div>
 
@@ -897,8 +898,8 @@
           <div class="expected">Correct hospital name displayed. No placeholder text. No "CliniCare Pro" or test data visible.</div>
         </div></div>
         <div class="step"><div class="step-num"></div><div class="step-body">
-          Check <code>/departments</code> — verify all 8 departments listed: General Medicine, Surgery, Gynecology, Pediatrics, Orthopedics, Neurology, Cardiology, Critical Care.
-          <div class="expected">All 8 departments with correct names, icons, and descriptions.</div>
+          Check <code>/departments</code> — verify all 10 departments listed: General Medicine, Surgery, Gynecology, Orthopedics, Neurology, Cardiology, Critical Care, Pulmonology, Urology, Nephrology.
+          <div class="expected">All 10 departments with correct names, icons, and descriptions. Pediatrics should NOT appear.</div>
         </div></div>
         <div class="step"><div class="step-num"></div><div class="step-body">
           Check <code>/services</code> — all services listed and grouped by department.
@@ -948,11 +949,11 @@
     </div>
   </div>
 
-  <!-- 14. Blog/Gallery/Reviews -->
+  <!-- 14. Blog/Gallery/Reviews/News -->
   <div class="test-section" id="content">
     <div class="section-header">
       <div class="section-num">14</div>
-      <h2>Blog, Gallery &amp; Reviews (Admin Content Management)</h2>
+      <h2>Blog, Gallery, Reviews &amp; News (Admin Content Management)</h2>
     </div>
 
     <div class="test-block">
@@ -1000,17 +1001,81 @@
         </div></div>
       </div>
     </div>
+
+    <div class="test-block">
+      <div class="test-block-header"><h3>News &amp; Announcements Management</h3><span class="url-tag">/admin/news</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Go to <code>/admin/news</code> → click <strong>"New Article"</strong>. Fill title, content, and category. Save as <strong>Draft</strong>.
+          <div class="expected">Article saved with Draft status. Not visible on the public <code>/news</code> page.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Change the article status to <strong>Published</strong>.
+          <div class="expected">Article now appears on the public <code>/news</code> page with correct title, date, and content.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Edit the article — change the title. Then delete the article.
+          <div class="expected">Updated title reflected on the public page. Deleted article no longer appears on <code>/news</code>.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Visit <code>/news/[slug]</code> of the published article from the public website.
+          <div class="expected">Article detail page loads with full content, date, and breadcrumb navigation back to <code>/news</code>.</div>
+        </div></div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- 15. Careers Portal & Document Exports -->
+  <!-- 15. Careers Portal & Jobs & Document Exports -->
   <div class="test-section" id="careers">
     <div class="section-header">
       <div class="section-num">15</div>
-      <h2>Careers Portal &amp; Document Exports</h2>
+      <h2>Careers Portal, Jobs &amp; Document Exports</h2>
     </div>
 
     <div class="test-block">
-      <div class="test-block-header"><h3>Careers Page — Public Job Listings</h3><span class="url-tag">/careers</span></div>
+      <div class="test-block-header"><h3>Job Openings Management (Admin)</h3><span class="url-tag">/admin/careers</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Go to <code>/admin/careers</code> → click <strong>"Add Job"</strong>. Fill: Title = "Staff Nurse", Department = "General Medicine", Type = "Full-Time", Description. Toggle it <strong>Active</strong>. Save.
+          <div class="expected">Job saved and appears in the admin list with Active badge. Job visible on the public <code>/careers</code> page.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Toggle the job to <strong>Inactive</strong>.
+          <div class="expected">Job disappears from the public <code>/careers</code> page. Remains in admin list with Inactive badge.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Edit the job — change the title. Delete the job.
+          <div class="expected">Updated title reflected on public page. Deleted job removed from both admin and public listing.</div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="test-block">
+      <div class="test-block-header"><h3>Job Applications Dashboard</h3><span class="url-tag">/admin/jobs</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Submit an application from the public <code>/careers</code> page. Then go to <code>/admin/jobs</code> as admin.
+          <div class="expected">Application appears in the list with applicant name, position, phone, submission date, and status badge: <strong>New</strong>.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Use the filter tabs — click <strong>New</strong>, <strong>Shortlisted</strong>, <strong>Reviewed</strong>, <strong>Rejected</strong> in turn.
+          <div class="expected">Each tab filters the list to applications with that status. The <strong>All</strong> tab shows every application.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Click <strong>"Shortlist"</strong> on the test application.
+          <div class="expected">Status badge updates to <code>Shortlisted</code> (green) in real time.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Click <strong>"Reject"</strong> on a different application.
+          <div class="expected">Status badge updates to <code>Rejected</code> (red). Application moves to the Rejected filter tab.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Click the applicant's phone number.
+          <div class="expected">Device triggers a <code>tel:</code> link — phone dialer opens with the number pre-filled.</div>
+        </div></div>
+      </div>
+    </div>
       <div class="steps">
         <div class="step"><div class="step-num"></div><div class="step-body">
           Go to <code>/careers</code> as a public (unauthenticated) visitor. Verify job listings load from Firestore.
@@ -1025,37 +1090,7 @@
           <div class="expected">General application saved to Firestore. Success confirmation displayed. Application appears in admin panel under the position "General Application".</div>
         </div></div>
       </div>
-      <div class="tip">To test with a live job listing: log in as admin, go to <code>/admin/careers</code> (or the careers management section in admin settings), add a job with title, department, and description, then re-visit <code>/careers</code> as a public visitor.</div>
-    </div>
-
-    <div class="test-block">
-      <div class="test-block-header"><h3>Admin — Job Applications Dashboard</h3><span class="url-tag">/admin/applications</span></div>
-      <div class="steps">
-        <div class="step"><div class="step-num"></div><div class="step-body">
-          As admin, go to <code>/admin/applications</code>. Verify the application submitted in the previous step appears in the list.
-          <div class="expected">Application visible with applicant name, position applied for, department, phone, submission date, cover note, and current status badge: <strong>New</strong> (default).</div>
-        </div></div>
-        <div class="step"><div class="step-num"></div><div class="step-body">
-          Use the filter tabs at the top of the page — click <strong>New</strong>, <strong>Shortlisted</strong>, <strong>Reviewed</strong>, <strong>Rejected</strong> tabs in turn.
-          <div class="expected">Each tab filters the list to show only applications in that status. The <strong>All</strong> tab shows every application regardless of status.</div>
-        </div></div>
-        <div class="step"><div class="step-num"></div><div class="step-body">
-          On the test application, click <strong>"Shortlist"</strong> (green button).
-          <div class="expected">Application status updates to <code>Shortlisted</code> in real time. Badge colour changes to green.</div>
-        </div></div>
-        <div class="step"><div class="step-num"></div><div class="step-body">
-          Click <strong>"Review"</strong> (amber button) on the same application.
-          <div class="expected">Status changes to <code>Reviewed</code>. Badge updates to amber.</div>
-        </div></div>
-        <div class="step"><div class="step-num"></div><div class="step-body">
-          Click <strong>"Reject"</strong> (red button) on a different test application.
-          <div class="expected">Status changes to <code>Rejected</code>. Badge updates to red. Application moves to the Rejected tab.</div>
-        </div></div>
-        <div class="step"><div class="step-num"></div><div class="step-body">
-          Click the applicant's phone number displayed in the list.
-          <div class="expected">Device opens the phone dialer (or a <code>tel:</code> link is triggered). The correct number is pre-filled, ready to call.</div>
-        </div></div>
-      </div>
+      <div class="tip">To test with a live job listing: log in as admin, go to <code>/admin/careers</code>, add a job with title, department, and description, then re-visit <code>/careers</code> as a public visitor.</div>
     </div>
 
     <div class="test-block">
@@ -1110,10 +1145,66 @@
 
   </div>
 
-  <!-- 16. Go-Live Checklist -->
-  <div class="test-section" id="golive">
+  <!-- 16. Newsletter & Locations -->
+  <div class="test-section" id="newsletter">
     <div class="section-header">
       <div class="section-num">16</div>
+      <h2>Newsletter &amp; Locations Management</h2>
+    </div>
+
+    <div class="test-block">
+      <div class="test-block-header"><h3>Newsletter Subscribers</h3><span class="url-tag">/admin/newsletter</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          From any public page footer, enter an email in the newsletter subscribe field and click Subscribe.
+          <div class="expected">Success message displayed. Email saved to Firestore <code>newsletters</code> collection with a timestamp.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          As admin, go to <code>/admin/newsletter</code>. Verify the subscriber appears.
+          <div class="expected">Subscriber list shows email, subscribed date, and status.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Click <strong>"Export CSV"</strong> (if available).
+          <div class="expected">CSV file downloads with subscriber emails and dates. Useful for bulk email campaigns.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Try subscribing with the same email again.
+          <div class="expected">Duplicate prevented — "Already subscribed" message or silent no-duplicate behaviour.</div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="test-block">
+      <div class="test-block-header"><h3>Locations / Branches Management</h3><span class="url-tag">/admin/locations</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Go to <code>/admin/locations</code> → click <strong>"Add Location"</strong>. Fill: Name, Address, Phone, Google Maps URL, Hours. Save.
+          <div class="expected">Location saved to Firestore. Appears in the admin list immediately.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Visit the public <code>/locations</code> page.
+          <div class="expected">The new location appears with its name, address, phone number, hours, and a "Get Directions" link pointing to the Google Maps URL.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Edit the location — update the phone number. Save.
+          <div class="expected">Updated phone number reflected on the public <code>/locations</code> page.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Delete the test location.
+          <div class="expected">Location removed from admin list and public page.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Visit <code>/locations/[slug]</code> of an existing location.
+          <div class="expected">Location detail page loads with full address, embedded Google Map, phone, and hours.</div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 17. Go-Live Checklist -->
+  <div class="test-section" id="golive">
+    <div class="section-header">
+      <div class="section-num">17</div>
       <h2>Final Go-Live Checklist</h2>
     </div>
     <div class="test-block">
@@ -1137,7 +1228,7 @@
 
         <li class="group">Data &amp; Content</li>
         <li>Demo/seed data cleared after testing (<code>/admin/settings → Reset Data</code>)</li>
-        <li>All 8 departments and 15+ service pages verified with correct content</li>
+        <li>All 10 departments and 15+ service pages verified with correct content</li>
         <li>At least one blog post published on the public site</li>
         <li>Billing services (quick-add items) configured with correct hospital-specific charges</li>
         <li>Medicine catalog populated with at least 10 core medicines</li>
@@ -1151,8 +1242,8 @@
 
         <li class="group">Integrations</li>
         <li>Resend API key added — appointment confirmation emails tested</li>
-        <li>Twilio configured (if WhatsApp required) — token notification tested with real phone</li>
-        <li>WhatsApp Business verification completed (for Twilio production)</li>
+        <li>WhatsApp <code>wa.me</code> links tested — token notification and invoice sharing opens correctly in WhatsApp</li>
+        <li>WhatsApp numbers verified: 7799381456 and 7799791456</li>
 
         <li class="group">Training &amp; Handover</li>
         <li>2-hour training session completed: admin panel, desk app, pharmacy panel</li>
