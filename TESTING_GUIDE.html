@@ -516,7 +516,7 @@
         </div></div>
         <div class="step"><div class="step-num"></div><div class="step-body">
           Click <strong>"Call Next Patient"</strong>.
-          <div class="expected">First token moves to "Called" state (amber). WhatsApp notification would fire to patient's phone (if Twilio configured).</div>
+          <div class="expected">First token moves to "Called" state (amber). A WhatsApp <code>wa.me</code> link is generated — staff can tap it to send the patient a notification via WhatsApp.</div>
         </div></div>
         <div class="step"><div class="step-num"></div><div class="step-body">
           Click <strong>"Start Consultation"</strong>.
@@ -644,7 +644,7 @@
         </div></div>
         <div class="step"><div class="step-num"></div><div class="step-body">
           Click <strong>"Share via WhatsApp"</strong> (or "Request Review via WhatsApp").
-          <div class="expected">WhatsApp link or message fired to patient's phone (requires Twilio in production). Review request link included.</div>
+          <div class="expected">WhatsApp opens in browser via <code>wa.me</code> link with pre-filled invoice text. Review request link included in the message.</div>
         </div></div>
       </div>
     </div>

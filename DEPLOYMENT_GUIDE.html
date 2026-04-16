@@ -202,7 +202,7 @@
     <span class="stack-badge">Firebase Auth</span>
     <span class="stack-badge">Vercel</span>
     <span class="stack-badge">Resend Email</span>
-    <span class="stack-badge">Twilio WhatsApp</span>
+    <span class="stack-badge">WhatsApp wa.me</span>
   </div>
 </div>
 
@@ -220,7 +220,7 @@
       <li><a href="#vercel">6. Deploy to Vercel</a></li>
       <li><a href="#postdeploy">7. Post-Deploy Verification</a></li>
       <li><a href="#domain">8. Custom Domain Setup</a></li>
-      <li><a href="#whatsapp">9. WhatsApp Setup (Twilio — Optional)</a></li>
+      <li><a href="#whatsapp">9. WhatsApp (wa.me Links — No API needed)</a></li>
       <li><a href="#routes">10. Route Structure Reference</a></li>
       <li><a href="#checklist">11. Deployment Checklist</a></li>
     </ol>
@@ -400,14 +400,6 @@
 <span class="key">HOSPITAL_EMAIL</span>=<span class="val">info@dhanvantarihospital.in</span>
 
 <span class="comment"># =========================================================</span>
-<span class="comment"># Twilio WhatsApp (optional — skip for initial deployment)</span>
-<span class="comment"># Add these only when WhatsApp feature is being activated</span>
-<span class="comment"># =========================================================</span>
-<span class="key">TWILIO_ACCOUNT_SID</span>=<span class="val">ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
-<span class="key">TWILIO_AUTH_TOKEN</span>=<span class="val">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
-<span class="key">TWILIO_WHATSAPP_FROM</span>=<span class="val">whatsapp:+14155238886</span>
-
-<span class="comment"># =========================================================</span>
 <span class="comment"># Site Configuration</span>
 <span class="comment"># =========================================================</span>
 <span class="key">NEXT_PUBLIC_SITE_URL</span>=<span class="val">https://www.dhanvantarihospital.in</span>
@@ -438,9 +430,6 @@
         <tr><td><code>HOSPITAL_EMAIL</code></td><td>Yes</td><td>Hospital inbox — receives copies of contact messages</td></tr>
         <tr><td><code>NEXT_PUBLIC_SITE_URL</code></td><td>Yes</td><td>Full production URL (used in review links, email links)</td></tr>
         <tr><td><code>REVALIDATION_SECRET</code></td><td>Yes</td><td>Random string for ISR revalidation API protection</td></tr>
-        <tr><td><code>TWILIO_ACCOUNT_SID</code></td><td>Optional</td><td>WhatsApp notifications via Twilio</td></tr>
-        <tr><td><code>TWILIO_AUTH_TOKEN</code></td><td>Optional</td><td>WhatsApp notifications via Twilio</td></tr>
-        <tr><td><code>TWILIO_WHATSAPP_FROM</code></td><td>Optional</td><td>Twilio sandbox or approved WhatsApp number</td></tr>
       </tbody>
     </table>
   </div>
@@ -732,69 +721,37 @@
   <div class="deploy-section" id="whatsapp">
     <div class="section-header">
       <div class="section-num">9</div>
-      <h2>WhatsApp Setup via Twilio (Optional)</h2>
+      <h2>WhatsApp — wa.me Links (No API Setup Required)</h2>
     </div>
-    <p>Skip this section for initial go-live. Add WhatsApp when the client is ready to activate automated patient notifications.</p>
+    <p>All WhatsApp features in this system use free <code>wa.me</code> links — no Twilio, no WhatsApp Business API, and no per-message charges. No account approval or third-party service is needed.</p>
 
-    <h3>9.1 Create Twilio Account &amp; Get Credentials</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-body">
-        Sign up at <strong>twilio.com</strong> → Verify phone number → Go to Console.
-      </div></div>
-      <div class="step"><div class="step-num"></div><div class="step-body">
-        Copy <strong>Account SID</strong> and <strong>Auth Token</strong> from the Console Dashboard.
-      </div></div>
-      <div class="step"><div class="step-num"></div><div class="step-body">
-        Add both to Vercel environment variables and to your <code>.env.local</code>:
-        <code>TWILIO_ACCOUNT_SID</code> and <code>TWILIO_AUTH_TOKEN</code>.
-      </div></div>
-    </div>
-
-    <h3>9.2 Test with WhatsApp Sandbox (Development)</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-body">
-        Twilio Console → <strong>Messaging → Try it out → Send a WhatsApp message</strong>.
-      </div></div>
-      <div class="step"><div class="step-num"></div><div class="step-body">
-        Follow instructions to join the sandbox: send <code>join [your-code]</code> from your phone to <code>+14155238886</code>.
-      </div></div>
-      <div class="step"><div class="step-num"></div><div class="step-body">
-        Set <code>TWILIO_WHATSAPP_FROM=whatsapp:+14155238886</code> in your env vars.
-      </div></div>
-      <div class="step"><div class="step-num"></div><div class="step-body">
-        Issue a token from <code>/desk/queue</code> → click Call Next → verify WhatsApp message received.
-      </div></div>
+    <h3>9.1 How It Works</h3>
+    <div class="card blue">
+      <p>When a staff member clicks a "Share via WhatsApp" button, the browser opens <code>https://wa.me/91XXXXXXXXXX?text=...</code> with a pre-filled message. The staff member reviews the message and taps Send in their own WhatsApp. All the following features work this way:</p>
+      <ul style="margin-top:10px; padding-left:18px; line-height:2;">
+        <li>Invoice / bill sharing from the desk billing page</li>
+        <li>Pharmacy bill sharing</li>
+        <li>Token called notification to patients</li>
+        <li>IPD card admission notification</li>
+        <li>Review request after discharge</li>
+        <li>Festive wishes bulk campaigns</li>
+      </ul>
     </div>
 
-    <h3>9.3 Production WhatsApp Business Setup</h3>
+    <h3>9.2 Configuration</h3>
     <div class="steps">
       <div class="step"><div class="step-num"></div><div class="step-body">
-        Apply for a Twilio WhatsApp Business Sender at <strong>Twilio Console → Messaging → WhatsApp senders</strong>.
+        Set the hospital WhatsApp numbers in your environment variables:
+        <br><code>NEXT_PUBLIC_HOSPITAL_WHATSAPP=917799381456</code>
+        <br><code>NEXT_PUBLIC_HOSPITAL_WHATSAPP2=917799791456</code>
+        <div style="margin-top:5px; font-size:0.82rem; color:#64748b;">Include the country code (91 for India) with no + or spaces.</div>
       </div></div>
       <div class="step"><div class="step-num"></div><div class="step-body">
-        Provide: business name (Dhanvantari Hospital), Facebook Business Manager ID, website URL.
-      </div></div>
-      <div class="step"><div class="step-num"></div><div class="step-body">
-        Twilio submits the approval request to Meta. Approval typically takes 1–5 business days.
-      </div></div>
-      <div class="step"><div class="step-num"></div><div class="step-body">
-        On approval, update <code>TWILIO_WHATSAPP_FROM</code> with the approved WhatsApp number: <code>whatsapp:+91XXXXXXXXXX</code>.
+        Test by clicking any "Share via WhatsApp" button in the desk or pharmacy panel.
+        <div style="margin-top:5px; font-size:0.82rem; color:#64748b;">WhatsApp should open (browser or app) with the message pre-filled and the correct phone number.</div>
       </div></div>
     </div>
-
-    <h3>9.4 Configure Webhook for WhatsApp Bot</h3>
-    <div class="steps">
-      <div class="step"><div class="step-num"></div><div class="step-body">
-        In Twilio Console → <strong>Messaging → Senders → WhatsApp → your sender</strong> → Find "Webhook URL" field.
-      </div></div>
-      <div class="step"><div class="step-num"></div><div class="step-body">
-        Set the webhook URL to: <code>https://www.dhanvantarihospital.in/api/whatsapp/webhook</code>
-      </div></div>
-      <div class="step"><div class="step-num"></div><div class="step-body">
-        Test by sending "HELP" or "APPOINTMENT" to the WhatsApp number. Bot should auto-reply.
-      </div></div>
-    </div>
-    <div class="tip">For local webhook testing, use <strong>ngrok</strong>: run <code>ngrok http 3000</code> and use the HTTPS URL as your Twilio webhook (e.g., <code>https://abc123.ngrok.io/api/whatsapp/webhook</code>).</div>
+    <div class="tip">No sandbox, no webhook, no approval process — wa.me links work immediately with any WhatsApp number. Perfect for small and medium hospitals without a dedicated WhatsApp Business account.</div>
   </div>
 
   <!-- 10. Route Structure -->
@@ -814,7 +771,7 @@
       <div class="route-card">
         <div class="who">Public — No login</div>
         <div class="path">/departments &nbsp; /services</div>
-        <p>Department and service pages — all 8 departments, 15+ services</p>
+        <p>Department and service pages — all 10 departments, 15+ services</p>
       </div>
       <div class="route-card">
         <div class="who">Public — No login</div>
@@ -936,7 +893,7 @@
       <li>First real backup downloaded and stored safely</li>
       <li>Staff training completed — admin, receptionist, pharmacist panels</li>
       <li>Client has credentials for all staff accounts</li>
-      <li>Twilio WhatsApp configured (if requested)</li>
+      <li>WhatsApp wa.me links tested — invoice sharing and token notifications verified</li>
     </ul>
 
     <div class="success" style="margin-top:28px;">
