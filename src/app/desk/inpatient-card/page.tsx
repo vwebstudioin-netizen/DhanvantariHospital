@@ -11,18 +11,29 @@ import { issueToken } from "@/lib/queue";
 import { SITE_NAME, CONTACT_PHONE, INPATIENT_WARDS } from "@/lib/constants";
 import type { InPatientCard, CardType } from "@/types/inpatient";
 import toast from "react-hot-toast";
-import { buildAdmissionCardLink, buildReviewRequestLink } from "@/lib/whatsapp";
+import { buildAdmissionCardLink, buildVisitCardLink, buildReviewRequestLink } from "@/lib/whatsapp";
 
 // ── Whatsapp helper ──────────────────────────────────────────────────────────
 function sendCardWhatsApp(card: InPatientCard) {
   if (!card.patientPhone) return;
-  const link = buildAdmissionCardLink(
-    card.patientPhone,
-    card.patientName,
-    card.cardNumber,
-    card.ward || (card.type === "visit" ? "OPD" : ""),
-    card.roomNumber || ""
-  );
+  let link: string;
+  if (card.type === "visit") {
+    link = buildVisitCardLink(
+      card.patientPhone,
+      card.patientName,
+      card.cardNumber,
+      card.admissionDate,
+      card.doctorName || ""
+    );
+  } else {
+    link = buildAdmissionCardLink(
+      card.patientPhone,
+      card.patientName,
+      card.cardNumber,
+      card.ward || "",
+      card.roomNumber || ""
+    );
+  }
   window.open(link, "_blank", "noopener,noreferrer");
 }
 

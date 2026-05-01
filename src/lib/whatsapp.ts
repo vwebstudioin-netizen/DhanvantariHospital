@@ -67,7 +67,7 @@ export function buildAppointmentReminderLink(
   return buildWaLink(phone, message);
 }
 
-/** Admission card details link. */
+/** Admission card details link — IPD room admission. */
 export function buildAdmissionCardLink(
   phone: string,
   name: string,
@@ -75,13 +75,37 @@ export function buildAdmissionCardLink(
   ward: string,
   roomNumber: string
 ): string {
+  const roomLine = roomNumber ? `Room: ${roomNumber}\n` : "";
   const message =
     `Hello ${name},\n\n` +
-    `*${SITE_NAME}* — In-Patient Card Details:\n\n` +
-    `🏥 Card No: *${cardNumber}*\n` +
-    `🛏 Ward: ${ward}, Room: ${roomNumber}\n\n` +
-    `Please keep this for reference during your stay.\n\n` +
-    `Get well soon! 💊`;
+    `*${SITE_NAME}* - In-Patient Admission Details:\n\n` +
+    `Card No: *${cardNumber}*\n` +
+    `Ward: ${ward}\n` +
+    `${roomLine}` +
+    `\nPlease keep this for reference during your stay.\n\n` +
+    `Get well soon!\n` +
+    `- ${SITE_NAME} Team`;
+  return buildWaLink(phone, message);
+}
+
+/** OPD visit card link — for outpatient / visit cards. */
+export function buildVisitCardLink(
+  phone: string,
+  name: string,
+  cardNumber: string,
+  visitDate: string,
+  doctorName?: string
+): string {
+  const doctorLine = doctorName ? `Doctor: ${doctorName}\n` : "";
+  const message =
+    `Hello ${name},\n\n` +
+    `*${SITE_NAME}* - OPD Visit Card:\n\n` +
+    `Card No: *${cardNumber}*\n` +
+    `Visit Date: ${visitDate}\n` +
+    `${doctorLine}` +
+    `\nPlease show this card at the reception for follow-up visits.\n\n` +
+    `Thank you!\n` +
+    `- ${SITE_NAME} Team`;
   return buildWaLink(phone, message);
 }
 
@@ -130,15 +154,16 @@ export function buildInvoiceLink(
   items?: { name: string; amount: number }[]
 ): string {
   const itemLines = items && items.length
-    ? "\n\n*Services:*\n" + items.map((i) => `  • ${i.name} — ₹${i.amount.toLocaleString("en-IN")}`).join("\n")
+    ? "\n\n*Services:*\n" + items.map((i) => `  - ${i.name}: Rs.${i.amount.toLocaleString("en-IN")}`).join("\n")
     : "";
   const message =
     `Hello ${name},\n\n` +
     `Your invoice from *${SITE_NAME}* is ready.\n\n` +
-    `🧾 Invoice No: *${invoiceNo}*${itemLines}\n\n` +
-    `💰 *Total: ₹${amount}*\n\n` +
+    `Invoice No: *${invoiceNo}*${itemLines}\n\n` +
+    `*Total: Rs.${amount}*\n\n` +
     `Please contact the billing counter for payment or queries.\n\n` +
-    `Thank you! 🙏`;
+    `Thank you!\n` +
+    `- ${SITE_NAME} Team`;
   return buildWaLink(phone, message);
 }
 
@@ -151,14 +176,15 @@ export function buildPharmacyBillLink(
   items: { name: string; quantity: number; unit: string; total: number }[]
 ): string {
   const itemLines = items
-    .map((i) => `  • ${i.name} × ${i.quantity} ${i.unit} — ₹${i.total.toFixed(2)}`)
+    .map((i) => `  - ${i.name} x${i.quantity} ${i.unit}: Rs.${i.total.toFixed(2)}`)
     .join("\n");
   const message =
     `Hello ${name},\n\n` +
     `Your pharmacy bill from *${SITE_NAME}*:\n\n` +
-    `🧾 Bill No: *${billNo}*\n\n` +
-    `💊 *Medicines:*\n${itemLines}\n\n` +
-    `💰 *Total: ₹${total.toFixed(2)}*\n\n` +
-    `Thank you for choosing ${SITE_NAME}! 🙏`;
+    `Bill No: *${billNo}*\n\n` +
+    `*Medicines:*\n${itemLines}\n\n` +
+    `*Total: Rs.${total.toFixed(2)}*\n\n` +
+    `Thank you for choosing ${SITE_NAME}!\n` +
+    `- ${SITE_NAME} Team`;
   return buildWaLink(phone, message);
 }
