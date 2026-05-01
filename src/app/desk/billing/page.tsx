@@ -78,6 +78,11 @@ function InvoicePrint({ data }: { data: any }) {
               <span>Discount</span><span>-₹{data.discount.toFixed(2)}</span>
             </div>
           )}
+          {data.gstRate > 0 && (
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", color: "#64748b" }}>
+              <span>GST ({data.gstRate}%)</span><span>+₹{data.gstAmount.toFixed(2)}</span>
+            </div>
+          )}
           <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderTop: "2px solid #1e3a5f", fontWeight: "900", fontSize: "14px", color: "#1e3a5f" }}>
             <span>Total</span><span>₹{data.total.toFixed(2)}</span>
           </div>
@@ -112,6 +117,7 @@ export default function BillingPage() {
   }, [patientMatch]);
   const [items, setItems] = useState<InvoiceItem[]>([]);
   const [discount, setDiscount] = useState(0);
+  const [gstRate, setGstRate] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<InvoicePaymentMethod>("cash");
   const [selectedServiceId, setSelectedServiceId] = useState("");
   const [addQty, setAddQty] = useState(1);
@@ -132,8 +138,10 @@ export default function BillingPage() {
 
   const selectedService = quickItems.find(q => q.id === selectedServiceId) ?? null;
 
-  const subtotal = items.reduce((s, i) => s + i.total, 0);
-  const total = Math.max(0, subtotal - discount);
+  const subtotal   = items.reduce((s, i) => s + i.total, 0);
+  const afterDisc  = Math.max(0, subtotal - discount);
+  const gstAmount  = parseFloat(((afterDisc * gstRate) / 100).toFixed(2));
+  const total      = parseFloat((afterDisc + gstAmount).toFixed(2));
 
   const addItem = () => {
     if (!selectedService) { toast.error("Select a service to add"); return; }
@@ -161,12 +169,12 @@ export default function BillingPage() {
         patientPhone: patient.phone,
         ...(patient.patientId  && { patientId:  patient.patientId }),
         ...(patient.doctorName && { doctorName: patient.doctorName }),
-        items, subtotal, discount, discountType: "flat", tax: 0, total,
+        items, subtotal, discount, discountType: "flat", tax: gstAmount, total,
         paymentMethod,
         paymentStatus: paymentMethod === "pending" ? "pending" : "paid",
         issuedBy: "Desk Staff",
       });
-      setCreatedInvoice({ invoiceNumber, patientName: patient.name, patientPhone: patient.phone, patientId: patient.patientId, doctorName: patient.doctorName, items, subtotal, discount, total, paymentMethod });
+      setCreatedInvoice({ invoiceNumber, patientName: patient.name, patientPhone: patient.phone, patientId: patient.patientId, doctorName: patient.doctorName, items, subtotal, discount, gstRate, gstAmount, total, paymentMethod });
       toast.success(`Invoice ${invoiceNumber} created!`);
     } catch {
       toast.error("Failed to create invoice");
@@ -230,7 +238,7 @@ export default function BillingPage() {
               <MessageCircle className="w-4 h-4" /> WhatsApp Invoice
             </a>
           )}
-          <button onClick={() => { setCreatedInvoice(null); setPatient({ name: "", phone: "", patientId: "", doctorName: "" }); setItems([]); setDiscount(0); }} className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 border border-slate-200 hover:bg-slate-50">
+          <button onClick={() => { setCreatedInvoice(null); setPatient({ name: "", phone: "", patientId: "", doctorName: "" }); setItems([]); setDiscount(0); setGstRate(0); }} className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 border border-slate-200 hover:bg-slate-50">
             New Invoice
           </button>
         </div>
@@ -368,6 +376,32 @@ export default function BillingPage() {
                 className="w-24 border border-slate-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20"
               />
             </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-slate-500">GST Rate</span>
+              <select
+                value={gstRate}
+                onChange={(e) => setGstRate(+e.target.value)}
+                className="border border-slate-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20"
+              >
+                <option value={0}>No GST (0%)</option>
+                <option value={5}>GST 5%</option>
+                <option value={12}>GST 12%</option>
+                <option value={18}>GST 18%</option>
+              </select>
+              {gstRate > 0 && <span className="text-sm text-slate-500">= ₹{gstAmount.toFixed(2)}</span>}
+            </div>
+            {discount > 0 && (
+              <div className="flex items-center justify-between text-sm text-green-600">
+                <span>After Discount</span>
+                <span>₹{afterDisc.toFixed(2)}</span>
+              </div>
+            )}
+            {gstRate > 0 && (
+              <div className="flex items-center justify-between text-sm text-slate-500">
+                <span>GST ({gstRate}%)</span>
+                <span>+₹{gstAmount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex items-center justify-between text-base font-bold text-[#1e3a5f] border-t border-slate-200 pt-3">
               <span>Total</span>
               <span>₹{total.toFixed(2)}</span>

@@ -80,6 +80,7 @@ function buildPrintHTML(bill: any, origin: string) {
       </table>
       <div style="text-align:right">
         ${bill.discount > 0 ? `<div style="color:#16a34a;margin-bottom:4px">Discount: -₹${bill.discount.toFixed(2)}</div>` : ""}
+        ${bill.gstRate > 0 ? `<div style="color:#64748b;margin-bottom:4px">GST (${bill.gstRate}%): ₹${bill.gstAmount.toFixed(2)}</div>` : ""}
         <div style="font-size:16px;font-weight:900;color:#1e3a5f">Total: ₹${bill.total.toFixed(2)}</div>
         <div style="font-size:11px;color:#64748b;text-transform:capitalize;margin-top:2px">${bill.paymentMethod}</div>
       </div>
@@ -104,6 +105,7 @@ export default function PharmacyBillingPage() {
     }));
   }, [patientMatch]);
   const [discount, setDiscount] = useState(0);
+  const [gstRate, setGstRate] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<typeof PAYMENT_METHODS[number]>("Cash");
   const [saving, setSaving] = useState(false);
   const [createdBill, setCreatedBill] = useState<any>(null);
@@ -112,8 +114,10 @@ export default function PharmacyBillingPage() {
     getMedicines(true).then(setMedicines).catch(() => toast.error("Failed to load medicines"));
   }, []);
 
-  const subtotal = cart.reduce((s, i) => s + i.total, 0);
-  const total = Math.max(0, subtotal - discount);
+  const subtotal   = cart.reduce((s, i) => s + i.total, 0);
+  const afterDisc  = Math.max(0, subtotal - discount);
+  const gstAmount  = parseFloat(((afterDisc * gstRate) / 100).toFixed(2));
+  const total      = parseFloat((afterDisc + gstAmount).toFixed(2));
 
   const addToCart = (med: Medicine) => {
     const existing = cart.find((c) => c.medicineId === med.id);
@@ -166,6 +170,8 @@ export default function PharmacyBillingPage() {
           ({ medicineId, name, unit, quantity, unitPrice, total })),
         subtotal,
         discount,
+        gstRate,
+        gstAmount,
         total,
         paymentMethod: paymentMethod.toLowerCase(),
         paymentStatus: paymentMethod === "Pending" ? "pending" : "paid",
@@ -173,7 +179,7 @@ export default function PharmacyBillingPage() {
         createdAt: Timestamp.now(),
       });
 
-      setCreatedBill({ billNumber, ...patient, items: cart, subtotal, discount, total, paymentMethod });
+      setCreatedBill({ billNumber, ...patient, items: cart, subtotal, discount, gstRate, gstAmount, total, paymentMethod });
       toast.success(`Bill ${billNumber} created & stock updated!`);
     } catch (err: any) {
       toast.error(err.message || "Failed to create bill");
@@ -255,7 +261,7 @@ export default function PharmacyBillingPage() {
               <MessageCircle className="w-4 h-4" /> WhatsApp
             </a>
           )}
-          <button onClick={() => { setCreatedBill(null); setCart([]); setPatient({ name: "", phone: "", doctorName: "" }); setDiscount(0); }}
+          <button onClick={() => { setCreatedBill(null); setCart([]); setPatient({ name: "", phone: "", doctorName: "" }); setDiscount(0); setGstRate(0); }}
             className="px-5 py-2 rounded-lg text-sm font-medium text-muted-foreground border border-border hover:bg-muted">
             New Bill
           </button>
@@ -383,6 +389,16 @@ export default function PharmacyBillingPage() {
                 className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
             <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">GST Rate</label>
+              <select value={gstRate} onChange={(e) => setGstRate(+e.target.value)}
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                <option value={0}>No GST (0%)</option>
+                <option value={5}>GST 5%</option>
+                <option value={12}>GST 12%</option>
+                <option value={18}>GST 18%</option>
+              </select>
+            </div>
+            <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Payment Method</label>
               <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value as any)}
                 className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
@@ -397,6 +413,11 @@ export default function PharmacyBillingPage() {
               {discount > 0 && (
                 <div className="flex justify-between text-green-600">
                   <span>Discount</span><span>-₹{discount.toFixed(2)}</span>
+                </div>
+              )}
+              {gstRate > 0 && (
+                <div className="flex justify-between text-muted-foreground">
+                  <span>GST ({gstRate}%)</span><span>+₹{gstAmount.toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between font-black text-foreground text-base pt-1 border-t border-border">
