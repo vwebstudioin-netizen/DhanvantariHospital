@@ -214,7 +214,6 @@ export default function FoundingMembersPage() {
                           width={160}
                           height={160}
                           className="object-cover w-full h-full"
-                          onError={() => {}}
                         />
                       </div>
                       <span className="absolute -bottom-2 -right-2 rounded-full bg-primary px-2 py-1 text-[10px] font-bold text-white shadow">
