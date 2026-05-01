@@ -143,12 +143,13 @@ interface PreviewRow {
 }
 
 interface Props {
-  onClose:    () => void;
+  inline?:    boolean;   // render as page section instead of modal overlay
+  onClose?:   () => void;
   onComplete: () => void;
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
-export default function BulkImportMedicines({ onClose, onComplete }: Props) {
+export default function BulkImportMedicines({ inline = false, onClose, onComplete }: Props) {
   const fileRef            = useRef<HTMLInputElement>(null);
   const [rows, setRows]    = useState<PreviewRow[]>([]);
   const [importing, setImporting] = useState(false);
@@ -217,26 +218,27 @@ export default function BulkImportMedicines({ onClose, onComplete }: Props) {
   const validCount   = rows.filter((r) => r.parsed.errors.length === 0).length;
   const invalidCount = rows.filter((r) => r.parsed.errors.length  >  0).length;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-background border border-border rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+  const inner = (
+    <div className={inline ? "bg-background border border-border rounded-2xl shadow-sm w-full flex flex-col" : "bg-background border border-border rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col"}>
 
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-primary/10 p-2">
-              <Upload className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">Bulk Import Medicines</h2>
-              <p className="text-xs text-muted-foreground">Upload a CSV file to add multiple medicines at once</p>
-            </div>
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg bg-primary/10 p-2">
+            <Upload className="w-5 h-5 text-primary" />
           </div>
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Bulk Import Medicines</h2>
+            <p className="text-xs text-muted-foreground">Upload a CSV file to add multiple medicines at once</p>
+          </div>
+        </div>
+        {!inline && onClose && (
           <button onClick={onClose} disabled={importing}
             className="p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
             <X className="w-5 h-5" />
           </button>
-        </div>
+        )}
+      </div>
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
@@ -389,7 +391,7 @@ export default function BulkImportMedicines({ onClose, onComplete }: Props) {
           </div>
           <div className="flex gap-3">
             <button
-              onClick={onClose}
+              onClick={() => inline ? onComplete() : onClose?.()}
               disabled={importing}
               className="px-5 py-2 rounded-lg text-sm font-medium text-muted-foreground border border-border hover:bg-muted transition-colors disabled:opacity-50"
             >
@@ -410,7 +412,14 @@ export default function BulkImportMedicines({ onClose, onComplete }: Props) {
             )}
           </div>
         </div>
-      </div>
+    </div>
+  );
+
+  if (inline) return inner;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      {inner}
     </div>
   );
 }
