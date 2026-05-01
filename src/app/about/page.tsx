@@ -22,7 +22,7 @@ export default function AboutPage() {
     <>
       <PageHero
         title="About Dhanvantari Hospital"
-        subtitle="Advanced multi-specialty healthcare serving our community with compassion, expertise, and innovation since 2010."
+        subtitle="Advanced multi-specialty healthcare serving our community with compassion, expertise, and innovation since 2026."
         breadcrumbs={[{ label: "About Us" }]}
       />
 
@@ -39,7 +39,7 @@ export default function AboutPage() {
                 personalized care that addresses each patient&apos;s unique needs.
               </p>
               <p className="mt-4 text-muted-foreground leading-relaxed">
-                Founded in 2010, we have grown from a single practice to a multi-location
+                Founded in 2026, we have grown from a single practice to a multi-location
                 healthcare network with specialist doctors across 10 medical departments.
                 Our growth reflects our unwavering commitment to clinical excellence and
                 patient satisfaction.

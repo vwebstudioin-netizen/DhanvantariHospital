@@ -74,6 +74,7 @@ export const FOOTER_LINKS = {
     { label: "Terms of Service", href: "/terms" },
   ],
   company: [
+    { label: "Founding Members", href: "/founding-members" },
     { label: "Gallery", href: "/gallery" },
     { label: "Blog", href: "/blog" },
     { label: "Careers", href: "/careers" },
