@@ -20,6 +20,7 @@ function sendCardWhatsApp(card: InPatientCard) {
   if (card.type === "visit") {
     link = buildVisitCardLink(
       card.patientPhone,
+      card.patientId,
       card.patientName,
       card.cardNumber,
       card.admissionDate,
@@ -28,6 +29,7 @@ function sendCardWhatsApp(card: InPatientCard) {
   } else {
     link = buildAdmissionCardLink(
       card.patientPhone,
+      card.patientId,
       card.patientName,
       card.cardNumber,
       card.ward || "",

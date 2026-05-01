@@ -70,42 +70,46 @@ export function buildAppointmentReminderLink(
 /** Admission card details link — IPD room admission. */
 export function buildAdmissionCardLink(
   phone: string,
+  patientId: string,
   name: string,
   cardNumber: string,
   ward: string,
   roomNumber: string
 ): string {
-  const roomLine = roomNumber ? `Room: ${roomNumber}\n` : "";
+  const roomLine = roomNumber ? `గది నం: ${roomNumber}\n` : "";
   const message =
-    `Hello ${name},\n\n` +
-    `*${SITE_NAME}* - In-Patient Admission Details:\n\n` +
-    `Card No: *${cardNumber}*\n` +
-    `Ward: ${ward}\n` +
+    `నమస్కారం ${name} గారు,\n\n` +
+    `*${SITE_NAME}* - వార్డు చేర్పు వివరాలు:\n\n` +
+    `రోగి నం: *${patientId}*\n` +
+    `కార్డు నం: *${cardNumber}*\n` +
+    `వార్డు: ${ward}\n` +
     `${roomLine}` +
-    `\nPlease keep this for reference during your stay.\n\n` +
-    `Get well soon!\n` +
-    `- ${SITE_NAME} Team`;
+    `\nమీ చికిత్స సమయంలో ఈ కార్డును జాగ్రత్తగా ఉంచుకోండి.\n\n` +
+    `త్వరగా కోలుకోవాలని కోరుకుంటున్నాము!\n` +
+    `- ${SITE_NAME}`;
   return buildWaLink(phone, message);
 }
 
 /** OPD visit card link — for outpatient / visit cards. */
 export function buildVisitCardLink(
   phone: string,
+  patientId: string,
   name: string,
   cardNumber: string,
   visitDate: string,
   doctorName?: string
 ): string {
-  const doctorLine = doctorName ? `Doctor: ${doctorName}\n` : "";
+  const doctorLine = doctorName ? `వైద్యుడు: ${doctorName}\n` : "";
   const message =
-    `Hello ${name},\n\n` +
-    `*${SITE_NAME}* - OPD Visit Card:\n\n` +
-    `Card No: *${cardNumber}*\n` +
-    `Visit Date: ${visitDate}\n` +
+    `నమస్కారం ${name} గారు,\n\n` +
+    `*${SITE_NAME}* - OPD సందర్శన కార్డు:\n\n` +
+    `రోగి నం: *${patientId}*\n` +
+    `కార్డు నం: *${cardNumber}*\n` +
+    `తేదీ: ${visitDate}\n` +
     `${doctorLine}` +
-    `\nPlease show this card at the reception for follow-up visits.\n\n` +
-    `Thank you!\n` +
-    `- ${SITE_NAME} Team`;
+    `\nతదుపరి సందర్శన కోసం ఈ కార్డును రిసెప్షన్‌లో చూపించండి.\n\n` +
+    `ధన్యవాదాలు!\n` +
+    `- ${SITE_NAME}`;
   return buildWaLink(phone, message);
 }
 
