@@ -19,16 +19,18 @@ import {
   Receipt,
   FileText,
   ArrowLeft,
+  Upload,
 } from "lucide-react";
 
 const PHARMACY_LINKS = [
-  { label: "Dashboard",      href: "/admin/pharmacy",          icon: LayoutDashboard },
-  { label: "Medicines",      href: "/admin/pharmacy/medicines", icon: Pill },
-  { label: "Stock",          href: "/admin/pharmacy/stock",     icon: ArrowDownUp },
-  { label: "New Bill",       href: "/admin/pharmacy/billing",   icon: Receipt },
-  { label: "Bill History",   href: "/admin/pharmacy/bills",     icon: FileText },
-  { label: "Suppliers",      href: "/admin/pharmacy/suppliers", icon: Truck },
-  { label: "Reports",        href: "/admin/pharmacy/reports",   icon: BarChart3 },
+  { label: "Dashboard",      href: "/admin/pharmacy",                         icon: LayoutDashboard, sub: false },
+  { label: "Medicines",      href: "/admin/pharmacy/medicines",                icon: Pill,            sub: false },
+  { label: "Bulk Import",    href: "/admin/pharmacy/medicines/bulk-import",    icon: Upload,          sub: true  },
+  { label: "Stock",          href: "/admin/pharmacy/stock",                    icon: ArrowDownUp,     sub: false },
+  { label: "New Bill",       href: "/admin/pharmacy/billing",                  icon: Receipt,         sub: false },
+  { label: "Bill History",   href: "/admin/pharmacy/bills",                    icon: FileText,        sub: false },
+  { label: "Suppliers",      href: "/admin/pharmacy/suppliers",                icon: Truck,           sub: false },
+  { label: "Reports",        href: "/admin/pharmacy/reports",                  icon: BarChart3,       sub: false },
 ];
 
 export default function PharmacyLayout({ children }: { children: ReactNode }) {
@@ -93,19 +95,22 @@ export default function PharmacyLayout({ children }: { children: ReactNode }) {
             const isActive =
               link.href === "/admin/pharmacy"
                 ? pathname === "/admin/pharmacy"
-                : pathname.startsWith(link.href);
+                : pathname === link.href || pathname.startsWith(link.href + "/");
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-lg text-sm font-medium transition-colors",
+                  link.sub
+                    ? "ml-5 pl-3 pr-3 py-2 border-l border-white/20"
+                    : "px-3 py-2.5",
                   isActive
                     ? "bg-white text-primary"
                     : "text-white/70 hover:bg-white/10 hover:text-white"
                 )}
               >
-                <Icon className="w-4 h-4 shrink-0" />
+                <Icon className={cn("shrink-0", link.sub ? "w-3.5 h-3.5" : "w-4 h-4")} />
                 {link.label}
               </Link>
             );
