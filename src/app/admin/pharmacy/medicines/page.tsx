@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Search, Edit, Trash2, AlertTriangle, RefreshCw } from "lucide-react";
+import { Plus, Search, Edit, Trash2, AlertTriangle, RefreshCw, Upload } from "lucide-react";
 import { MEDICINE_CATEGORIES, type Medicine, type MedicineUnit } from "@/types/medicine";
 import { getMedicines, addMedicine, updateMedicine, deleteMedicine } from "@/lib/medicines";
+import BulkImportMedicines from "@/components/admin/BulkImportMedicines";
 import toast from "react-hot-toast";
 
 const UNITS: MedicineUnit[] = ["tablet", "capsule", "ml", "mg", "vial", "strip", "sachet", "syrup", "cream", "drops"];
@@ -22,6 +23,7 @@ export default function MedicinesPage() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({ ...EMPTY_FORM });
+  const [showBulkImport, setShowBulkImport] = useState(false);
 
   useEffect(() => { load(); }, []);
 
@@ -98,6 +100,12 @@ export default function MedicinesPage() {
 
   return (
     <div className="space-y-5">
+      {showBulkImport && (
+        <BulkImportMedicines
+          onClose={() => setShowBulkImport(false)}
+          onComplete={() => { setShowBulkImport(false); load(); }}
+        />
+      )}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Medicines</h1>
@@ -106,6 +114,12 @@ export default function MedicinesPage() {
         <div className="flex gap-2">
           <button onClick={load} className="p-2 text-muted-foreground hover:text-foreground border border-border rounded-lg hover:bg-muted">
             <RefreshCw className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setShowBulkImport(true)}
+            className="flex items-center gap-2 border border-border bg-background text-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-muted transition-colors"
+          >
+            <Upload className="w-4 h-4" /> Bulk Import
           </button>
           <button onClick={() => { setShowForm(!showForm); setEditId(null); setForm({ ...EMPTY_FORM }); }}
             className="flex items-center gap-2 bg-[#1e3a5f] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#152d4a]">
