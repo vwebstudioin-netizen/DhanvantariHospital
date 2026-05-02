@@ -10,7 +10,6 @@ import {
   Check, SkipForward, UserX, Printer, Stethoscope, Play, FileText, GripVertical,
 } from "lucide-react";
 import { SITE_NAME, CONTACT_PHONE, HOSPITAL_ADDRESS } from "@/lib/constants";
-import { buildTokenCalledLink } from "@/lib/whatsapp";
 import { format } from "date-fns";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -78,12 +77,7 @@ export default function QueuePage() {
   };
 
   const handleCallNext = async () => {
-    const served = await callNext();
-    if (served?.patientPhone && served?.displayNumber) {
-      // Open WhatsApp in browser with pre-filled message — user just taps Send
-      const link = buildTokenCalledLink(served.patientPhone, served.displayNumber);
-      window.open(link, "_blank", "noopener,noreferrer");
-    }
+    await callNext();
   };
 
   // Drag-and-drop reorder handlers
