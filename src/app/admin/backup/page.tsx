@@ -18,7 +18,7 @@ const BACKUP_COLLECTIONS = [
   // Billing
   "invoices", "pharmacyBills", "billingServices", "counters",
   // Pharmacy
-  "medicines", "stockMovements", "suppliers",
+  "medicines", "stockMovements", "pharmacySuppliers",
   // Doctors
   "doctors",
   // CRM / communications
