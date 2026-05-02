@@ -510,16 +510,16 @@
       <div class="test-block-header"><h3>Issue Tokens &amp; Work Through the Full 5-Stage Flow</h3><span class="url-tag">/desk/queue</span></div>
       <div class="steps">
         <div class="step"><div class="step-num"></div><div class="step-body">
-          As receptionist, go to <code>/desk/queue</code>. Enter a patient phone number — verify patient name auto-fills if they exist in records. Select purpose. Click <strong>"Issue Token"</strong>.
-          <div class="expected">Token appears in Waiting list with sequential number. Print slip option available.</div>
+          As receptionist, go to <code>/desk/queue</code>. Enter a patient phone number — verify patient name auto-fills if they exist in records. Select purpose. Optionally select an <strong>Assign Doctor</strong> from the dropdown. Click <strong>"Issue Token"</strong>.
+          <div class="expected">Token appears in Waiting list with sequential number. If a doctor was selected, their name appears below the purpose in the waiting list row. Print slip option available.</div>
         </div></div>
         <div class="step"><div class="step-num"></div><div class="step-body">
-          Issue 3 more tokens for different patients.
-          <div class="expected">All 4 tokens visible in queue with correct order.</div>
+          Issue 3 more tokens for different patients. Assign different doctors to some tokens.
+          <div class="expected">All 4 tokens visible in queue with correct order. Each assigned doctor name is shown in the waiting list.</div>
         </div></div>
         <div class="step"><div class="step-num"></div><div class="step-body">
           Click <strong>"Call Next Patient"</strong>.
-          <div class="expected">First token moves to "Called" state (amber). A WhatsApp <code>wa.me</code> link is generated — staff can tap it to send the patient a notification via WhatsApp.</div>
+          <div class="expected">First token moves to "Called" state (amber). Token status updates in Firestore. No WhatsApp popup — staff manually send WhatsApp if needed.</div>
         </div></div>
         <div class="step"><div class="step-num"></div><div class="step-body">
           Click <strong>"Start Consultation"</strong>.
@@ -540,6 +540,44 @@
         <div class="step"><div class="step-num"></div><div class="step-body">
           Click <strong>Print Slip</strong> on any waiting token.
           <div class="expected">New browser window opens with thermal-format slip: token number, patient name, purpose, QR code, hospital name.</div>
+        </div></div>
+      </div>
+    </div>
+
+    </div>
+
+    <div class="test-block">
+      <div class="test-block-header"><h3>Drag-and-Drop Queue Reorder</h3><span class="url-tag">/desk/queue · /admin/queue</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Issue at least 4 tokens for different patients (some assigned to different doctors).
+          <div class="expected">Waiting list shows all tokens in issue order. Each row has a grip handle (⠿) on the left.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Drag token #4 (bottom of the list) to the top position using the grip handle.
+          <div class="expected">Token #4 moves to the top visually. On release, Firestore is updated. <strong>"Call Next Patient"</strong> now calls token #4 first — not token #1.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Verify the position counter (the small #1, #2… shown on the right) updates to reflect the new order.
+          <div class="expected">Position numbers re-render to match new order. Token numbers (001, 004…) do not change — only priority changes.</div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="test-block">
+      <div class="test-block-header"><h3>Reset Queue (Testing / End-of-Day)</h3><span class="url-tag">/admin/queue · /desk/queue</span></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          After issuing several tokens, click the red <strong>"Reset Queue"</strong> button in the top-right header.
+          <div class="expected">A confirmation dialog appears: "Reset today's entire queue? All tokens will be deleted and the counter resets to 0."</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Click <strong>OK</strong> to confirm.
+          <div class="expected">All today's tokens deleted. Counter resets. Success toast: "Queue reset — counter starts from 1 again". Next issued token will be <strong>#001</strong>.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Click <strong>Cancel</strong> on the confirmation dialog.
+          <div class="expected">Nothing happens. Queue remains unchanged.</div>
         </div></div>
       </div>
     </div>
@@ -692,12 +730,20 @@
       <div class="test-block-header"><h3>Medicine Catalog</h3><span class="url-tag">/admin/pharmacy/medicines</span></div>
       <div class="steps">
         <div class="step"><div class="step-num"></div><div class="step-body">
-          Click <strong>"Add Medicine"</strong>. Fill: Brand Name = "Paracetamol 500mg", Generic = "Paracetamol", Category = "Analgesic", Unit = "Tablet", Selling Price = 2, Stock = 200, Reorder Level = 50. Click <strong>Save</strong>.
-          <div class="expected">Medicine saved to Firestore. Appears in catalog table immediately.</div>
+          First add a supplier at <code>/admin/pharmacy/suppliers</code>: Name = "Sun Pharma", Phone, mark active. Save.
+          <div class="expected">Supplier saved and appears in the supplier list.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Click <strong>"Add Medicine"</strong>. Fill: Brand Name = "Paracetamol 500mg", Generic = "Paracetamol", Batch = "PCM-2026-01", Mfg. Date = "2025-10", Expiry Date = "2027-06". In the <strong>Manufacturer / Supplier</strong> dropdown, select "Sun Pharma". Set Category = "Analgesic", Unit = "Tablet", Selling Price = 2, Stock = 200, Reorder Level = 50. Click <strong>Save</strong>.
+          <div class="expected">Medicine saved to Firestore with manufacturer, batch, mfg date, and expiry. Appears in catalog table with a <strong>Batch / Dates</strong> column showing batch#, Mfg: 2025-10, Exp: 2027-06.</div>
         </div></div>
         <div class="step"><div class="step-num"></div><div class="step-body">
           Click the edit icon (pencil) on any medicine → change the selling price → click <strong>Update</strong>.
           <div class="expected">Updated in Firestore. New price shown in table.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Verify the <strong>Manufacturer / Supplier</strong> field in the form is a dropdown (not a free-text input). Only active suppliers appear.
+          <div class="expected">Dropdown shows all active suppliers. Selecting one saves the supplier name as the manufacturer field.</div>
         </div></div>
         <div class="step"><div class="step-num"></div><div class="step-body">
           Set stock to a value at or below the reorder level. Check for warning indicator.
@@ -736,11 +782,15 @@
       <div class="test-block-header"><h3>Pharmacy Billing</h3><span class="url-tag">/admin/pharmacy/billing</span></div>
       <div class="steps">
         <div class="step"><div class="step-num"></div><div class="step-body">
-          Search for "Paracetamol" → click Add to cart → set quantity to 10. Add another medicine. Fill patient name and phone.
-          <div class="expected">Cart shows both medicines with quantities and per-unit prices. Total calculated.</div>
+          Search for "Paracetamol" → click <strong>Add to cart</strong>. In the cart, find the quantity cell — verify it shows a number input with <strong>− and + buttons</strong> on either side. Type "10" directly into the input.
+          <div class="expected">Quantity updates to 10. Total recalculates immediately. You can type any number directly — no need to click + repeatedly.</div>
         </div></div>
         <div class="step"><div class="step-num"></div><div class="step-body">
-          Click <strong>"Generate Bill"</strong>.
+          Add another medicine. Verify the cart shows Mfg and Expiry dates below each medicine name (if those fields were set).
+          <div class="expected">Cart rows show "Mfg: YYYY-MM · Exp: YYYY-MM" in smaller text under the medicine name when those dates exist.</div>
+        </div></div>
+        <div class="step"><div class="step-num"></div><div class="step-body">
+          Fill patient name and phone. Click <strong>"Generate Bill"</strong>.
           <div class="expected">Pharmacy bill saved as PHRM-XXXX. Stock is automatically deducted for each medicine in the bill. No manual stock update needed.</div>
         </div></div>
         <div class="step"><div class="step-num"></div><div class="step-body">
@@ -749,7 +799,7 @@
         </div></div>
         <div class="step"><div class="step-num"></div><div class="step-body">
           Click <strong>"Print"</strong> on the bill.
-          <div class="expected">Print-ready bill with hospital logo, PHRM number, patient name, medicine list, quantities, prices, and total.</div>
+          <div class="expected">Print-ready bill with hospital logo, PHRM number, patient name, medicine list with Mfg/Exp dates, quantities, prices, and total.</div>
         </div></div>
       </div>
     </div>
