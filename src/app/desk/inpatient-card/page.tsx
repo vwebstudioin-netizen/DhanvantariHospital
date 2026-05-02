@@ -40,62 +40,6 @@ function sendCardWhatsApp(card: InPatientCard) {
   window.open(link, "_blank", "noopener,noreferrer");
 }
 
-// ── Printable Room Card ──────────────────────────────────────────────────────
-function PrintableRoomCard({ card }: { card: InPatientCard }) {
-  return (
-    <div style={{ width: "85.6mm", minHeight: "54mm", border: "2px solid #1e3a5f", padding: "8px 12px", fontFamily: "Arial, sans-serif", fontSize: "11px", color: "#1e293b", background: "#fff" }}>
-      <div style={{ borderBottom: "1.5px solid #1e3a5f", paddingBottom: "4px", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
-        <img src="/images/logo.jpg" alt="Logo" style={{ width: "26px", height: "26px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
-        <div>
-          <div style={{ fontWeight: "900", fontSize: "10px", color: "#1e3a5f", textTransform: "uppercase", letterSpacing: "1px" }}>{SITE_NAME}</div>
-          <div style={{ fontSize: "7px", color: "#64748b" }}>Room Admission Card</div>
-        </div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3px" }}>
-        <div><span style={{ color: "#64748b" }}>Card No: </span><strong>{card.cardNumber}</strong></div>
-        <div><span style={{ color: "#64748b" }}>Patient ID: </span><strong>{card.patientId}</strong></div>
-        <div style={{ gridColumn: "1/-1" }}><span style={{ color: "#64748b" }}>Name: </span><strong>{card.patientName}</strong></div>
-        <div><span style={{ color: "#64748b" }}>Doctor: </span>{card.doctorName}</div>
-        <div><span style={{ color: "#64748b" }}>Ward: </span>{card.ward}</div>
-        <div><span style={{ color: "#64748b" }}>Room: </span>{card.roomNumber}</div>
-        {card.bedNumber && <div><span style={{ color: "#64748b" }}>Bed: </span>{card.bedNumber}</div>}
-        <div style={{ gridColumn: "1/-1" }}><span style={{ color: "#64748b" }}>Diagnosis: </span>{card.diagnosis}</div>
-        <div><span style={{ color: "#64748b" }}>Admitted: </span>{card.admissionDate}</div>
-      </div>
-      <div style={{ borderTop: "1px solid #e2e8f0", marginTop: "5px", paddingTop: "3px", fontSize: "8px", color: "#94a3b8", textAlign: "center" }}>
-        Active until discharged by hospital staff
-      </div>
-    </div>
-  );
-}
-
-// ── Printable Visit Card ─────────────────────────────────────────────────────
-function PrintableVisitCard({ card }: { card: InPatientCard }) {
-  return (
-    <div style={{ width: "85.6mm", minHeight: "54mm", border: "2px solid #16a34a", padding: "8px 12px", fontFamily: "Arial, sans-serif", fontSize: "11px", color: "#1e293b", background: "#fff" }}>
-      <div style={{ borderBottom: "1.5px solid #16a34a", paddingBottom: "4px", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
-        <img src="/images/logo.jpg" alt="Logo" style={{ width: "26px", height: "26px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
-        <div>
-          <div style={{ fontWeight: "900", fontSize: "10px", color: "#16a34a", textTransform: "uppercase", letterSpacing: "1px" }}>{SITE_NAME}</div>
-          <div style={{ fontSize: "7px", color: "#64748b" }}>OPD Visit Card</div>
-        </div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3px" }}>
-        <div><span style={{ color: "#64748b" }}>Card No: </span><strong>{card.cardNumber}</strong></div>
-        <div><span style={{ color: "#64748b" }}>Patient ID: </span><strong>{card.patientId}</strong></div>
-        <div style={{ gridColumn: "1/-1" }}><span style={{ color: "#64748b" }}>Name: </span><strong>{card.patientName}</strong></div>
-        <div><span style={{ color: "#64748b" }}>Doctor: </span>{card.doctorName}</div>
-        <div><span style={{ color: "#64748b" }}>Visit Date: </span>{card.admissionDate}</div>
-        <div style={{ gridColumn: "1/-1" }}><span style={{ color: "#64748b" }}>Purpose: </span>{card.diagnosis}</div>
-      </div>
-      <div style={{ borderTop: "1px solid #e2e8f0", marginTop: "5px", paddingTop: "4px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ fontSize: "8px", color: "#64748b" }}>Valid for follow-up until:</span>
-        <strong style={{ color: "#dc2626", fontSize: "12px" }}>{card.expiryDate}</strong>
-      </div>
-    </div>
-  );
-}
-
 // ── Expiry Badge (visit cards only) ─────────────────────────────────────────
 function ExpiryBadge({ expiryDate }: { expiryDate: string }) {
   const days = differenceInDays(new Date(expiryDate), new Date());
@@ -178,7 +122,6 @@ export default function InPatientCardPage() {
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
-  const [printCard, setPrintCard] = useState<InPatientCard | null>(null);
 
   const [roomForm, setRoomForm] = useState({
     patientName: "", patientPhone: "", doctorName: "",
@@ -354,8 +297,51 @@ export default function InPatientCardPage() {
   };
 
   const handlePrint = (card: InPatientCard) => {
-    setPrintCard(card);
-    setTimeout(() => { window.print(); setPrintCard(null); }, 300);
+    const isRoom = card.type === "room";
+    const borderColor = isRoom ? "#1e3a5f" : "#16a34a";
+    const label = isRoom ? "Room Admission Card" : "OPD Visit Card";
+    const extraRows = isRoom
+      ? `<tr><td>Ward</td><td>${card.ward || "—"}</td></tr>
+         <tr><td>Room / Bed</td><td>${card.roomNumber || "—"}${card.bedNumber ? ` · Bed ${card.bedNumber}` : ""}</td></tr>
+         <tr><td>Admitted</td><td>${card.admissionDate}</td></tr>`
+      : `<tr><td>Visit Date</td><td>${card.admissionDate}</td></tr>
+         <tr><td>Valid Until</td><td><strong style="color:#dc2626">${card.expiryDate || "—"}</strong></td></tr>`;
+
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>${label} — ${card.patientName}</title>
+    <style>
+      @page { size: 85.6mm 54mm; margin: 0; }
+      body { margin: 0; padding: 6px 10px; font-family: Arial, sans-serif; font-size: 10px; color: #1e293b; background: #fff; width: 85.6mm; box-sizing: border-box; }
+      .header { border-bottom: 1.5px solid ${borderColor}; padding-bottom: 4px; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+      .brand { font-weight: 900; font-size: 9px; color: ${borderColor}; text-transform: uppercase; letter-spacing: 1px; }
+      .sub-brand { font-size: 7px; color: #64748b; }
+      table { width: 100%; border-collapse: collapse; }
+      td { padding: 2px 0; font-size: 9.5px; vertical-align: top; }
+      td:first-child { color: #64748b; width: 38%; }
+      td:last-child { font-size: 9.5px; }
+      .footer { border-top: 1px solid #e2e8f0; margin-top: 4px; padding-top: 3px; font-size: 7px; color: #94a3b8; text-align: center; }
+      @media print { body { margin: 0; } }
+    </style></head><body>
+    <div class="header">
+      <div>
+        <div class="brand">${SITE_NAME}</div>
+        <div class="sub-brand">${label}</div>
+      </div>
+    </div>
+    <table>
+      <tr><td>Card No</td><td><strong>${card.cardNumber}</strong></td></tr>
+      <tr><td>Patient ID</td><td>${card.patientId}</td></tr>
+      <tr><td>Name</td><td><strong>${card.patientName}</strong></td></tr>
+      <tr><td>Doctor</td><td>${card.doctorName}</td></tr>
+      <tr><td>Diagnosis</td><td>${card.diagnosis}</td></tr>
+      ${extraRows}
+    </table>
+    <div class="footer">Issued by ${SITE_NAME}</div>
+    <script>window.onload = () => { window.print(); window.onafterprint = () => window.close(); };</script>
+    </body></html>`;
+
+    const w = window.open("", "_blank", "width=360,height=260");
+    if (w) { w.document.write(html); w.document.close(); }
   };
 
   const handleReview = (card: InPatientCard) => {
@@ -413,15 +399,6 @@ export default function InPatientCardPage() {
 
   return (
     <div className="space-y-5">
-      {/* Print overlay */}
-      {printCard && (
-        <div className="fixed inset-0 bg-white z-50 flex items-center justify-center print:static print:inset-auto">
-          {printCard.type === "room"
-            ? <PrintableRoomCard card={printCard} />
-            : <PrintableVisitCard card={printCard} />
-          }
-        </div>
-      )}
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -504,8 +481,13 @@ export default function InPatientCardPage() {
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-medium text-slate-600 mb-1">Diagnosis *</label>
-                  <input value={roomForm.diagnosis} onChange={(e) => setRoomForm({ ...roomForm, diagnosis: e.target.value })} placeholder="Primary diagnosis"
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f]" />
+                  <input
+                    list="diagnosis-options"
+                    value={roomForm.diagnosis}
+                    onChange={(e) => setRoomForm({ ...roomForm, diagnosis: e.target.value })}
+                    placeholder="Select or type primary diagnosis"
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f]"
+                  />
                 </div>
               </>
             ) : (
@@ -544,8 +526,45 @@ export default function InPatientCardPage() {
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-medium text-slate-600 mb-1">Purpose / Diagnosis *</label>
-                  <input value={visitForm.diagnosis} onChange={(e) => setVisitForm({ ...visitForm, diagnosis: e.target.value })} placeholder="Reason for visit"
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500" />
+                  <input
+                    list="diagnosis-options"
+                    value={visitForm.diagnosis}
+                    onChange={(e) => setVisitForm({ ...visitForm, diagnosis: e.target.value })}
+                    placeholder="Select or type reason for visit"
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500"
+                  />
+                  <datalist id="diagnosis-options">
+                    <option value="General Consultation" />
+                    <option value="Follow-up Visit" />
+                    <option value="Fever / Viral Infection" />
+                    <option value="Cold, Cough & Respiratory" />
+                    <option value="Stomach Pain / Gastritis" />
+                    <option value="Vomiting / Diarrhoea" />
+                    <option value="Headache / Migraine" />
+                    <option value="Blood Pressure Check" />
+                    <option value="Diabetes Management" />
+                    <option value="Thyroid Consultation" />
+                    <option value="Chest Pain / Cardiology" />
+                    <option value="Joint Pain / Arthritis" />
+                    <option value="Back Pain / Spine" />
+                    <option value="Skin Rash / Dermatology" />
+                    <option value="Eye Consultation" />
+                    <option value="ENT — Ear / Nose / Throat" />
+                    <option value="Dental Pain" />
+                    <option value="Antenatal Check-up" />
+                    <option value="Gynaecology Consultation" />
+                    <option value="Paediatric Consultation" />
+                    <option value="Vaccination / Immunisation" />
+                    <option value="Wound Dressing / Injury" />
+                    <option value="Fracture / Orthopaedic" />
+                    <option value="Pre-Operative Assessment" />
+                    <option value="Post-Operative Follow-up" />
+                    <option value="Lab Reports / Review" />
+                    <option value="Physiotherapy" />
+                    <option value="Neurology Consultation" />
+                    <option value="Urology Consultation" />
+                    <option value="Other" />
+                  </datalist>
                 </div>
                 <div className="sm:col-span-2 p-3 bg-green-50 border border-green-200 rounded-lg text-xs text-green-700">
                   📋 Visit card expires in <strong>14 days</strong>. A <strong>token number</strong> will be automatically added to today's queue when this card is created.
