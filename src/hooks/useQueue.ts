@@ -11,6 +11,7 @@ import {
   skipToken as skipFn,
   markNoShow as markNoShowFn,
   reorderQueue as reorderQueueFn,
+  resetQueue as resetQueueFn,
   ensureQueueConfig,
 } from "@/lib/queue";
 
@@ -80,6 +81,10 @@ export function useQueue(date?: string) {
     return reorderQueueFn(dateKey, reordered);
   }, [dateKey]);
 
+  const resetQueue = useCallback(async () => {
+    return resetQueueFn(dateKey);
+  }, [dateKey]);
+
   return {
     tokens,
     waitingTokens,
@@ -96,5 +101,6 @@ export function useQueue(date?: string) {
     skip,
     noShow,
     reorderQueue,
+    resetQueue,
   };
 }

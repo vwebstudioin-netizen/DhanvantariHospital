@@ -195,6 +195,22 @@ export async function reorderQueue(
   await batch.commit();
 }
 
+// Reset today's queue — deletes all tokens and resets counter to 0
+export async function resetQueue(date: string): Promise<void> {
+  const { writeBatch: wb, getDocs: gd } = await import("firebase/firestore");
+  const snap = await gd(tokensCol(date));
+  const batch = wb(db);
+  snap.docs.forEach((d) => batch.delete(d.ref));
+  batch.set(configRef(date), {
+    date,
+    lastTokenNumber: 0,
+    currentServingToken: 0,
+    isQueueActive: true,
+    updatedAt: serverTimestamp(),
+  });
+  await batch.commit();
+}
+
 export function subscribeToConfig(date: string, callback: (config: QueueConfig | null) => void): Unsubscribe {
   return onSnapshot(configRef(date), (snap) => {
     callback(snap.exists() ? (snap.data() as QueueConfig) : null);

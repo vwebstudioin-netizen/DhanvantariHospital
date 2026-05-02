@@ -7,7 +7,7 @@ import { useDoctors } from "@/hooks/useDoctors";
 import TokenSlip from "@/components/shared/TokenSlip";
 import {
   Ticket, Phone, User, Plus, ChevronRight,
-  Check, SkipForward, UserX, Printer, Stethoscope, Play, FileText, GripVertical,
+  Check, SkipForward, UserX, Printer, Stethoscope, Play, FileText, GripVertical, RotateCcw,
 } from "lucide-react";
 import { SITE_NAME, CONTACT_PHONE, HOSPITAL_ADDRESS } from "@/lib/constants";
 import { format } from "date-fns";
@@ -25,7 +25,7 @@ export default function QueuePage() {
   const {
     tokens, waitingTokens, calledToken, servingToken, activeToken,
     completedTokens, config, loading,
-    issueToken, callNext, startConsultation, complete, skip, noShow, reorderQueue,
+    issueToken, callNext, startConsultation, complete, skip, noShow, reorderQueue, resetQueue,
   } = useQueue();
 
   const { doctors } = useDoctors();
@@ -191,6 +191,15 @@ export default function QueuePage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={async () => {
+              if (!confirm("Reset today's entire queue? All tokens will be deleted and the counter resets to 0.")) return;
+              try { await resetQueue(); toast.success("Queue reset — counter starts from 1 again"); }
+              catch { toast.error("Reset failed"); }
+            }}
+            className="flex items-center gap-2 rounded-lg border border-red-200 text-red-600 px-4 py-2 text-sm font-medium hover:bg-red-50 transition-colors">
+            <RotateCcw className="h-4 w-4" /> Reset Queue
+          </button>
           <button onClick={handleExportPDF} disabled={tokens.length === 0}
             className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-muted disabled:opacity-40 transition-colors">
             <FileText className="h-4 w-4" /> PDF Log
