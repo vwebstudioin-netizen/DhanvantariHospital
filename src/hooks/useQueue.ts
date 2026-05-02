@@ -10,6 +10,7 @@ import {
   completeToken as completeFn,
   skipToken as skipFn,
   markNoShow as markNoShowFn,
+  reorderQueue as reorderQueueFn,
   ensureQueueConfig,
 } from "@/lib/queue";
 
@@ -34,7 +35,9 @@ export function useQueue(date?: string) {
     return () => { unsubConfig(); unsubTokens(); };
   }, [dateKey]);
 
-  const waitingTokens = tokens.filter((t) => t.status === "waiting");
+  const waitingTokens = tokens
+    .filter((t) => t.status === "waiting")
+    .sort((a, b) => (a.sortOrder ?? a.tokenNumber) - (b.sortOrder ?? b.tokenNumber));
 
   // calledToken — summoned but not yet started
   const calledToken = tokens.find((t) => t.status === "called") || null;
@@ -49,8 +52,8 @@ export function useQueue(date?: string) {
     (t) => t.status === "completed" || t.status === "skipped" || t.status === "no-show"
   );
 
-  const issueToken = useCallback(async (name: string, phone: string, purpose?: string) => {
-    return issueTokenFn(name, phone, purpose);
+  const issueToken = useCallback(async (name: string, phone: string, purpose?: string, doctorId?: string, doctorName?: string) => {
+    return issueTokenFn(name, phone, purpose, doctorId, doctorName);
   }, []);
 
   const callNext = useCallback(async () => {
@@ -73,6 +76,10 @@ export function useQueue(date?: string) {
     return markNoShowFn(dateKey, tokenId);
   }, [dateKey]);
 
+  const reorderQueue = useCallback(async (reordered: { id: string; sortOrder: number }[]) => {
+    return reorderQueueFn(dateKey, reordered);
+  }, [dateKey]);
+
   return {
     tokens,
     waitingTokens,
@@ -88,5 +95,6 @@ export function useQueue(date?: string) {
     complete,
     skip,
     noShow,
+    reorderQueue,
   };
 }

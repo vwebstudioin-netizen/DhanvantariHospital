@@ -15,6 +15,9 @@ export interface Token {
   patientName: string;
   patientPhone: string;
   purpose?: string;
+  doctorId?: string;
+  doctorName?: string;
+  sortOrder?: number;        // for manual reordering; defaults to tokenNumber
   status: TokenStatus;
   issuedAt: Timestamp;
   calledAt?: Timestamp;

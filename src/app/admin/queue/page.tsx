@@ -3,10 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import { usePatientLookup } from "@/hooks/usePatientLookup";
 import { useQueue } from "@/hooks/useQueue";
+import { useDoctors } from "@/hooks/useDoctors";
 import TokenSlip from "@/components/shared/TokenSlip";
 import {
   Ticket, Phone, User, Plus, ChevronRight,
-  Check, SkipForward, UserX, Printer, Stethoscope, Play, FileText,
+  Check, SkipForward, UserX, Printer, Stethoscope, Play, FileText, GripVertical,
 } from "lucide-react";
 import { SITE_NAME, CONTACT_PHONE, HOSPITAL_ADDRESS } from "@/lib/constants";
 import { buildTokenCalledLink } from "@/lib/whatsapp";
@@ -25,8 +26,10 @@ export default function QueuePage() {
   const {
     tokens, waitingTokens, calledToken, servingToken, activeToken,
     completedTokens, config, loading,
-    issueToken, callNext, startConsultation, complete, skip, noShow,
+    issueToken, callNext, startConsultation, complete, skip, noShow, reorderQueue,
   } = useQueue();
+
+  const { doctors } = useDoctors();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -38,6 +41,7 @@ export default function QueuePage() {
     if (!phone && patientMatch.phone) setPhone(patientMatch.phone);
   }, [patientMatch]);
   const [purpose, setPurpose] = useState(PURPOSES[0]);
+  const [selectedDoctorId, setSelectedDoctorId] = useState("");
   const [issuing, setIssuing] = useState(false);
   const [lastIssued, setLastIssued] = useState<{ displayNumber: string; patientName: string } | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
@@ -49,13 +53,23 @@ export default function QueuePage() {
     ? "/doctor/queue/doctor"
     : "/admin/queue/doctor";
 
+  // Drag-and-drop state
+  const dragIndexRef = useRef<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
   const handleIssue = async () => {
     if (!name.trim() || !phone.trim()) return;
     setIssuing(true);
     try {
-      const token = await issueToken(name.trim(), phone.trim(), purpose);
+      const drData = doctors.find((d) => d.slug === selectedDoctorId);
+      const drName = drData ? `${drData.title} ${drData.firstName} ${drData.lastName}`.trim() : undefined;
+      const token = await issueToken(
+        name.trim(), phone.trim(), purpose,
+        selectedDoctorId || undefined,
+        drName,
+      );
       setLastIssued({ displayNumber: token.displayNumber, patientName: token.patientName });
-      setName(""); setPhone(""); setPurpose(PURPOSES[0]);
+      setName(""); setPhone(""); setPurpose(PURPOSES[0]); setSelectedDoctorId("");
     } catch (err) {
       console.error("Failed to issue token:", err);
     } finally {
@@ -70,6 +84,25 @@ export default function QueuePage() {
       const link = buildTokenCalledLink(served.patientPhone, served.displayNumber);
       window.open(link, "_blank", "noopener,noreferrer");
     }
+  };
+
+  // Drag-and-drop reorder handlers
+  const handleDragStart = (index: number) => { dragIndexRef.current = index; };
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverIndex(index);
+  };
+  const handleDrop = async (dropIndex: number) => {
+    const fromIndex = dragIndexRef.current;
+    if (fromIndex === null || fromIndex === dropIndex) { setDragOverIndex(null); return; }
+    const reordered = [...waitingTokens];
+    const [moved] = reordered.splice(fromIndex, 1);
+    reordered.splice(dropIndex, 0, moved);
+    // Assign new sortOrder values (1-based, spaced by 10 to allow future inserts)
+    const updates = reordered.map((t, i) => ({ id: t.id, sortOrder: (i + 1) * 10 }));
+    dragIndexRef.current = null;
+    setDragOverIndex(null);
+    try { await reorderQueue(updates); } catch { toast.error("Reorder failed"); }
   };
 
   const handlePrint = () => {
@@ -229,6 +262,20 @@ export default function QueuePage() {
                 {PURPOSES.map((p) => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                Assign Doctor <span className="font-normal text-muted-foreground/60">(optional)</span>
+              </label>
+              <select value={selectedDoctorId} onChange={(e) => setSelectedDoctorId(e.target.value)}
+                className="w-full rounded-lg border border-border bg-background py-2 px-3 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+                <option value="">— Any Available Doctor —</option>
+                {doctors.filter((d) => d.acceptingNewPatients !== false).map((d) => (
+                  <option key={d.slug} value={d.slug}>
+                    {d.title} {d.firstName} {d.lastName} — {d.specialty}
+                  </option>
+                ))}
+              </select>
+            </div>
             <button onClick={handleIssue} disabled={!name.trim() || !phone.trim() || issuing}
               className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-medium text-white hover:bg-[#152d4a] disabled:opacity-50">
               <Ticket className="h-4 w-4" />
@@ -269,6 +316,11 @@ export default function QueuePage() {
                 <p className="font-semibold text-foreground">{activeToken.patientName}</p>
                 <p className="text-xs text-muted-foreground">{activeToken.purpose}</p>
                 <p className="text-xs text-muted-foreground">{activeToken.patientPhone}</p>
+                {activeToken.doctorName && (
+                  <p className="text-xs font-medium text-primary mt-1 flex items-center justify-center gap-1">
+                    <Stethoscope className="w-3 h-3" /> {activeToken.doctorName}
+                  </p>
+                )}
                 <span className={`inline-block mt-2 px-2 py-0.5 text-xs font-bold rounded-full ${statusColor(activeToken.status)}`}>
                   {activeToken.status === "called" ? "Called — waiting for patient" : "Consultation in progress"}
                 </span>
@@ -338,13 +390,25 @@ export default function QueuePage() {
 
         {/* Waiting List */}
         <div className="rounded-xl border border-border bg-card p-6">
-          <h2 className="mb-4 text-lg font-semibold">Waiting ({waitingTokens.length})</h2>
+          <h2 className="mb-1 text-lg font-semibold">Waiting ({waitingTokens.length})</h2>
+          <p className="text-xs text-muted-foreground mb-4">Drag rows to reorder priority</p>
           {waitingTokens.length === 0 ? (
             <p className="text-center text-sm text-muted-foreground py-8">No patients waiting</p>
           ) : (
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {waitingTokens.map((token, i) => (
-                <div key={token.id} className="flex items-center gap-3 rounded-lg border border-border p-3">
+                <div
+                  key={token.id}
+                  draggable
+                  onDragStart={() => handleDragStart(i)}
+                  onDragOver={(e) => handleDragOver(e, i)}
+                  onDrop={() => handleDrop(i)}
+                  onDragEnd={() => setDragOverIndex(null)}
+                  className={`flex items-center gap-3 rounded-lg border p-3 cursor-grab active:cursor-grabbing transition-colors ${
+                    dragOverIndex === i ? "border-primary bg-primary/5" : "border-border"
+                  }`}
+                >
+                  <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
                   <div className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold shrink-0 ${
                     i === 0 ? "bg-primary text-white" : "bg-primary/10 text-primary"
                   }`}>
@@ -353,7 +417,13 @@ export default function QueuePage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{token.patientName}</p>
                     <p className="text-xs text-muted-foreground truncate">{token.purpose}</p>
+                    {token.doctorName && (
+                      <p className="text-xs text-primary font-medium truncate flex items-center gap-1 mt-0.5">
+                        <Stethoscope className="w-3 h-3" /> {token.doctorName}
+                      </p>
+                    )}
                   </div>
+                  <span className="text-xs text-muted-foreground shrink-0">#{i + 1}</span>
                 </div>
               ))}
             </div>

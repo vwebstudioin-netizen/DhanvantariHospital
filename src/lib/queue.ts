@@ -43,7 +43,9 @@ export async function ensureQueueConfig(date: string): Promise<QueueConfig> {
 export async function issueToken(
   patientName: string,
   patientPhone: string,
-  purpose?: string
+  purpose?: string,
+  doctorId?: string,
+  doctorName?: string,
 ): Promise<Token> {
   const date = getTodayDateKey();
 
@@ -54,17 +56,18 @@ export async function issueToken(
     const nextNum = lastNum + 1;
     const displayNumber = String(nextNum).padStart(3, "0");
 
-    const tokenData = {
-      tokenNumber: nextNum,
-      displayNumber,
-      patientName,
-      patientPhone,
-      purpose: purpose || "",
-      status: "waiting" as const,
-      issuedAt: serverTimestamp(),
-    };
-
-    const tokenRef = doc(tokensCol(date));
+      const tokenData = {
+        tokenNumber: nextNum,
+        displayNumber,
+        patientName,
+        patientPhone,
+        purpose: purpose || "",
+        doctorId: doctorId || "",
+        doctorName: doctorName || "",
+        sortOrder: nextNum,
+        status: "waiting" as const,
+        issuedAt: serverTimestamp(),
+      };    const tokenRef = doc(tokensCol(date));
     transaction.set(tokenRef, tokenData);
     transaction.set(cfgRef, {
       date,
@@ -85,7 +88,7 @@ export async function issueToken(
   return newToken;
 }
 
-// Step 1 — Call Next: picks lowest waiting token → status: "called"
+// Step 1 — Call Next: picks lowest sortOrder waiting token → status: "called"
 // WhatsApp notification is sent from the UI after this
 export async function callNextToken(date: string): Promise<Token | null> {
   // Fetch all tokens then filter/sort client-side to avoid composite index requirement
@@ -93,9 +96,10 @@ export async function callNextToken(date: string): Promise<Token | null> {
   const snap = await getDocs(q);
   const waiting = snap.docs
     .map((d) => ({ id: d.id, ...d.data() }) as Token)
-    .filter((t) => t.status === "waiting");
+    .filter((t) => t.status === "waiting")
+    .sort((a, b) => (a.sortOrder ?? a.tokenNumber) - (b.sortOrder ?? b.tokenNumber));
   if (waiting.length === 0) return null;
-  const next = waiting[0]; // Already sorted by tokenNumber asc
+  const next = waiting[0];
 
   await updateDoc(doc(tokensCol(date), next.id), {
     status: "called",
@@ -176,6 +180,19 @@ export async function getTokenByPhone(date: string, phone: string): Promise<Toke
   const snap = await getDocs(q);
   if (snap.empty) return null;
   return { id: snap.docs[0].id, ...snap.docs[0].data() } as Token;
+}
+
+// Reorder waiting queue — update sortOrder for all affected tokens in one batch
+export async function reorderQueue(
+  date: string,
+  reorderedWaiting: { id: string; sortOrder: number }[]
+): Promise<void> {
+  const { writeBatch } = await import("firebase/firestore");
+  const batch = writeBatch(db);
+  for (const { id, sortOrder } of reorderedWaiting) {
+    batch.update(doc(tokensCol(date), id), { sortOrder });
+  }
+  await batch.commit();
 }
 
 export function subscribeToConfig(date: string, callback: (config: QueueConfig | null) => void): Unsubscribe {
