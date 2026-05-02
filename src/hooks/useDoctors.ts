@@ -34,6 +34,9 @@ export function useDoctors(filters?: {
     async () => {
       let result = await fetchDoctors();
 
+      // Only show active doctors (isActive === true OR isActive is undefined for legacy records)
+      result = result.filter((d) => d.isActive !== false);
+
       if (filters?.departmentSlug) {
         result = result.filter((d) =>
           d.departmentSlugs.includes(filters.departmentSlug!)

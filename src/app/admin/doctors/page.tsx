@@ -226,6 +226,21 @@ export default function AdminDoctorsPage() {
     }
   }
 
+  // ── Enable / Disable ──────────────────────────────────────────────────────
+
+  async function handleToggleActive(d: FirestoreDoctor) {
+    const newActive = d.isActive === false ? true : false;
+    try {
+      if (!d.id.startsWith("static-")) {
+        await updateDoc(doc(db, "doctors", d.id), { isActive: newActive, updatedAt: serverTimestamp() });
+      }
+      setDoctors((prev) => prev.map((x) => x.id === d.id ? { ...x, isActive: newActive } : x));
+      toast.success(`${d.title} ${d.firstName} ${d.lastName} ${newActive ? "enabled" : "disabled"}`);
+    } catch {
+      toast.error("Failed to update status");
+    }
+  }
+
   // ── Array / comma helpers ─────────────────────────────────────────────────
 
   const commaToArray = (v: string) => v.split(",").map((s) => s.trim()).filter(Boolean);
@@ -327,8 +342,13 @@ export default function AdminDoctorsPage() {
 
                 {/* Status badges */}
                 <div className="hidden sm:flex items-center gap-2 shrink-0">
-                  <Badge variant={d.acceptingNewPatients ? "default" : "secondary"} className="text-xs">
-                    {d.acceptingNewPatients ? "Active" : "Inactive"}
+                  <Badge
+                    variant={d.isActive === false ? "secondary" : "default"}
+                    className={`text-xs cursor-pointer select-none ${d.isActive === false ? "bg-red-100 text-red-700 hover:bg-red-200" : "bg-green-100 text-green-700 hover:bg-green-200"}`}
+                    onClick={() => handleToggleActive(d)}
+                    title={d.isActive === false ? "Click to enable" : "Click to disable"}
+                  >
+                    {d.isActive === false ? "⛔ Disabled" : "✅ Active"}
                   </Badge>
                   {d.offersTelehealth && (
                     <Badge variant="outline" className="text-xs">Telehealth</Badge>

@@ -296,6 +296,7 @@ export interface DoctorData {
   gender: "male" | "female" | "other";
   acceptingNewPatients: boolean;
   offersTelehealth: boolean;
+  isActive?: boolean;
   conditionsTreated: string[];
   proceduresPerformed: string[];
   image: string;

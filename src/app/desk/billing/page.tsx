@@ -196,11 +196,10 @@ export default function BillingPage() {
         );
         w.document.write(`<!DOCTYPE html><html><head><title>Invoice</title>
           <style>body{font-family:Arial,sans-serif;margin:0;padding:20px}@media print{body{padding:0}}</style>
-          </head><body>${html}</body></html>`);
+          </head><body>${html}
+          <script>window.onload = function() { window.focus(); window.print(); window.onafterprint = function() { window.close(); }; };<\/script>
+          </body></html>`);
         w.document.close();
-        w.focus();
-        w.print();
-        w.close();
       }
     }
   };

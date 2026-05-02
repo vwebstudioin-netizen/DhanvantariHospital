@@ -204,8 +204,10 @@ export default function PharmacyBillingPage() {
     if (w) {
       w.document.write(`<!DOCTYPE html><html><head><title>Pharmacy Bill ${bill.billNumber}</title>
         <style>body{margin:0}@media print{body{margin:0}}</style>
-        </head><body>${buildPrintHTML(bill, origin)}</body></html>`);
-      w.document.close(); w.focus(); w.print(); w.close();
+        </head><body>${buildPrintHTML(bill, origin)}
+        <script>window.onload = function() { window.focus(); window.print(); window.onafterprint = function() { window.close(); }; };<\/script>
+        </body></html>`);
+      w.document.close();
     }
   };
 
