@@ -18,6 +18,7 @@ const CSV_HEADERS = [
   "sellingPrice",
   "currentStock",
   "reorderLevel",
+  "mfgDate",
   "expiryDate",
   "batchNumber",
   "isActive",
@@ -26,15 +27,15 @@ const CSV_HEADERS = [
 const SAMPLE_ROWS = [
   [
     "Paracetamol 500mg", "Paracetamol", "Analgesics", "Sun Pharma",
-    "tablet", "10", "5.00", "10.00", "200", "50", "2027-06", "PCM-2026-01", "true",
+    "tablet", "10", "5.00", "10.00", "200", "50", "2025-10", "2027-06", "PCM-2026-01", "true",
   ],
   [
     "Amoxicillin 250mg", "Amoxicillin", "Antibiotics", "Cipla",
-    "capsule", "10", "18.00", "30.00", "100", "30", "2026-12", "AMX-2026-02", "true",
+    "capsule", "10", "18.00", "30.00", "100", "30", "2025-08", "2026-12", "AMX-2026-02", "true",
   ],
   [
     "Omeprazole 20mg", "Omeprazole", "Antacids", "Dr. Reddy's",
-    "capsule", "14", "12.00", "22.00", "80", "20", "2027-03", "OMP-2026-03", "true",
+    "capsule", "14", "12.00", "22.00", "80", "20", "2025-11", "2027-03", "OMP-2026-03", "true",
   ],
 ];
 
@@ -113,8 +114,9 @@ function parseRow(headers: string[], cells: string[]): ParsedRow {
     currentStock,
     reorderLevel,
     isActive,
-    ...(get("expiryDate")   && { expiryDate:   get("expiryDate") }),
-    ...(get("batchNumber")  && { batchNumber:  get("batchNumber") }),
+    ...(get("mfgDate")     && { mfgDate:     get("mfgDate") }),
+    ...(get("expiryDate")  && { expiryDate:  get("expiryDate") }),
+    ...(get("batchNumber") && { batchNumber: get("batchNumber") }),
   };
 
   return { data, errors };

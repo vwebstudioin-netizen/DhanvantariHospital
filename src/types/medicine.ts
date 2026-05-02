@@ -22,7 +22,8 @@ export interface Medicine {
   sellingPrice: number;
   currentStock: number;       // in units
   reorderLevel: number;       // alert when stock < this
-  expiryDate?: string;        // batch expiry
+  mfgDate?: string;           // manufacturing date YYYY-MM
+  expiryDate?: string;        // batch expiry YYYY-MM
   batchNumber?: string;
   supplierId?: string;
   isActive: boolean;

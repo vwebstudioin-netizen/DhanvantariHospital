@@ -16,6 +16,8 @@ interface CartItem {
   medicineId: string;
   name: string;
   unit: string;
+  mfgDate?: string;
+  expiryDate?: string;
   quantity: number;
   unitPrice: number;
   total: number;
@@ -64,6 +66,7 @@ function buildPrintHTML(bill: any, origin: string) {
       <table style="width:100%;border-collapse:collapse;margin-bottom:12px">
         <thead><tr style="background:#1e3a5f;color:#fff">
           <th style="padding:7px 10px;text-align:left">Medicine</th>
+          <th style="padding:7px 10px;text-align:left">Mfg / Exp</th>
           <th style="padding:7px 10px;text-align:center">Qty</th>
           <th style="padding:7px 10px;text-align:right">Rate</th>
           <th style="padding:7px 10px;text-align:right">Amount</th>
@@ -71,10 +74,16 @@ function buildPrintHTML(bill: any, origin: string) {
         <tbody>
           ${bill.items.map((item: CartItem, i: number) => `
             <tr style="background:${i % 2 === 0 ? "#fff" : "#f8fafc"}">
-              <td style="padding:7px 10px">${item.name}</td>
-              <td style="padding:7px 10px;text-align:center">${item.quantity} ${item.unit}</td>
-              <td style="padding:7px 10px;text-align:right">₹${item.unitPrice.toFixed(2)}</td>
-              <td style="padding:7px 10px;text-align:right;font-weight:600">₹${item.total.toFixed(2)}</td>
+              <td style="padding:7px 10px">${item.name}<br/><span style="font-size:10px;color:#64748b">${item.unit}</span></td>
+              <td style="padding:7px 10px;font-size:10px;color:#64748b">
+                ${item.mfgDate ? `Mfg: ${item.mfgDate}` : ""}
+                ${item.mfgDate && item.expiryDate ? "<br/>" : ""}
+                ${item.expiryDate ? `Exp: ${item.expiryDate}` : ""}
+                ${!item.mfgDate && !item.expiryDate ? "-" : ""}
+              </td>
+              <td style="padding:7px 10px;text-align:center">${item.quantity}</td>
+              <td style="padding:7px 10px;text-align:right">Rs.${item.unitPrice.toFixed(2)}</td>
+              <td style="padding:7px 10px;text-align:right;font-weight:600">Rs.${item.total.toFixed(2)}</td>
             </tr>`).join("")}
         </tbody>
       </table>
@@ -133,6 +142,7 @@ export default function PharmacyBillingPage() {
       if (med.currentStock < 1) { toast.error("Out of stock"); return; }
       setCart([...cart, {
         medicineId: med.id, name: med.name, unit: med.unit,
+        mfgDate: med.mfgDate, expiryDate: med.expiryDate,
         quantity: 1, unitPrice: med.sellingPrice, total: med.sellingPrice,
         currentStock: med.currentStock,
       }]);
@@ -329,6 +339,13 @@ export default function PharmacyBillingPage() {
                       <td className="px-4 py-3">
                         <div className="font-medium">{item.name}</div>
                         <div className="text-xs text-muted-foreground">{item.unit}</div>
+                        {(item.mfgDate || item.expiryDate) && (
+                          <div className="text-xs text-muted-foreground mt-0.5">
+                            {item.mfgDate && <span>Mfg: {item.mfgDate}</span>}
+                            {item.mfgDate && item.expiryDate && <span className="mx-1">·</span>}
+                            {item.expiryDate && <span>Exp: {item.expiryDate}</span>}
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-2">
