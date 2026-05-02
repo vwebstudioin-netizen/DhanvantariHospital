@@ -173,7 +173,7 @@ export default function InPatientCardPage() {
     setSaving(true);
     try {
       const payload: any = { type: activeTab, ...form, issuedBy: "Desk Staff" };
-      const { cardNumber } = await createInPatientCard(payload);
+      const { cardNumber, patientId } = await createInPatientCard(payload);
 
       // Visit card → auto-issue a token in today's queue
       let tokenNumber = "";
@@ -192,7 +192,7 @@ export default function InPatientCardPage() {
 
       // Send WhatsApp notification
       if (form.patientPhone) {
-        const tmpCard = { ...payload, cardNumber, patientId: "", id: "", isActive: true, createdAt: null, updatedAt: null };
+        const tmpCard = { ...payload, cardNumber, patientId, id: "", isActive: true, createdAt: null, updatedAt: null };
         if (activeTab === "visit") {
           const expiryDate = format(addDays(new Date(form.admissionDate), 14), "yyyy-MM-dd");
           tmpCard.expiryDate = expiryDate;
