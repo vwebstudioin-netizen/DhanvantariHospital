@@ -348,10 +348,20 @@ export default function PharmacyBillingPage() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-1">
                           <button onClick={() => updateQty(item.medicineId, item.quantity - 1)}
                             className="w-6 h-6 rounded border border-border flex items-center justify-center hover:bg-muted text-sm font-bold">−</button>
-                          <span className="w-8 text-center font-medium">{item.quantity}</span>
+                          <input
+                            type="number"
+                            min={1}
+                            max={item.currentStock ?? 9999}
+                            value={item.quantity}
+                            onChange={(e) => {
+                              const v = parseInt(e.target.value);
+                              if (!isNaN(v) && v >= 1) updateQty(item.medicineId, v);
+                            }}
+                            className="w-14 text-center border border-border rounded px-1 py-0.5 text-sm font-medium bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+                          />
                           <button onClick={() => updateQty(item.medicineId, item.quantity + 1)}
                             className="w-6 h-6 rounded border border-border flex items-center justify-center hover:bg-muted text-sm font-bold">+</button>
                         </div>
