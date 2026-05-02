@@ -48,7 +48,7 @@ export default function SuppliersPage() {
         await updateDoc(doc(db, "pharmacySuppliers", editId), { ...form });
         toast.success("Supplier updated");
       } else {
-        await addDoc(collection(db, "pharmacySuppliers"), { ...form, createdAt: Timestamp.now() });
+        await addDoc(collection(db, "pharmacySuppliers"), { ...form, isActive: true, createdAt: Timestamp.now() });
         toast.success("Supplier added");
       }
       setShowForm(false); setEditId(null); setForm({ ...EMPTY }); load();

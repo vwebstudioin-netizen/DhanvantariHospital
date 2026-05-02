@@ -12,7 +12,7 @@ import { updateStock, getMedicineById } from "@/lib/medicines";
 import type { StockMovement, Supplier } from "@/types/stock";
 
 const MOVEMENTS = "stockMovements";
-const SUPPLIERS = "suppliers";
+const SUPPLIERS = "pharmacySuppliers";
 
 export async function addStockIn(
   medicineId: string,
