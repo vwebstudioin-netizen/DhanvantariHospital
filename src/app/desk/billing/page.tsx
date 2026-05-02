@@ -7,6 +7,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { createInvoice } from "@/lib/invoices";
 import { SITE_NAME, HOSPITAL_ADDRESS, CONTACT_PHONE, INVOICE_PAYMENT_METHODS } from "@/lib/constants";
+import { useDoctors } from "@/hooks/useDoctors";
 import type { InvoiceItem, InvoiceItemType, InvoicePaymentMethod } from "@/types/invoice";
 import toast from "react-hot-toast";
 import { buildInvoiceLink } from "@/lib/whatsapp";
@@ -106,6 +107,7 @@ export default function BillingPage() {
 
   const [patient, setPatient] = useState({ name: "", phone: "", patientId: "", doctorName: "" });
   const { match: patientMatch, loading: lookingUp } = usePatientLookup(patient.phone, patient.patientId);
+  const { doctors } = useDoctors();
   useEffect(() => {
     if (!patientMatch) return;
     setPatient(prev => ({
@@ -258,7 +260,6 @@ export default function BillingPage() {
             { key: "name", label: "Patient Name *", placeholder: "Full name" },
             { key: "phone", label: "Phone *", placeholder: "9876543210" },
             { key: "patientId", label: "Patient ID", placeholder: "PAT-0001 (optional)" },
-            { key: "doctorName", label: "Doctor Name", placeholder: "Dr. Name (optional)" },
           ].map((f) => (
             <div key={f.key}>
               <label className="block text-xs font-medium text-slate-600 mb-1">{f.label}</label>
@@ -270,6 +271,21 @@ export default function BillingPage() {
               />
             </div>
           ))}
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Doctor Name</label>
+            <select
+              value={patient.doctorName}
+              onChange={(e) => setPatient({ ...patient, doctorName: e.target.value })}
+              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f]"
+            >
+              <option value="">— Select Doctor (optional) —</option>
+              {doctors?.map((d) => (
+                <option key={d.slug} value={`${d.title} ${d.firstName} ${d.lastName}`}>
+                  {d.title} {d.firstName} {d.lastName} — {d.specialty}
+                </option>
+              ))}
+            </select>
+          </div>
           {/* Auto-fill indicator */}
           {lookingUp && patient.phone.replace(/\D/g,"").length === 10 && (
             <p className="text-xs text-muted-foreground mt-1">Searching patient records…</p>
