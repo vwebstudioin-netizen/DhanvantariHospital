@@ -9,6 +9,7 @@ import { exportToCsv } from "@/lib/exportCsv";
 import { createInPatientCard, getActiveCards, dischargePatient } from "@/lib/inpatient";
 import { issueToken } from "@/lib/queue";
 import { SITE_NAME, CONTACT_PHONE, INPATIENT_WARDS } from "@/lib/constants";
+import { useDoctors } from "@/hooks/useDoctors";
 import type { InPatientCard, CardType } from "@/types/inpatient";
 import toast from "react-hot-toast";
 import { buildAdmissionCardLink, buildVisitCardLink, buildReviewRequestLink } from "@/lib/whatsapp";
@@ -194,6 +195,7 @@ export default function InPatientCardPage() {
 
   const { match: roomMatch, loading: roomLooking } = usePatientLookup(roomForm.patientPhone);
   const { match: visitMatch, loading: visitLooking } = usePatientLookup(visitForm.patientPhone);
+  const { doctors } = useDoctors();
 
   useEffect(() => {
     if (!roomMatch) return;
@@ -461,7 +463,6 @@ export default function InPatientCardPage() {
               <>
                 {[{ label: "Patient Name *", key: "patientName", placeholder: "Full name" },
                   { label: "Phone (WhatsApp)", key: "patientPhone", placeholder: "9876543210" },
-                  { label: "Doctor Name *", key: "doctorName", placeholder: "Dr. Name" },
                   { label: "Room Number *", key: "roomNumber", placeholder: "101" },
                   { label: "Bed Number", key: "bedNumber", placeholder: "A (optional)" },
                 ].map((f) => (
@@ -471,6 +472,18 @@ export default function InPatientCardPage() {
                       className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f]" />
                   </div>
                 ))}
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Doctor *</label>
+                  <select value={roomForm.doctorName} onChange={(e) => setRoomForm({ ...roomForm, doctorName: e.target.value })}
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f]">
+                    <option value="">— Select Doctor —</option>
+                    {doctors?.map((d) => (
+                      <option key={d.slug} value={`${d.title} ${d.firstName} ${d.lastName}`}>
+                        {d.title} {d.firstName} {d.lastName} — {d.specialty}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 {roomLooking && roomForm.patientPhone.replace(/\D/g,"").length === 10 && (
                   <p className="text-xs text-muted-foreground col-span-full mt-1">Searching…</p>
                 )}
@@ -499,7 +512,6 @@ export default function InPatientCardPage() {
               <>
                 {[{ label: "Patient Name *", key: "patientName", placeholder: "Full name" },
                   { label: "Phone (WhatsApp)", key: "patientPhone", placeholder: "9876543210" },
-                  { label: "Doctor Name *", key: "doctorName", placeholder: "Dr. Name" },
                 ].map((f) => (
                   <div key={f.key}>
                     <label className="block text-xs font-medium text-slate-600 mb-1">{f.label}</label>
@@ -507,6 +519,18 @@ export default function InPatientCardPage() {
                       className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500" />
                   </div>
                 ))}
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Doctor *</label>
+                  <select value={visitForm.doctorName} onChange={(e) => setVisitForm({ ...visitForm, doctorName: e.target.value })}
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500">
+                    <option value="">— Select Doctor —</option>
+                    {doctors?.map((d) => (
+                      <option key={d.slug} value={`${d.title} ${d.firstName} ${d.lastName}`}>
+                        {d.title} {d.firstName} {d.lastName} — {d.specialty}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 {visitLooking && visitForm.patientPhone.replace(/\D/g,"").length === 10 && (
                   <p className="text-xs text-muted-foreground col-span-full mt-1">Searching…</p>
                 )}
