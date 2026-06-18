@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getPaymentMode } from "@/lib/payment-mode";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  const paymentMode = getPaymentMode();
+  if (paymentMode === "on" && pathname !== "/maintenance") {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = "/maintenance";
+    return NextResponse.redirect(redirectUrl);
+  }
 
   // Admin routes protection
   if (pathname.startsWith("/admin")) {
@@ -21,5 +29,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/portal/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

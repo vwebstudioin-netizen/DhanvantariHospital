@@ -6,6 +6,7 @@ import ThemeProvider from "@/providers/ThemeProvider";
 import AuthProvider from "@/providers/AuthProvider";
 import LocationProvider from "@/providers/LocationProvider";
 import PublicShell from "@/components/layout/PublicShell";
+import PaymentReminderFlash from "@/components/layout/PaymentReminderFlash";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,6 +58,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <LocationProvider>
+              <PaymentReminderFlash />
               <Toaster
                 position="top-center"
                 toastOptions={{
